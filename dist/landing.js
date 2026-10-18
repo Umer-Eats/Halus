@@ -126,5 +126,27 @@ export function initLanding(root) {
     select(nodes[0]); paused = false; // show first description, keep orbit moving
   }
 
+  // Study panel: segmented tabs with a sliding pill.
+  const panel = root.querySelector('.study-panel');
+  if (panel) {
+    const tabs = [...panel.querySelectorAll('[data-tab]')], pill = panel.querySelector('.sp-pill');
+    const movePill = t => { pill.style.width = t.offsetWidth + 'px'; pill.style.transform = `translateX(${t.offsetLeft}px)`; };
+    const pick = t => {
+      tabs.forEach(x => { x.classList.toggle('active', x === t); x.setAttribute('aria-selected', x === t); });
+      panel.querySelectorAll('[data-pane]').forEach(p => p.classList.toggle('active', p.dataset.pane === t.dataset.tab));
+      movePill(t);
+    };
+    tabs.forEach(t => on(t, 'click', () => pick(t)));
+    requestAnimationFrame(() => movePill(tabs[0]));
+    on(window, 'resize', () => movePill(panel.querySelector('[data-tab].active')));
+  }
+
+  // Event carousel arrows.
+  const track = root.querySelector('.moves-track');
+  root.querySelectorAll('[data-move]').forEach(b => on(b, 'click', () => {
+    const card = track.querySelector('.move-card');
+    track.scrollBy({left: Number(b.dataset.move) * (card.offsetWidth + 16), behavior: still ? 'auto' : 'smooth'});
+  }));
+
   return () => cleanups.forEach(fn => fn());
 }
