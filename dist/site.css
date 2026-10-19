@@ -390,6 +390,19 @@
 .auth-who strong { color: var(--ink); font-weight: 500; }
 .auth-who .text-button { font-size: 13.5px; text-decoration: underline; }
 .auth-error { padding: 12px 14px; border-radius: 12px; background: var(--red-soft); color: var(--red-ink); font-size: 14px; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px; background: var(--surface-3); }
+.auth-tabs button { min-height: 38px; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--muted); transition: background .2s, color .2s; }
+.auth-tabs button:hover { color: var(--ink); }
+.auth-tabs button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 0 var(--line-strong), 0 0 0 1px var(--line); }
+.auth-fields .auth-step { margin-top: 6px; }
+.auth-fields .auth-step:first-child { margin-top: 0; }
+.auth-hint { margin-top: -6px; color: var(--muted); font-size: 13px; }
+.auth-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.auth-or { display: flex; align-items: center; gap: 12px; color: var(--muted); font: 400 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.auth-or::before, .auth-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.auth-forgot { justify-self: end; margin-top: -6px; font-size: 13px; text-decoration: underline; }
+.auth-fields .button.google { margin-top: 0; }
+@media (max-width: 420px) { .auth-pair { grid-template-columns: 1fr; } }
 .auth-wait, .loading-panel { display: grid; justify-items: center; gap: 14px; padding: 40px 0; color: var(--muted); }
 .spinner { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--red); animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

@@ -11,7 +11,7 @@ The static site in `dist/` and a single serverless function in `api/index.js` de
 5. On Vercel, add the same variables under Project > Settings > Environment Variables, then deploy. Tables are created automatically on the first request.
 
 Turso: `turso db create halus`, then `turso db show halus --url` and `turso db tokens create halus`.
-Firebase: enable the **Google** sign-in provider (Authentication > Sign-in method); the site signs in with Google only. Download a service account key (Project settings > Service accounts) for the three `FIREBASE_*` Admin settings. Add your Vercel domain under Authentication > Settings > Authorized domains.
+Firebase: enable the **Google** and **Email/Password** sign-in providers (Authentication > Sign-in method). Students and teachers can make an account with either. Download a service account key (Project settings > Service accounts) for the three `FIREBASE_*` Admin settings. Add your Vercel domain under Authentication > Settings > Authorized domains.
 
 ## Communities
 
@@ -27,8 +27,9 @@ Communities are listed in [`communities.json`](communities.json), which is commi
 ```
 
 - Each community has its own student password and its own instructor password. They must be different from each other, and no two communities may share a student password.
-- Enrollment: a user signs in with Firebase. The site then calls `POST /api/auth/register` with `{ role, communityId, password, displayName }`. The password must match that community's password for the chosen role. Each account holds one role in one community.
-- Wrong guesses are limited to 10 per account every 15 minutes.
+- Enrollment: the login pages have a **Create account** tab and a **Sign in** tab. Creating an account makes the Firebase user (Google, or first name, last name, email and password) and then calls `POST /api/auth/register` with `{ role, communityId, password, firstName, lastName }`. If the community password is wrong, the brand-new Firebase user is deleted again.
+- Students do not choose a school: their student password identifies it (which is why student passwords must be unique). Teachers choose their school from a dropdown and must give that school's teacher password. Each account holds one role in one community.
+- Wrong guesses are limited to 10 per account and 40 per network address every 15 minutes.
 - To change a password, update the setting in Vercel and redeploy. Existing members stay enrolled; the shared password only gates joining.
 - To add a community, add an object with a new lowercase `id`, set its two settings, and deploy. Keep existing IDs unchanged, because memberships reference them.
 

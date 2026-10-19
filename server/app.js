@@ -9,6 +9,7 @@ const EVENT_NAMES = new Set(EVENTS.map((e) => e.name));
 const LESSON_IDS = new Set(LESSONS.map((l) => l.id));
 const ASSIGNMENT_TYPES = ['Lesson', 'Quiz', 'Skill checklist', 'Reflection'];
 const ENROLL_LIMIT = 10;
+const ENROLL_IP_LIMIT = 40;
 const ENROLL_WINDOW_MS = 15 * 60_000;
 
 // ---------- validation ----------
@@ -87,9 +88,13 @@ async function member(ctx, role) {
   return user;
 }
 
-async function limitEnrollment(db, uid) {
+const clientAddress = (req) =>
+  String(req.headers['x-forwarded-for'] ?? '').split(',')[0].trim() || req.socket?.remoteAddress || 'local';
+
+// Limits are per account and per address: making a fresh account for every guess still runs out.
+async function limitEnrollment(db, id, limit = ENROLL_LIMIT) {
   const now = Date.now();
-  const key = createHash('sha256').update('enroll:' + uid).digest('hex');
+  const key = createHash('sha256').update('enroll:' + id).digest('hex');
   const result = await db.batch([
     { sql: 'DELETE FROM enrollment_limits WHERE expires_at < ?', args: [now] },
     {
@@ -98,7 +103,7 @@ async function limitEnrollment(db, uid) {
     },
     { sql: 'SELECT attempts FROM enrollment_limits WHERE key = ?', args: [key] },
   ], 'write');
-  if (Number(result[2].rows[0].attempts) > ENROLL_LIMIT)
+  if (Number(result[2].rows[0].attempts) > limit)
     throw new AppError(429, 'Too many attempts. Try again in 15 minutes.');
 }
 
@@ -122,8 +127,7 @@ route('GET', '/health', () => ({ ok: true }));
 // Hal's study chat (Gemini). Open to visitors too, so it is rate limited per address.
 const halLog = new Map();
 route('POST', '/hal', async (ctx) => {
-  const address = String(ctx.req.headers['x-forwarded-for'] ?? '').split(',')[0].trim() || ctx.req.socket?.remoteAddress || 'local';
-  if (!allowHalMessage(halLog, address, Date.now())) throw new AppError(429, 'Hal needs a short break. Try again in a few minutes.');
+  if (!allowHalMessage(halLog, clientAddress(ctx.req), Date.now())) throw new AppError(429, 'Hal needs a short break. Try again in a few minutes.');
   return askHal(ctx.body, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_MODEL });
 });
 
@@ -145,25 +149,39 @@ route('POST', '/auth/register', async (ctx) => {
   if (!who.email) throw new AppError(400, 'Use an account with an email address.');
   const body = ctx.body;
   if (body.role !== 'student' && body.role !== 'instructor') throw new AppError(400, 'Choose student or instructor.');
-  const community = findCommunity(body.communityId, ctx.communities);
-  if (!community) throw new AppError(400, 'Choose your school community.');
+  // Instructors pick their school. Students may leave it out: their password names the school,
+  // because no two communities share a student password (see checkPasswordSettings).
+  let community = null;
+  if (body.communityId || body.role === 'instructor') {
+    community = findCommunity(body.communityId, ctx.communities);
+    if (!community) throw new AppError(400, 'Choose your school community.');
+  }
 
   const existing = one(await ctx.db.execute({ sql: 'SELECT * FROM users WHERE id = ?', args: [who.uid] }));
   if (existing) {
     if (existing.role !== body.role)
       throw new AppError(409, `This account is already registered as an ${existing.role}. Use that login instead.`);
-    if (existing.community_id !== community.id)
+    if (community && existing.community_id !== community.id)
       throw new AppError(409, 'This account already belongs to another school community.');
     return { profile: profile(existing, ctx.communities) };
   }
 
-  const displayName = text(body.displayName ?? who.name, 'your name', { max: 80 });
+  const fullName = [body.firstName, body.lastName].map((p) => (typeof p === 'string' ? p.trim() : '')).filter(Boolean).join(' ');
+  const displayName = text(fullName || body.displayName || who.name, 'your name', { max: 80 });
   if (typeof body.password !== 'string' || !body.password || body.password.length > 256)
-    throw new AppError(400, body.role === 'student' ? 'Enter your community student password.' : 'Enter your community instructor password.');
-  const expected = passwordFor(community, body.role, ctx.env);
+    throw new AppError(400, body.role === 'student' ? 'Enter your community student password.' : 'Enter your community teacher password.');
   // Count the attempt before checking it, so wrong guesses always use up the allowance.
-  await limitEnrollment(ctx.db, who.uid);
-  if (!equalSecret(body.password, expected)) throw new AppError(403, 'That password is not right for this community.');
+  await limitEnrollment(ctx.db, 'uid:' + who.uid);
+  await limitEnrollment(ctx.db, 'ip:' + clientAddress(ctx.req), ENROLL_IP_LIMIT);
+  if (community) {
+    if (!equalSecret(body.password, passwordFor(community, body.role, ctx.env)))
+      throw new AppError(403, body.role === 'student' ? 'That student password is not right for this school.' : 'That teacher password is not right for this school.');
+  } else {
+    // Compare against every community so the time taken does not hint at which one matched.
+    const matches = ctx.communities.filter((c) => ctx.env[c.studentEnv] && equalSecret(body.password, ctx.env[c.studentEnv]));
+    if (matches.length !== 1) throw new AppError(403, 'That student password does not match a school community on Halus.');
+    community = matches[0];
+  }
 
   await ctx.db.execute({
     sql: 'INSERT INTO users (id, email, display_name, role, community_id) VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING',

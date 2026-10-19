@@ -1,4 +1,4 @@
-// Firebase Google sign-in plus the Halus API. The Firebase web config comes from GET /api/config,
+// Firebase sign-in (Google or email and password) plus the Halus API. The Firebase web config comes from GET /api/config,
 // so nothing project-specific is committed to the static site.
 const SDK = 'https://www.gstatic.com/firebasejs/12.19.0/';
 
@@ -13,6 +13,8 @@ export const session = {
 };
 
 let fb = null;
+// While an account is being created, createAccount settles the session itself.
+let creating = false;
 const listeners = new Set();
 const notify = () => listeners.forEach((fn) => fn());
 export const onSession = (fn) => listeners.add(fn);
@@ -61,6 +63,9 @@ export async function startSession() {
     return notify();
   }
   fb.onAuthStateChanged(fb.auth, async (user) => {
+    if (creating) return;
+    // Nothing changed (for example a failed sign-up that was already rolled back).
+    if (session.ready && (user?.uid ?? null) === (session.user?.uid ?? null)) return;
     session.user = user;
     session.profile = null;
     session.enrolled = false;
@@ -73,28 +78,115 @@ export async function startSession() {
 const AUTH_ERRORS = {
   'auth/popup-blocked': 'Your browser blocked the Google window. Allow pop-ups for Halus and try again.',
   'auth/unauthorized-domain': 'Google sign-in is not enabled for this address yet.',
-  'auth/operation-not-allowed': 'Google sign-in is not enabled for Halus yet.',
-  'auth/network-request-failed': 'Google could not be reached. Check your connection and try again.',
+  'auth/operation-not-allowed': 'This sign-in method is not enabled for Halus yet.',
+  'auth/network-request-failed': 'Halus could not reach the sign-in service. Check your connection and try again.',
   'auth/account-exists-with-different-credential': 'This email already uses a different sign-in method.',
   'auth/user-disabled': 'This account has been disabled.',
+  'auth/email-already-in-use': 'An account already uses this email. Sign in instead.',
+  'auth/invalid-email': 'Enter a valid email address.',
+  'auth/weak-password': 'Choose a password with at least 8 characters.',
+  'auth/missing-password': 'Enter your password.',
+  'auth/invalid-credential': 'That email and password do not match an account.',
+  'auth/wrong-password': 'That email and password do not match an account.',
+  'auth/user-not-found': 'That email and password do not match an account.',
+  'auth/too-many-requests': 'Too many attempts. Wait a few minutes and try again.',
 };
+const authFailure = (error, fallback) => new Error(AUTH_ERRORS[error?.code] || fallback);
+const closedPopup = (error) => error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/cancelled-popup-request';
+
+function ready() {
+  if (!fb) throw new Error(session.unavailable || 'Sign-in is still loading.');
+}
+
+function googlePopup() {
+  const provider = new fb.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  return fb.signInWithPopup(fb.auth, provider);
+}
 
 // Resolves false when the person closes the Google window themselves.
 export async function googleSignIn() {
-  if (!fb) throw new Error(session.unavailable || 'Sign-in is still loading.');
-  const provider = new fb.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
+  ready();
   try {
-    await fb.signInWithPopup(fb.auth, provider);
+    await googlePopup();
     return true;
   } catch (error) {
-    if (error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/cancelled-popup-request') return false;
-    throw new Error(AUTH_ERRORS[error?.code] || 'Google sign-in did not finish. Please try again.');
+    if (closedPopup(error)) return false;
+    throw authFailure(error, 'Google sign-in did not finish. Please try again.');
   }
 }
 
-export async function enroll({ role, communityId, password, displayName }) {
-  const { profile } = await api('POST', '/auth/register', { role, communityId, password, displayName });
+export async function emailSignIn(email, password) {
+  ready();
+  try {
+    await fb.signInWithEmailAndPassword(fb.auth, email.trim(), password);
+  } catch (error) {
+    throw authFailure(error, 'Sign-in did not finish. Please try again.');
+  }
+}
+
+export async function resetPassword(email) {
+  ready();
+  try {
+    await fb.sendPasswordResetEmail(fb.auth, email.trim());
+  } catch (error) {
+    // Unknown emails are not reported, so this cannot be used to find out who has an account.
+    if (error?.code !== 'auth/user-not-found') throw authFailure(error, 'The reset email could not be sent. Please try again.');
+  }
+}
+
+// Creates the sign-in account and joins the school community in one step. If the community
+// password is wrong, a brand-new account is removed again so nothing is left half made.
+// Resolves false when the person closes the Google window themselves.
+export async function createAccount({ method, role, communityId, password, firstName, lastName, email, accountPassword }) {
+  ready();
+  creating = true;
+  let credential, fresh;
+  try {
+    // The popup has to open straight from the click, so nothing is awaited before it.
+    if (method === 'google') {
+      credential = await googlePopup();
+      fresh = Boolean(fb.getAdditionalUserInfo(credential)?.isNewUser);
+    } else {
+      credential = await fb.createUserWithEmailAndPassword(fb.auth, email.trim(), accountPassword);
+      fresh = true;
+      await fb.updateProfile(credential.user, { displayName: `${firstName} ${lastName}`.trim() }).catch(() => {});
+    }
+  } catch (error) {
+    creating = false;
+    if (closedPopup(error)) return false;
+    throw authFailure(error, 'Your account could not be created. Please try again.');
+  }
+  session.user = credential.user;
+  try {
+    const { profile } = await api('POST', '/auth/register', { role, communityId: communityId || undefined, password, firstName, lastName });
+    session.profile = profile;
+    session.enrolled = true;
+    session.error = '';
+    if (method !== 'google') fb.sendEmailVerification(credential.user).catch(() => {});
+  } catch (error) {
+    if (fresh) {
+      await fb.deleteUser(credential.user).catch(() => fb.signOut(fb.auth));
+      session.user = null;
+      session.profile = null;
+      session.enrolled = false;
+    } else {
+      // An existing Google account: show the state it is really in.
+      await loadProfile();
+      if (!session.enrolled) session.error = '';
+      notify();
+    }
+    throw error;
+  } finally {
+    creating = false;
+    session.ready = true;
+  }
+  notify();
+  return true;
+}
+
+export async function enroll({ role, communityId, password, firstName, lastName }) {
+  const { profile } = await api('POST', '/auth/register', { role, communityId: communityId || undefined, password, firstName, lastName });
   session.profile = profile;
   session.enrolled = true;
   session.error = '';

@@ -64,6 +64,21 @@ test('enrollment needs a session and the right password for the chosen role', as
   assert.equal((await join('rivera', 'instructor', 'pines-teacher')).status, 201);
 });
 
+test('a student password alone links the account to its school', async () => {
+  const register = (as, body) => call('POST', '/auth/register', { as, body });
+  const ok = await register('nia', { role: 'student', password: 'other-student', firstName: ' Nia ', lastName: 'Brooks' });
+  assert.equal(ok.status, 201);
+  assert.equal(ok.data.profile.community.id, 'other');
+  assert.equal(ok.data.profile.displayName, 'Nia Brooks');
+  assert.equal((await register('s-none', { role: 'student', password: 'pines-teacher' })).status, 403, 'a teacher password never makes a student');
+  assert.equal((await register('t-none', { role: 'instructor', password: 'pines-teacher' })).status, 400, 'teachers must choose their school');
+  assert.equal((await register('t-wrong', { role: 'instructor', communityId: 'other', password: 'pines-teacher' })).status, 403, 'a teacher password only works for its own school');
+  const teacher = await register('t-ok', { role: 'instructor', communityId: 'other', password: 'other-teacher', firstName: 'Ana', lastName: 'Diaz' });
+  assert.equal(teacher.status, 201);
+  assert.equal(teacher.data.profile.role, 'instructor');
+  assert.equal(teacher.data.profile.community.id, 'other');
+});
+
 test('an account keeps one role and one community', async () => {
   assert.equal((await join('maya', 'instructor', 'pines-teacher')).status, 409);
   assert.equal((await join('maya', 'student', 'other-student', 'other')).status, 409);

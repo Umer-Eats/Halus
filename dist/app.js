@@ -2,12 +2,15 @@ import {EVENTS,GROUPS,RANKS,LESSONS} from './model.js';
 import {initLanding} from './landing.js';
 import {cellularAtlas} from './cellular.js';
 import {mountHal} from './hal.js';
-import {session,onSession,startSession,api,googleSignIn,enroll,setProfile,signOut} from './session.js';
+import {session,onSession,startSession,api,googleSignIn,emailSignIn,resetPassword,createAccount,enroll,setProfile,signOut} from './session.js';
 
 const app=document.querySelector('#app'), modal=document.querySelector('#modal');
 // The old browser-only demo kept everything here. Real data now lives on the server.
 try{localStorage.removeItem('halus-state');}catch{}
 let currentTab='Knowledge',assignmentFilter='All',eventFilter='All',eventSearch='',studentSearch='',busy=false,authError='',draft={};
+// Returning visitors land on Sign in; everyone else starts on Create account.
+const returning=()=>{try{return localStorage.getItem('halus-returning')==='1';}catch{return false;}};
+let authTab=returning()?'signin':'create';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const date=s=>new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const stamp=s=>new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -82,8 +85,8 @@ function landing(){
  return siteHeader('home')+`<main id="main" class="landing home-editorial">
  <section class="hero organism-hero">
    <div class="organism-intro"><span class="organism-eyebrow">A home for future health professionals</span><h1>Made of<br><span>curiosity.</span></h1><p>For the questions that keep you up.<br>The people you’ll care for.<br>And the person you’re becoming.</p><a class="entry-link" href="#/start">Find your place <span aria-hidden="true">↗</span></a></div>
-   <canvas class="sculpture" aria-label="Live illustration of red blood cells flowing through a vessel"></canvas><div class="hero-fallback" aria-hidden="true"></div>
-   <div class="organism-bottom"><div class="blood-controls"><span class="blood-caption"><b>A little life. A lot of possibility.</b><small>Erythrocytes in motion</small></span><button class="motion-toggle" data-blood-pause aria-pressed="false">Pause motion</button></div><a href="#living-world" class="closer-link">Enter the living world <span aria-hidden="true">↓</span></a></div>
+   <canvas class="sculpture" aria-label="Live 3D illustration of red cells, white cells, platelets, antibodies, and insulin moving through blood; molecules enlarged for visibility"></canvas><div class="hero-fallback" aria-hidden="true"></div>
+   <div class="organism-bottom"><div class="blood-controls"><span class="blood-caption"><b>A little life. A lot of possibility.</b><small>Blood cells in motion · IgG and insulin enlarged</small></span><button class="motion-toggle" data-blood-pause aria-pressed="false">Pause motion</button></div><a href="#living-world" class="closer-link">Enter the living world <span aria-hidden="true">↓</span></a></div>
  </section>
  <section class="belief-strip"><p>The future of healthcare<br>has <span>you</span> in it.</p><div><span class="small-label">This is Halus.</span><p>A place to turn your interest in health into a little more confidence, every day. One event, your own pace, and your chapter beside you.</p><a href="#/mission">Meet Halus ↗</a></div></section>
  ${cellularAtlas()}
@@ -101,7 +104,7 @@ function landing(){
 function eventCards(){return EVENTS.filter(e=>(eventFilter==='All'||e.category===eventFilter)&&e.name.toLowerCase().includes(eventSearch.toLowerCase())).map(e=>'<article class="event-card"><span class="micro">'+e.category+'</span><h3>'+e.name+'</h3>'+(e.special?'<span class="badge">IDEA eligibility applies</span>':'<span class="subtle">Secondary division</span>')+'<div><button class="text-button" data-action="event-detail" data-event="'+esc(e.name)+'">View event '+icon('arrow')+'</button></div></article>').join('')||'<div class="empty"><h3>No matching events.</h3><p>Try another search or category.</p></div>';}
 function heading(eyebrow,title,subtitle,action=''){return '<div class="page-heading"><div><span class="eyebrow">'+eyebrow+'</span><h1>'+title+'</h1><p>'+subtitle+'</p></div>'+action+'</div>';}
 function eventsPage(){const choosing=session.enrolled&&!isInstructor()&&!me().event;return siteHeader()+'<main id="main" class="catalog">'+heading(choosing?'CHOOSE YOUR ANNUAL EVENT':'FIND YOUR FOCUS','There’s a place for your curiosity.',choosing?'Pick the one event you will compete in this year. Once it is set, only your instructor can change it.':'Explore the 2026–27 regular competitive events listed for the secondary division. Choose one annual focus in Halus.')+'<div class="catalog-toolbar"><label class="search-field">'+icon('search')+'<input id="event-search" type="search" placeholder="Search events" aria-label="Search events" value="'+esc(eventSearch)+'"></label><label class="select-label">Category<select id="event-category">'+['All',...Object.keys(GROUPS)].map(t=>'<option '+(eventFilter===t?'selected':'')+'>'+t+'</option>').join('')+'</select></label></div><div class="event-catalog" id="event-results">'+eventCards()+'</div><p class="catalog-note">Catalog based on <a href="https://hosa.org/guidelines" target="_blank" rel="noreferrer">HOSA’s 2026–27 guidelines</a>. Additional recognition and academic testing programs are separate from the annual competitive-event selection. State availability and eligibility may vary; check with your advisor.</p></main>'+footer();}
-function startPage(){return siteHeader()+'<main id="main" class="start-page"><span class="eyebrow">MAKE YOURSELF AT HOME</span><h1>Your next chapter<br><em>starts here.</em></h1><p>Sign in with Google, then join your school with the password your chapter gave you.</p><div class="role-cards"><a href="#/student">'+icon('book')+'<h2>I’m a student</h2><p>Find your focus, practice, and connect with your chapter.</p><span>Student login '+icon('arrow')+'</span></a><a href="#/teacher">'+icon('users')+'<h2>I’m a teacher</h2><p>Guide your students and keep your chapter moving forward.</p><span>Teacher login '+icon('arrow')+'</span></a></div><small>No school password yet? Ask your HOSA advisor.</small></main>';}
+function startPage(){return siteHeader()+'<main id="main" class="start-page"><span class="eyebrow">MAKE YOURSELF AT HOME</span><h1>Your next chapter<br><em>starts here.</em></h1><p>Make your account with Google or your email, and join your school with the password your chapter gave you.</p><div class="role-cards"><a href="#/student">'+icon('book')+'<h2>I’m a student</h2><p>Find your focus, practice, and connect with your chapter.</p><span>Student login '+icon('arrow')+'</span></a><a href="#/teacher">'+icon('users')+'<h2>I’m a teacher</h2><p>Guide your students and keep your chapter moving forward.</p><span>Teacher login '+icon('arrow')+'</span></a></div><small>No school password yet? Ask your HOSA advisor.</small></main>';}
 function missionPage(){const pillars=[['Free, always','Every lesson, practice set, and study tool for students is free. No premium tier, no paywall between you and your event.'],['Built for one event','HOSA students compete in one event a year. Halus is shaped around that single focus instead of spreading you thin.'],['For every chapter','Instructors get assignments, progress views, and a private chapter space at no cost, so any school can take part.']];
  return siteHeader('mission')+'<main id="main" class="landing page">'+
  '<section class="page-hero"><div class="hero-meta"><span class="micro">Halus / Mission</span><span class="micro">What is Halus?</span></div>'+split('h1',['Free preparation','<b>for every <em>HOSA</em></b>','<b>student.</b>'],'duo')+
@@ -113,19 +116,45 @@ function rankingsBody(){return '<div class="ranking-layout"><section class="pane
 function leaderboardPage(){return siteHeader('rankings')+'<main id="main" class="landing page public-ranks"><section class="page-hero compact"><div class="hero-meta"><span class="micro">Halus / Rankings</span><span class="micro">Iron → Radiant</span></div>'+split('h1',['Global <b><em>rankings.</em></b>'],'duo')+'<div class="page-hero-side" data-reveal><p>Nine tiers, earned through ranked assessments and compared within the same event.</p></div></section><div class="ranks-body">'+rankingsBody()+'</div></main>'+footer();}
 
 // ---------- login ----------
+// Two tabs: make an account (it joins the school in the same step) or sign in.
+const field=(label,input)=>'<label class="field">'+label+input+'</label>';
+const val=k=>esc(draft[k]??'');
+// Students give only their community password: it names their school. Teachers choose the school too.
+function schoolFields(role){const list=session.communities;
+ if(role==='student')return field('Community student password','<input name="password" type="password" maxlength="256" required autocomplete="off" spellcheck="false" data-community>')+'<p class="auth-hint">Your HOSA advisor shares this password. It links your account to your school automatically.</p>';
+ if(!list.length)return '<p class="auth-error">No school communities are open yet.</p>';
+ return field('School community','<select name="communityId" required data-community><option value="">Choose your school</option>'+list.map(c=>'<option value="'+esc(c.id)+'"'+(draft.communityId===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select>')+
+  field('Community teacher password','<input name="password" type="password" maxlength="256" required autocomplete="off" spellcheck="false" data-community>')+'<p class="auth-hint">You will be a teacher in this school community only.</p>';}
+const nameFields=()=>'<div class="auth-pair">'+field('First name','<input name="firstName" maxlength="40" required autocomplete="given-name" value="'+val('firstName')+'">')+field('Last name','<input name="lastName" maxlength="40" required autocomplete="family-name" value="'+val('lastName')+'">')+'</div>';
+const orLine=t=>'<div class="auth-or"><span>'+t+'</span></div>';
+const errorSlot=()=>{const err=authError||session.error;return '<p class="auth-error" role="alert"'+(err?'':' hidden')+'>'+esc(err)+'</p>';};
+function authTabs(){return '<div class="auth-tabs" role="tablist" aria-label="Account">'+[['create','Create account'],['signin','Sign in']].map(([k,l])=>'<button type="button" role="tab" data-action="auth-tab" data-value="'+k+'" aria-selected="'+(authTab===k)+'" class="'+(authTab===k?'on':'')+'">'+l+'</button>').join('')+'</div>';}
+function createForm(role){const student=role==='student';
+ return '<form id="create-form" data-role="'+role+'" class="auth-fields"><span class="auth-step micro">01 / YOUR SCHOOL</span>'+schoolFields(role)+
+  '<span class="auth-step micro">02 / YOUR ACCOUNT</span><button type="button" class="button google" data-action="google-create">'+googleMark+'Create with Google</button>'+orLine('or use your email')+nameFields()+
+  field('Email','<input name="email" type="email" maxlength="254" required autocomplete="email" value="'+val('email')+'">')+
+  field('Create a password','<input name="accountPassword" type="password" minlength="8" maxlength="128" required autocomplete="new-password" placeholder="At least 8 characters">')+
+  '<button class="button" type="submit" data-label="Create '+(student?'student':'teacher')+' account">Create '+(student?'student':'teacher')+' account</button></form>';}
+function signInForm(){return '<div class="auth-fields"><button type="button" class="button google" data-action="google">'+googleMark+'Sign in with Google</button></div>'+orLine('or sign in with email')+
+ '<form id="signin-form" class="auth-fields">'+field('Email','<input name="email" type="email" maxlength="254" required autocomplete="email" value="'+val('email')+'">')+
+ field('Password','<input name="accountPassword" type="password" maxlength="128" required autocomplete="current-password">')+
+ '<button type="button" class="text-button auth-forgot" data-action="reset-password">Forgot your password?</button><button class="button" type="submit" data-label="Sign in">Sign in</button></form>';}
+// A signed-in account that has not joined a school yet, such as a first Google sign-in from the Sign in tab.
+function joinForm(role){const student=role==='student',[first,...rest]=String(session.user.displayName||'').trim().split(/\s+/);
+ draft.firstName??=first||'';draft.lastName??=rest.join(' ');
+ return '<span class="auth-step micro">ONE LAST STEP</span><h2>Join your school.</h2><p>Enter the '+(student?'student':'teacher')+' password your '+(student?'HOSA advisor':'school')+' shared with you. You only do this once.</p>'+errorSlot()+
+  '<form id="enroll-form" data-role="'+role+'" class="auth-fields">'+schoolFields(role)+nameFields()+'<button class="button" type="submit" data-label="Join as a '+(student?'student':'teacher')+'">Join as a '+(student?'student':'teacher')+'</button></form>';}
 function loginPage(role){const student=role==='student';let card;
  const signedAs=session.user?'<p class="auth-who">Signed in as <strong>'+esc(session.user.email)+'</strong> · <button class="text-button" data-action="sign-out">Use another account</button></p>':'';
- const err=authError||session.error;const errBox=err?'<p class="auth-error" role="alert">'+esc(err)+'</p>':'';
+ const roleWord=r=>r==='instructor'?'teacher':'student';
  if(!session.ready)card='<div class="auth-wait"><span class="spinner" aria-hidden="true"></span><p>Checking your session…</p></div>';
  else if(session.unavailable)card='<h2>Sign-in is offline.</h2><p class="auth-error" role="alert">'+esc(session.unavailable)+'</p><p class="auth-note">Please try again in a little while.</p>';
- else if(!session.user)card='<span class="auth-step micro">01 / GOOGLE ACCOUNT</span><h2>'+(student?'Open your study space.':'Open your chapter desk.')+'</h2><p>Use the Google account you use for school.</p>'+errBox+'<button class="button google" data-action="google" '+(busy?'disabled':'')+'>'+googleMark+(busy?'Opening Google…':'Continue with Google')+'</button><p class="auth-note">New to Halus? You’ll join your school with your '+(student?'student':'teacher')+' password next.</p>';
- else if(session.enrolled&&me().role!==role)card='<h2>This account is an '+roleName(me().role)+' account.</h2><p>'+esc(session.user.email)+' is registered as '+(me().role==='instructor'?'an instructor':'a student')+' at '+esc(me().community?.name||'your school')+'. Each Google account holds one role.</p>'+linkButton('Open my '+roleName(me().role)+' space',home())+signedAs;
- else if(session.error&&!session.enrolled)card='<h2>We could not open your account.</h2>'+errBox+button('Try again','retry-profile')+signedAs;
- else{const list=session.communities;card='<span class="auth-step micro">02 / JOIN YOUR SCHOOL</span><h2>Join your school.</h2><p>Enter the '+(student?'student':'teacher')+' password your '+(student?'chapter advisor':'school')+' shared with you. You only do this once.</p>'+errBox+
-  '<form id="enroll-form" data-role="'+role+'" class="auth-fields">'+(list.length>1?'<label class="field">School community<select name="communityId" required><option value="">Choose your school</option>'+list.map(c=>'<option value="'+esc(c.id)+'"'+(draft.communityId===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></label>':list.length?'<input type="hidden" name="communityId" value="'+esc(list[0].id)+'"><div class="auth-school"><span class="micro">School community</span><strong>'+esc(list[0].name)+'</strong></div>':'<p class="auth-error">No school communities are open yet.</p>')+
-  '<label class="field">Your name<input name="displayName" maxlength="80" required autocomplete="name" value="'+esc(draft.displayName??session.user.displayName??'')+'"></label>'+
-  '<label class="field">'+(student?'Student':'Teacher')+' password<input name="password" type="password" maxlength="256" required autocomplete="off" spellcheck="false"></label>'+
-  '<button class="button" type="submit" '+(busy||!list.length?'disabled':'')+'>'+(busy?'Checking…':'Join '+(student?'as a student':'as a teacher'))+'</button></form>'+signedAs;}
+ else if(!session.user)card=authTabs()+(authTab==='create'
+  ?'<h2>'+(student?'Make your student account.':'Make your teacher account.')+'</h2><p>'+(student?'Your account joins your school community the moment it is made.':'Choose your school, then make the account you will teach with.')+'</p>'+errorSlot()+createForm(role)
+  :'<h2>'+(student?'Welcome back.':'Welcome back to your desk.')+'</h2><p>Sign in the same way you made your account.</p>'+errorSlot()+signInForm());
+ else if(session.enrolled&&me().role!==role)card='<h2>This is a '+roleWord(me().role)+' account.</h2><p>'+esc(session.user.email)+' is registered as a '+roleWord(me().role)+' at '+esc(me().community?.name||'your school')+'. Each account holds one role in one school.</p>'+linkButton('Open my '+roleWord(me().role)+' space',home())+signedAs;
+ else if(session.error&&!session.enrolled)card='<h2>We could not open your account.</h2>'+errorSlot()+button('Try again','retry-profile')+signedAs;
+ else card=joinForm(role)+signedAs;
  const other='<a class="auth-switch" href="'+(student?'#/teacher':'#/student')+'">'+(student?'Teacher login':'Student login')+' '+icon('arrow')+'</a>';
  if(student)return siteHeader()+'<main id="main" class="auth-page auth-student"><div class="auth-student-top"><span class="micro">HALUS / STUDENT ENTRY</span><span class="micro">ONE EVENT · ONE YEAR</span></div><section class="auth-intro"><span class="eyebrow">YOUR STUDY NOTEBOOK</span><h1>Make room<br>to <em>grow.</em></h1><p>Pick your event, take a lesson at a time, and see how far you’ve come.</p><div class="auth-student-index"><span class="micro">INSIDE YOUR SPACE</span><ul><li><span>01</span> Your event and lessons</li><li><span>02</span> Practice and progress</li><li><span>03</span> Your school chapter</li></ul></div>'+other+'</section><section class="auth-card">'+card+'</section><p class="auth-help">Need your school password? Ask your HOSA advisor.</p></main>';
  return siteHeader()+'<main id="main" class="auth-page auth-teacher"><section class="auth-teacher-banner"><div class="auth-teacher-kicker"><span class="micro">HALUS / TEACHER ENTRY</span><span class="micro">A SPACE FOR YOUR CHAPTER</span></div><h1>Keep the chapter<br><em>moving.</em></h1><p>Bring assignments, student progress, and chapter conversation together in one calm place.</p></section><div class="auth-teacher-body"><section class="auth-card">'+card+'</section><aside class="auth-teacher-aside"><span class="eyebrow">AT YOUR DESK</span><h2>More time for the people behind the progress.</h2><ul><li><strong>Assign</strong><span>Give students their next lesson or reflection.</span></li><li><strong>Follow</strong><span>See progress by student and event.</span></li><li><strong>Gather</strong><span>Share updates in your private chapter.</span></li></ul><p>Need a teacher password? Ask the person who manages your school’s Halus chapter.</p>'+other+'</aside></div></main>';}
@@ -206,14 +235,29 @@ let quizIndex=0,quizAnswers=[];
 function quizModal(){const q=LESSONS[quizIndex];showModal('A quick check-in.','<span class="eyebrow">QUESTION '+(quizIndex+1)+' OF '+LESSONS.length+'</span><h3 class="quiz-question">'+q.question+'</h3><form id="quiz-answer"><div class="quiz-options">'+q.options.map((o,i)=>'<label><input type="radio" name="answer" value="'+i+'" required><span>'+esc(o)+'</span></label>').join('')+'</div><button type="submit" class="button">Check answer</button></form>');}
 function confirmModal(title,text,action,attrs,label){showModal(title,'<p class="lesson-body">'+text+'</p><div class="modal-actions">'+button(label,action,attrs)+button('Cancel','close','',true)+'</div>');}
 
+// ---------- auth helpers ----------
+// Auth forms are updated in place rather than re-rendered, so typed passwords survive a failed attempt.
+function showAuthError(message){authError=message;const slot=document.querySelector('.auth-card .auth-error[role=alert]');if(slot){slot.textContent=message;slot.hidden=!message;}}
+// Keeps names, email and school for the next render. Passwords are never kept.
+function formData(form){const d=Object.fromEntries(new FormData(form));for(const k of ['firstName','lastName','email','communityId'])if(k in d)draft[k]=d[k];return d;}
+function authBusy(trigger,label){const card=document.querySelector('.auth-card');const controls=card?[...card.querySelectorAll('button,input,select')].filter(c=>!c.disabled):[];const html=trigger?.innerHTML;
+ busy=true;controls.forEach(c=>{c.disabled=true;});if(trigger)trigger.innerHTML=(trigger.classList.contains('google')?googleMark:'')+label;
+ return()=>{busy=false;if(!trigger?.isConnected)return;controls.forEach(c=>{c.disabled=false;});trigger.innerHTML=html;};}
+function welcome(){cache={};errors={};draft={};try{localStorage.setItem('halus-returning','1');}catch{}toast('Welcome to '+(me()?.community?.name||'your chapter')+'.');}
+
 // ---------- actions ----------
 async function run(task){try{await task();}catch(err){toast(err.message);}}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const action=el.dataset.action;
  if(action==='theme'){document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('halus-theme',document.documentElement.dataset.theme);}catch{}document.querySelectorAll('.theme-toggle').forEach(b=>{b.outerHTML=themeButton();});return;}
  if(action==='close'){modal.close();return;}
  if(action==='menu'){document.querySelector('.sidebar').classList.toggle('open');return;}
- if(action==='google'){authError='';busy=true;render();googleSignIn().catch(err=>{authError=err.message;}).finally(()=>{busy=false;render();});return;}
- if(action==='sign-out'){authError='';draft={};const route=location.hash.slice(1),dest=route==='/student'||route==='/teacher'?route:home().slice(1);run(async()=>{await signOut();location.hash=dest;});return;}
+ if(action==='auth-tab'){authTab=el.dataset.value;authError='';render();return;}
+ if(action==='google'){showAuthError('');const restore=authBusy(el,'Opening Google…');googleSignIn().catch(err=>showAuthError(err.message)).finally(restore);return;}
+ if(action==='google-create'){const form=el.closest('form');if(![...form.querySelectorAll('[data-community]')].every(f=>f.reportValidity()))return;const d=formData(form);showAuthError('');const restore=authBusy(el,'Opening Google…');
+  createAccount({method:'google',role:form.dataset.role,communityId:d.communityId,password:d.password,firstName:d.firstName,lastName:d.lastName}).then(ok=>{if(ok)welcome();}).catch(err=>showAuthError(err.message)).finally(restore);return;}
+ if(action==='reset-password'){const email=document.querySelector('#signin-form [name=email]');if(!email.value.trim()){showAuthError('Enter your email above, then choose Forgot your password.');email.focus();return;}if(!email.reportValidity())return;
+  const restore=authBusy(el,'Sending…');resetPassword(email.value).then(()=>{showAuthError('');toast('If an account uses that email, a reset link is on its way.');}).catch(err=>showAuthError(err.message)).finally(restore);return;}
+ if(action==='sign-out'){authError='';draft={};authTab='signin';const route=location.hash.slice(1),dest=route==='/student'||route==='/teacher'?route:home().slice(1);run(async()=>{await signOut();location.hash=dest;});return;}
  if(action==='retry-profile'){location.reload();return;}
  if(action==='retry'){refresh(el.dataset.key);return;}
  if(action==='lesson'){lessonModal(el.dataset.id);return;}
@@ -242,9 +286,15 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-action]')
  if(action==='open-event'){modal.close();location.hash='/my-event';return;}
  if(action==='select-event'){el.disabled=true;run(async()=>{const {profile}=await api('PUT','/me/event',{event:el.dataset.event});modal.close();refresh('assignments');setProfile(profile);location.hash='/my-event';toast('Your event for the year is set.');}).finally(()=>{el.disabled=false;});return;}
 });
-document.addEventListener('submit',e=>{const form=e.target;if(!['enroll-form','post-form','create-assignment','submit-assignment','quiz-answer','manage-event'].includes(form.id))return;e.preventDefault();const data=Object.fromEntries(new FormData(form));const submit=form.querySelector('[type=submit]');
+document.addEventListener('submit',e=>{const form=e.target;if(!['create-form','signin-form','enroll-form','post-form','create-assignment','submit-assignment','quiz-answer','manage-event'].includes(form.id))return;e.preventDefault();const data=Object.fromEntries(new FormData(form));const submit=form.querySelector('[type=submit]');
  if(form.id==='quiz-answer'){const q=LESSONS[quizIndex],correct=Number(data.answer)===q.answer;quizAnswers.push(correct);showModal(correct?'You’ve got it.':'A chance to learn.','<div class="quiz-feedback">'+icon(correct?'check':'book')+'<p>'+q.explanation+'</p>'+button(quizIndex===LESSONS.length-1?'See my result':'Next question','quiz-next')+'</div>');return;}
- if(form.id==='enroll-form'){authError='';busy=true;draft={displayName:data.displayName,communityId:data.communityId};render();enroll({role:form.dataset.role,communityId:data.communityId,password:data.password,displayName:data.displayName}).then(()=>{cache={};errors={};draft={};toast('Welcome to '+(me().community?.name||'your chapter')+'.');}).catch(err=>{authError=err.message;}).finally(()=>{busy=false;render();});return;}
+ if(form.id==='create-form'||form.id==='signin-form'||form.id==='enroll-form'){const d=formData(form);showAuthError('');
+  if(form.id!=='signin-form'&&(!d.firstName?.trim()||!d.lastName?.trim())){showAuthError('Enter your first and last name.');return;}
+  const restore=authBusy(submit,{'create-form':'Creating your account…','signin-form':'Signing in…','enroll-form':'Checking…'}[form.id]);
+  const task=form.id==='signin-form'?emailSignIn(d.email,d.accountPassword)
+   :form.id==='create-form'?createAccount({method:'email',role:form.dataset.role,communityId:d.communityId,password:d.password,firstName:d.firstName.trim(),lastName:d.lastName.trim(),email:d.email,accountPassword:d.accountPassword}).then(welcome)
+   :enroll({role:form.dataset.role,communityId:d.communityId,password:d.password,firstName:d.firstName.trim(),lastName:d.lastName.trim()}).then(welcome);
+  task.then(()=>{try{localStorage.setItem('halus-returning','1');}catch{}}).catch(err=>showAuthError(err.message)).finally(restore);return;}
  if(submit)submit.disabled=true;
  run(async()=>{
   if(form.id==='post-form'){if(!data.text.trim())throw new Error('Write a message first.');await api('POST','/posts',{body:data.text});refresh('posts');toast('Posted to your chapter.');}
