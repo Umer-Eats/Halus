@@ -1,8 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {seed,selectEvent,completeLesson,createAssignment,assignmentsFor,postsFor,addPost,progress} from '../dist/model.js';
-test('annual event cannot be silently replaced',()=>{assert.throws(()=>selectEvent(seed(),'Medical Terminology'),/already selected/);assert.equal(selectEvent({...seed(),event:null},'Medical Terminology').event,'Medical Terminology');});
-test('completing a lesson twice does not inflate progress',()=>{const s=completeLesson(seed(),'guidelines');assert.deepEqual(completeLesson(s,'guidelines').completed,['guidelines']);assert.equal(progress(s),33);});
-test('assignment appears only in the matching school and event',()=>{const s=createAssignment(seed(),{title:'Practice',event:'Medical Terminology',due:'2026-11-01',type:'Lesson'});assert.equal(assignmentsFor(s).length,2);assert.equal(assignmentsFor(s,'teacher').length,3);assert.equal(assignmentsFor({...s,school:'northview'},'teacher').length,0);});
-test('school feed excludes other chapter content',()=>{const s=addPost({...seed(),school:'northview'},'Hello');assert.equal(postsFor(s).length,1);assert.equal(postsFor({...s,school:'westbridge'}).length,2);});
-test('blank content rejected',()=>{assert.throws(()=>addPost(seed(),'  '));assert.throws(()=>createAssignment(seed(),{title:' ',event:'Nursing Assisting',due:'2026-11-01'}));});
+import {EVENTS,GROUPS,LESSONS} from '../dist/model.js';
+test('every secondary event is listed once, under its category',()=>{const names=EVENTS.map(e=>e.name);assert.equal(new Set(names).size,names.length);assert.equal(names.length,Object.values(GROUPS).flat().length);});
+test('lesson ids are unique and every answer points at a real option',()=>{assert.equal(new Set(LESSONS.map(l=>l.id)).size,LESSONS.length);for(const l of LESSONS)assert.ok(l.options[l.answer],l.id);});

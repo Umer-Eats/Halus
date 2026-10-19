@@ -27,7 +27,8 @@ const el = (tag, attrs = {}, ...children) => {
   return node;
 };
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const studentEvent = () => read('halus-state', null)?.event ?? null;
+// app.js sets this from the signed-in student's profile.
+const studentEvent = () => document.body.dataset.event || null;
 
 export function mountHal(parent = document.body) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');

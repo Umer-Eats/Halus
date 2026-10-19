@@ -11,7 +11,7 @@ The static site in `dist/` and a single serverless function in `api/index.js` de
 5. On Vercel, add the same variables under Project > Settings > Environment Variables, then deploy. Tables are created automatically on the first request.
 
 Turso: `turso db create halus`, then `turso db show halus --url` and `turso db tokens create halus`.
-Firebase: enable the sign-in providers you want. Download a service account key (Project settings > Service accounts) for the three `FIREBASE_*` Admin settings. Add your Vercel domain under Authentication > Settings > Authorized domains.
+Firebase: enable the **Google** sign-in provider (Authentication > Sign-in method); the site signs in with Google only. Download a service account key (Project settings > Service accounts) for the three `FIREBASE_*` Admin settings. Add your Vercel domain under Authentication > Settings > Authorized domains.
 
 ## Communities
 

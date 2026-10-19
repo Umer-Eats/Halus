@@ -285,3 +285,52 @@
   .site-header .wordmark { width: 70px; }
   .site-header { padding: 10px 20px 4px; }
 }
+
+/* ---------- Login ---------- */
+.auth-page {
+  width: min(1080px, calc(100% - 48px)); margin: 0 auto; min-height: 100vh;
+  display: grid; grid-template-columns: 1fr minmax(0, 440px); gap: 64px; align-items: center;
+  padding: 140px 0 80px;
+}
+.auth-intro { display: grid; gap: 20px; align-content: center; }
+.auth-intro h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); letter-spacing: -.05em; line-height: .98; }
+.auth-intro p { color: var(--ink-2); max-width: 400px; }
+.auth-intro .editorial-link { justify-self: start; }
+.auth-card {
+  display: grid; gap: 16px; padding: 36px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 24px;
+}
+.auth-card h2 { font-size: 1.7rem; letter-spacing: -.03em; line-height: 1.15; }
+.auth-card > p { color: var(--ink-2); font-size: 15px; }
+.auth-step { color: var(--red-ink); }
+.auth-fields { display: grid; gap: 14px; }
+.auth-fields .field { display: grid; gap: 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.auth-fields .button { width: 100%; margin-top: 6px; }
+.auth-school { display: grid; gap: 6px; padding: 14px 16px; border-radius: 12px; background: var(--surface-3); }
+.auth-school .micro { color: var(--muted); }
+.button.google { --b-bg: var(--ink); --b-ink: var(--bg); --b-hover: var(--ink-2); width: 100%; gap: 12px; }
+.g-mark { width: 18px; height: 18px; flex: none; background: #fff; border-radius: 50%; padding: 2px; box-sizing: content-box; }
+.auth-note { color: var(--muted); font-size: 13.5px; }
+.auth-who { color: var(--muted); font-size: 13.5px; padding-top: 14px; border-top: 1px solid var(--line); }
+.auth-who strong { color: var(--ink); font-weight: 500; }
+.auth-who .text-button { font-size: 13.5px; text-decoration: underline; }
+.auth-error { padding: 12px 14px; border-radius: 12px; background: var(--red-soft); color: var(--red-ink); font-size: 14px; }
+.auth-wait, .loading-panel { display: grid; justify-items: center; gap: 14px; padding: 40px 0; color: var(--muted); }
+.spinner { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--red); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.button:disabled { opacity: .55; cursor: default; }
+@media (max-width: 860px) {
+  .auth-page { grid-template-columns: 1fr; gap: 32px; padding: 110px 0 60px; width: calc(100% - 32px); }
+  .auth-card { padding: 24px; }
+}
+
+/* ---------- Workspace additions ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.row-actions { white-space: nowrap; text-align: right; }
+.row-actions .text-button + .text-button { margin-left: 14px; }
+.student-name small { display: block; font-size: 12px; }
+.post-delete { margin-left: auto; width: 32px; height: 32px; }
+.post-delete .icon { width: 16px; height: 16px; }
+.submission { display: grid; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line); }
+.submission p { white-space: pre-wrap; }
+.modal-actions { gap: 10px; flex-wrap: wrap; }

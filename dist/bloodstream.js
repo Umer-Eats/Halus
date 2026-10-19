@@ -2,7 +2,7 @@
 // Each erythrocyte is shaded analytically from the Evans–Fung biconcave profile, tumbles as it
 // travels, and is rendered with depth of field: a sharp focal plane, hazy far cells and large
 // out-of-focus foreground cells. Flow is laminar (faster in the centre of the vessel) and
-// parts gently around the pointer.
+// responds to the pointer's movement with a short-lived local drag.
 
 const BG_FRAG = `
 precision mediump float;
@@ -119,7 +119,7 @@ export function mountBloodstream(canvas) {
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const rand = (a, b) => a + Math.random() * (b - a);
   let W = 1, H = 1, dpr = 1, maxDpr = Math.min(devicePixelRatio || 1, 1.75), slow = 0, wide = true, frame = 0, last = performance.now(), clock = 0, visible = true;
-  const mouse = {x: -9999, y: -9999};
+  const mouse = {x: -9999, y: -9999, vx: 0, vy: 0, lastMove: 0};
 
   const spawn = (cell, anywhere) => {
     const fore = Math.random() < .07;
@@ -161,9 +161,17 @@ export function mountBloodstream(canvas) {
       const xf = c.s * 1.3 - .15;
       const yc = base + slope * xf + .05 * Math.sin(xf * 4.2 + clock * .25);
       let x = xf * W, y = (yc + c.lane * half * Math.min(persp, 1.15)) * H;
-      const dx = x - mouse.x, dy = y - mouse.y, dist = Math.hypot(dx, dy), R = 170;
-      const push = dist < R ? Math.pow(1 - dist / R, 2) * 46 : 0;
-      c.ox += ((dist ? dx / dist : 0) * push - c.ox) * .08; c.oy += ((dist ? dy / dist : 0) * push - c.oy) * .08;
+      if (dt > 0) {
+        const dx = x + c.ox - mouse.x, dy = y + c.oy - mouse.y;
+        const dist2 = dx * dx + dy * dy, reach = Math.min(180, H * .28);
+        // Nearby cells are carried in the direction of the moving pointer.
+        // The influence falls off smoothly; a stationary pointer leaves the stream alone.
+        const influence = dist2 < 4 * reach * reach ? Math.exp(-dist2 / (reach * reach)) : 0;
+        const depth = 1 / (1 + Math.abs(c.z) * .5);
+        const settle = 1 - Math.exp(-dt * 10);
+        c.ox += (mouse.vx * .075 * influence * depth - c.ox) * settle;
+        c.oy += (mouse.vy * .075 * influence * depth - c.oy) * settle;
+      }
       x += c.ox; y += c.oy;
       const rad = (wide ? .03 : .021) * H * persp, ext = rad * 1.35;
       const blur = Math.min(Math.abs(c.z - .12) * .5 + (c.z > 1.1 ? .35 : 0), 1);
@@ -206,13 +214,33 @@ export function mountBloodstream(canvas) {
     frame = requestAnimationFrame(loop);
     const dt = Math.min(now - last, 60) / 1000; last = now;
     if (!visible || document.hidden) return;
-    if (!still) { clock += dt; step(dt); }
+    if (!still) {
+      clock += dt;
+      if (now - mouse.lastMove > 80) {
+        const fade = Math.exp(-dt * 12);
+        mouse.vx *= fade; mouse.vy *= fade;
+      }
+      step(dt);
+    }
     draw();
     if (clock > 2 && dt > .028) { if (++slow > 45 && maxDpr > .75) { maxDpr = Math.max(.75, maxDpr - .25); size(); slow = 0; } } else slow = Math.max(0, slow - 1);
   };
   const hero = canvas.closest('.hero') || canvas;
-  const onMove = e => { const r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; };
-  const onLeave = () => { mouse.x = mouse.y = -9999; };
+  const onMove = e => {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now();
+    if (mouse.lastMove && now - mouse.lastMove < 100) {
+      const elapsed = Math.max((now - mouse.lastMove) / 1000, 1 / 120);
+      const vx = Math.max(-1100, Math.min(1100, (x - mouse.x) / elapsed));
+      const vy = Math.max(-1100, Math.min(1100, (y - mouse.y) / elapsed));
+      mouse.vx += (vx - mouse.vx) * .4;
+      mouse.vy += (vy - mouse.vy) * .4;
+    } else {
+      mouse.vx = mouse.vy = 0;
+    }
+    mouse.x = x; mouse.y = y; mouse.lastMove = now;
+  };
+  const onLeave = () => { mouse.x = mouse.y = -9999; mouse.vx = mouse.vy = 0; mouse.lastMove = 0; };
   hero.addEventListener('pointermove', onMove, {passive: true}); hero.addEventListener('pointerleave', onLeave);
   const ro = new ResizeObserver(() => { size(); draw(); }); ro.observe(canvas);
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }); io.observe(canvas);
