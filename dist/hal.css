@@ -1,0 +1,93 @@
+/* Hal, the roaming study companion, and his chat. Solid surfaces only. */
+.hal-companion { position: fixed; inset: 0; z-index: 80; pointer-events: none; }
+.hal-companion-body {
+  position: absolute; left: 0; top: 0; width: 96px; height: 96px; padding: 0; border: 0;
+  background: transparent; cursor: grab; pointer-events: auto; touch-action: none; user-select: none;
+  will-change: transform;
+}
+.hal-companion-body:active { cursor: grabbing; }
+.hal-companion-body:focus-visible { outline: 2px dashed var(--red); outline-offset: 3px; border-radius: 8px; }
+.hal-art, .hal-rig { display: block; width: 96px; height: 96px; image-rendering: pixelated; }
+.hal-nameplate {
+  position: absolute; bottom: -2px; left: 4px; white-space: nowrap;
+  font: 500 9px/1 var(--font-mono); letter-spacing: .08em; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-strong); padding: 3px 5px; border-radius: 4px;
+}
+.hal-nameplate span { font-size: 8px; letter-spacing: 0; color: var(--muted); }
+.hal-apple { position: absolute; image-rendering: pixelated; transition: opacity .3s; }
+.hal-apple.is-eating { opacity: .45; }
+
+.hal-bubble, .hal-panel {
+  position: absolute; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  border-radius: 12px; box-shadow: var(--shadow);
+}
+.hal-bubble { width: 240px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; }
+.hal-panel { pointer-events: auto; }
+.hal-panel button { font: inherit; color: inherit; cursor: pointer; }
+.hal-panel-title { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
+.hal-panel-title button { border: 0; background: none; font-size: 20px; line-height: 1; padding: 0 4px; color: var(--muted); }
+.hal-panel-title button:hover { color: var(--red); }
+
+.hal-controls { width: 240px; padding: 12px; max-height: calc(100dvh - 16px); overflow-y: auto; }
+.hal-controls p { font-size: 11px; line-height: 1.7; color: var(--muted); margin: 6px 0 10px; }
+.hal-controls > button, .hal-controls-actions button, .hal-moods button {
+  font-family: var(--font-button); font-size: 11px; letter-spacing: .01em;
+  border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: 6px; padding: 7px 6px;
+}
+.hal-controls .hal-primary { display: block; width: 100%; margin-bottom: 7px; background: var(--red); border-color: var(--red); color: var(--on-red); font-weight: 500; }
+.hal-controls .hal-primary:hover { background: var(--red-hover); }
+.hal-controls-actions { display: flex; gap: 6px; }
+.hal-controls-actions button { flex: 1; }
+.hal-anchor { display: block; width: 100%; margin-top: 7px; }
+.hal-controls button[aria-pressed="true"] { background: var(--red-soft); border-color: var(--red); color: var(--red-ink); }
+.hal-moods { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.hal-controls .hal-moods button { padding: 4px 7px; font-size: 10px; text-transform: capitalize; }
+
+.hal-chat { display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow: auto; }
+.hal-chat[hidden] { display: none; }
+.hal-chat > :not(.hal-chat-log) { flex-shrink: 0; }
+.hal-chat .hal-panel-title { padding-left: 18px; }
+.hal-chat-resize {
+  position: absolute; left: -1px; top: -1px; width: 26px; height: 26px; z-index: 1;
+  border: 1px solid var(--line-strong); border-radius: 12px 0 8px 0; background: var(--surface-2);
+  touch-action: none; cursor: nwse-resize !important;
+}
+.hal-chat-focus { display: flex; align-items: center; gap: 8px; font: 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.hal-chat-focus select {
+  flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--line-strong); border-radius: 6px;
+  background: var(--bg); color: var(--ink); font: 12px var(--font-body); text-transform: none; letter-spacing: 0;
+}
+.hal-chat-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; }
+.hal-chat-hint, .hal-chat-note { font-size: 11.5px; line-height: 1.6; color: var(--muted); margin: 0; }
+.hal-chat-note { font-size: 10px; }
+.hal-chat-turn {
+  max-width: 88%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px;
+  font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.hal-chat-turn p { margin: 0; }
+.hal-chat-turn p + p { margin-top: 8px; }
+.hal-chat-hal { align-self: flex-start; background: var(--surface-2); border-bottom-left-radius: 2px; }
+.hal-chat-student { align-self: flex-end; background: var(--red); border-color: var(--red); color: var(--on-red); border-bottom-right-radius: 2px; }
+.hal-chat-pending { color: var(--muted); font-style: italic; }
+.hal-chat-prompts { display: flex; flex-wrap: wrap; gap: 6px; }
+.hal-chat-prompts[hidden] { display: none; }
+.hal-chat-prompts button {
+  padding: 5px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-2);
+  font: 11px var(--font-button);
+}
+.hal-chat-prompts button:hover { border-color: var(--red); color: var(--red-ink); }
+.hal-chat-why { font-size: 11px; font-weight: 600; color: var(--red-ink); margin: 0; }
+.hal-chat-error { font-size: 11px; color: var(--red-ink); margin: 0; }
+.hal-chat-form { display: flex; gap: 6px; }
+.hal-chat-form textarea {
+  flex: 1; min-width: 0; resize: none; padding: 8px; border: 1px solid var(--line-strong); border-radius: 8px;
+  background: var(--bg); color: var(--ink); font: 12.5px/1.45 var(--font-body);
+}
+.hal-chat-form textarea:focus { outline: none; border-color: var(--red); }
+.hal-chat-form button {
+  padding: 0 14px; border: 1px solid var(--red); border-radius: 8px; background: var(--red); color: var(--on-red);
+  font: 500 12px var(--font-button);
+}
+.hal-chat-form button:disabled { opacity: .45; cursor: default; }
+.hal-companion .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media print { .hal-companion { display: none; } }

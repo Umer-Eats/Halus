@@ -1,0 +1,8 @@
+[
+  {
+    "id": "ppchs",
+    "name": "Pembroke Pines Charter High School",
+    "studentPassword": { "env": "PPCHS_STUDENT_PASSWORD" },
+    "instructorPassword": { "env": "PPCHS_INSTRUCTOR_PASSWORD" }
+  }
+]

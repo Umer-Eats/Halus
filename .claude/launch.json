@@ -1,6 +1,26 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "halus", "runtimeExecutable": "node", "runtimeArgs": ["server.mjs"], "port": 4173 }
+    {
+      "name": "halus",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--env-file-if-exists=.env",
+        "server.mjs"
+      ],
+      "port": 4173
+    },
+    {
+      "name": "halus-alt",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--env-file-if-exists=.env",
+        "server.mjs"
+      ],
+      "port": 4174,
+      "env": {
+        "PORT": "4174"
+      }
+    }
   ]
 }

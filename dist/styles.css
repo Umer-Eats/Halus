@@ -125,10 +125,6 @@ em { font-style: normal; color: var(--red); }
 .brand { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
 .brand-mark { width: 18px; height: 27px; }
 .wordmark { width: 84px; height: 24px; color: var(--ink); }
-.hal { image-rendering: pixelated; image-rendering: crisp-edges; width: 120px; height: auto; user-select: none; animation: hal-bob 4.5s ease-in-out infinite; transform-origin: 50% 90%; }
-.hal:hover { animation: hal-wiggle .6s ease, hal-bob 4.5s ease-in-out infinite; }
-@keyframes hal-bob { 50% { translate: 0 -6px; } }
-@keyframes hal-wiggle { 25% { rotate: -6deg; } 75% { rotate: 6deg; } }
 
 /* ---------- Buttons ----------
    Pill-shaped, solid, set in Geist Mono like transit signage. A thin inner highlight gives
@@ -237,7 +233,6 @@ em { font-style: normal; color: var(--red); }
 .role-cards p { color: var(--muted); }
 .role-cards span { display: inline-flex; gap: 8px; align-items: center; font: 600 12px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--red-ink); margin-top: 8px; }
 .start-page small { color: var(--muted); }
-.start-page .hal { width: 96px; }
 
 /* ---------- Workspace (solid blocks, no imagery) ---------- */
 body.in-workspace { background: var(--bg-deep); }
@@ -265,7 +260,6 @@ body.in-workspace { background: var(--bg-deep); }
 .sidebar nav a.active { background: var(--red); color: #fff; box-shadow: 0 3px 0 0 var(--red-edge); }
 .sidebar-bottom { margin-top: auto; display: grid; gap: 10px; }
 .hal-card { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 14px; background: var(--red-soft); }
-.hal-card .hal { width: 56px; }
 .hal-card p { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
 .role-switch, .back-home { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; font-size: 13px; color: var(--muted); }
 .role-switch { border: 1.5px solid var(--line-strong); color: var(--ink); font-weight: 600; }
@@ -422,7 +416,6 @@ body.in-workspace { background: var(--bg-deep); }
 .teacher-note .button { justify-self: start; margin-top: 8px; }
 .teacher-grid .assignments-panel { grid-column: span 8; }
 .chapter-pulse { grid-column: span 4; display: grid; gap: 12px; align-content: center; justify-items: start; background: var(--red-soft); }
-.chapter-pulse .hal { width: 92px; }
 .chapter-pulse h2 { font-size: 1.4rem; }
 .chapter-pulse p { color: var(--ink-2); }
 
@@ -509,7 +502,6 @@ tbody tr:last-child td { border-bottom: 0; }
 .post-head small { color: var(--muted); font-size: 13px; }
 .post p { color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
 .community-aside { position: sticky; top: 10px; display: grid; gap: 14px; }
-.community-aside .hal { width: 84px; }
 .community-aside h2 { font-size: 1.4rem; }
 .community-aside h3 { font-size: 1.1rem; letter-spacing: -.02em; }
 .community-aside p { color: var(--muted); font-size: 14px; }

@@ -3,5 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "start": "node server.mjs", "dev": "node server.mjs", "test": "node --test", "check": "node --check dist/app.js && node --check dist/model.js" }
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "dev": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test",
+    "check": "node --check dist/app.js && node --check dist/model.js && node --check server/app.js",
+    "communities:check": "node --env-file-if-exists=.env scripts/check-communities.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "firebase-admin": "^14.5.0"
+  },
+  "engines": {
+    "node": ">=22.9"
+  }
 }
