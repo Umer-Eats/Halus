@@ -71,7 +71,7 @@ export function mountHal(parent = document.body) {
     } else {
       s.apple = boundHal(point ?? {x: s.position.x + (s.position.x > innerWidth / 2 ? -180 : 180), y: s.position.y}, innerWidth, innerHeight);
       s.target = s.apple;
-      setAction('run');
+      setAction('dash');
       say('An apple a day! Thank you.');
     }
     setMenu(false);
@@ -88,7 +88,7 @@ export function mountHal(parent = document.body) {
     prefs.anchored = value;
     savePrefs();
     write('hal-position', s.position);
-    if (value) { s.target = null; if (s.action === 'walk' || s.action === 'run') setAction('idle'); }
+    if (value) { s.target = null; if (s.action === 'slither' || s.action === 'dash') setAction('idle'); }
     renderMenu();
   };
 
@@ -101,6 +101,7 @@ export function mountHal(parent = document.body) {
   const plate = el('span', {class: 'hal-nameplate'});
   const body = el('button', {type: 'button', class: 'hal-companion-body', 'aria-expanded': 'false', 'aria-controls': 'hal-controls'}, art, plate);
   const menu = el('div', {id: 'hal-controls', class: 'hal-panel hal-controls', role: 'region', 'aria-label': 'Hal controls', hidden: true});
+  const menuPreview = el('div', {class: 'hal-menu-preview', 'aria-hidden': 'true'});
   const chat = createChat({react, onClose: () => setChat(false)});
   root.append(apple, bubble, body, menu, chat.node);
   parent.append(root);
@@ -119,26 +120,36 @@ export function mountHal(parent = document.body) {
   }
   function renderMenu() {
     plate.innerHTML = 'HAL <span>' + (prefs.muted ? '· quiet' : '· study buddy') + '</span>';
-    body.setAttribute('aria-label', `Hal, your study buddy. ${prefs.muted ? 'Talking muted.' : 'Talking enabled.'} Click for controls, double-click to chat, right-click to toggle talking.`);
+    body.setAttribute('aria-label', `Hal, your study buddy. Click or right-click for animations and controls, double-click to chat.`);
     root.dataset.muted = String(prefs.muted);
     root.dataset.anchored = String(prefs.anchored);
     if (!menuOpen) return;
-    const moods = el('div', {class: 'hal-moods', 'aria-label': 'Try an expression'},
-      ...['thinking', 'happy', 'sad', 'angry', 'wave', 'sleep', 'surprised'].map(a => el('button', {type: 'button', 'aria-pressed': String(s.action === a), onclick: () => { react(a); renderMenu(); }}, a)));
+    const animations = ['idle', 'wave', 'thinking', 'happy', 'angry', 'sad', 'surprised', 'eat', 'sleep', 'slither', 'dash'];
+    const moods = el('div', {class: 'hal-moods', 'aria-label': 'Hal animations'},
+      ...animations.map(a => el('button', {type: 'button', class: 'hal-animation', 'aria-pressed': String(s.action === a), onclick: () => {
+        if (a === 'slither' || a === 'dash') {
+          if (prefs.anchored) setAnchored(false);
+          s.target = boundHal({x: s.position.x + (s.position.x > innerWidth / 2 ? -140 : 140), y: s.position.y}, innerWidth, innerHeight);
+          setAction(a);
+          setMenu(false);
+        } else react(a, 5000);
+        renderMenu();
+      }}, el('span', {class: 'hal-animation-icon'}, (() => { const span = el('span'); span.innerHTML = halSVG({action: a, seconds: .2}); return span; })()), el('span', {}, a === 'angry' ? 'Mad' : a === 'dash' ? 'Fast slither' : a))));
     menu.replaceChildren(
-      el('div', {class: 'hal-panel-title'}, el('strong', {}, 'A little lab snake.'), el('button', {type: 'button', 'aria-label': 'Close Hal controls', onclick: () => setMenu(false)}, '×')),
-      el('p', {}, 'Drag Hal to place and anchor him.', el('br'), 'Triple-click anywhere to leave an apple.', el('br'), 'Right-click Hal to toggle his pep talks.'),
-      el('button', {type: 'button', class: 'hal-primary', onclick: () => setChat(true)}, 'Chat with Hal'),
+      el('div', {class: 'hal-panel-title'}, el('strong', {}, 'Hal animation studio'), el('button', {type: 'button', 'aria-label': 'Close Hal controls', onclick: () => setMenu(false)}, '×')),
+      el('p', {}, 'Pick an animation. Drag Hal to a spot, then anchor him there.'),
+      menuPreview,
+      moods,
+      el('button', {type: 'button', class: 'hal-anchor', 'aria-pressed': String(prefs.anchored), onclick: () => setAnchored(!prefs.anchored)}, prefs.anchored ? '● Anchored here · Release' : '○ Anchor Hal here'),
       el('div', {class: 'hal-controls-actions'},
         el('button', {type: 'button', onclick: () => feed()}, 'Give apple'),
         el('button', {type: 'button', 'aria-pressed': String(prefs.muted), onclick: toggleTalking}, prefs.muted ? 'Unmute talks' : 'Mute talks')),
-      el('button', {type: 'button', class: 'hal-anchor', 'aria-pressed': String(prefs.anchored), onclick: () => setAnchored(!prefs.anchored)}, prefs.anchored ? 'Release anchor' : 'Anchor in place'),
-      moods,
+      el('button', {type: 'button', class: 'hal-primary', onclick: () => setChat(true)}, 'Chat with Hal'),
     );
   }
   renderMenu();
 
-  // Pointer: drag to place, click for menu, double-click to chat, right-click to mute.
+  // Pointer: drag to place, click/right-click for animation studio, double-click to chat.
   body.addEventListener('pointerdown', e => {
     if (e.button !== 0) return;
     drag = {x: e.clientX, y: e.clientY, origin: {...s.position}, moved: false};
@@ -165,7 +176,7 @@ export function mountHal(parent = document.body) {
   body.addEventListener('pointerleave', () => { held = false; });
   body.addEventListener('focus', () => { held = true; });
   body.addEventListener('blur', () => { held = false; });
-  body.addEventListener('contextmenu', e => { e.preventDefault(); toggleTalking(); });
+  body.addEventListener('contextmenu', e => { e.preventDefault(); clearTimeout(clickTimer); setMenu(true); });
   body.addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
     if (k === 'm') toggleTalking();
@@ -202,7 +213,7 @@ export function mountHal(parent = document.body) {
   window.addEventListener('resize', onResize);
 
   // Frame loop -----------------------------------------------------------------------------------
-  let raf = 0, previous = performance.now(), lastArt = '';
+  let raf = 0, previous = performance.now(), lastArt = '', lastPreview = '';
   const tick = now => {
     const dt = Math.min((now - previous) / 1000, 0.05);
     previous = now;
@@ -212,7 +223,7 @@ export function mountHal(parent = document.body) {
       if (!menuOpen && !chatOpen && (!held || s.apple)) {
         if (s.target) {
           if (Math.abs(s.target.x - s.position.x) > 1) s.facing = s.target.x < s.position.x ? -1 : 1;
-          s.position = canMove() ? stepHal(s.position, s.target, dt, s.action === 'run' ? 230 : 70) : {...s.target};
+          s.position = canMove() ? stepHal(s.position, s.target, dt, s.action === 'dash' ? 230 : 70) : {...s.target};
           if (Math.hypot(s.position.x - s.target.x, s.position.y - s.target.y) < 1) {
             s.target = null;
             setAction(s.apple ? 'eat' : 'idle', s.apple ? now + 1700 : 0);
@@ -228,7 +239,7 @@ export function mountHal(parent = document.body) {
           // Hal roams the whole viewport, below the site header.
           roamIndex++;
           s.target = boundHal({x: 16 + Math.random() * (innerWidth - HAL_SIZE - 32), y: 72 + Math.random() * (innerHeight - HAL_SIZE - 88)}, innerWidth, innerHeight);
-          setAction(roamIndex % 4 === 0 ? 'run' : 'walk');
+          setAction(roamIndex % 4 === 0 ? 'dash' : 'slither');
           if (roamIndex % 5 === 0) say('Just stretching my coils.');
         }
       }
@@ -263,13 +274,14 @@ export function mountHal(parent = document.body) {
     const showBubble = Boolean(s.message) && !prefs.muted && !menuOpen && !chatOpen;
     if (bubble.textContent !== s.message) bubble.textContent = s.message;
     bubble.hidden = !showBubble;
-    const left = clamp(x - 72, 8, innerWidth - 248);
+    const left = clamp(x - 72, 8, Math.max(8, innerWidth - 248));
     if (showBubble) {
       bubble.style.left = left + 'px';
       bubble.style.top = (y < 110 ? y + HAL_SIZE + 4 : y - bubble.offsetHeight - 8) + 'px';
     }
     if (menuOpen) {
-      menu.style.left = left + 'px';
+      if (markup !== lastPreview) { menuPreview.innerHTML = markup; lastPreview = markup; }
+      menu.style.left = clamp(x - 80, 8, Math.max(8, innerWidth - menu.offsetWidth - 8)) + 'px';
       menu.style.top = clamp(y < 320 ? y + HAL_SIZE : y - menu.offsetHeight - 6, 8, innerHeight - menu.offsetHeight - 8) + 'px';
     }
     if (chatOpen) chat.place(s.position);

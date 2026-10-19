@@ -2,7 +2,7 @@
 // Each erythrocyte is shaded analytically from the Evans–Fung biconcave profile, tumbles as it
 // travels, and is rendered with depth of field: a sharp focal plane, hazy far cells and large
 // out-of-focus foreground cells. Flow is laminar (faster in the centre of the vessel) and
-// responds to the pointer's movement with a short-lived local drag.
+// yields to the pointer's path with a brief, fluid-like wake.
 
 const BG_FRAG = `
 precision mediump float;
@@ -119,7 +119,7 @@ export function mountBloodstream(canvas) {
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const rand = (a, b) => a + Math.random() * (b - a);
   let W = 1, H = 1, dpr = 1, maxDpr = Math.min(devicePixelRatio || 1, 1.75), slow = 0, wide = true, frame = 0, last = performance.now(), clock = 0, visible = true;
-  const mouse = {x: -9999, y: -9999, vx: 0, vy: 0, lastMove: 0};
+  const mouse = {x: -9999, y: -9999, lastMove: 0};
 
   const spawn = (cell, anywhere) => {
     const fore = Math.random() < .07;
@@ -129,7 +129,7 @@ export function mountBloodstream(canvas) {
     cell.speed = rand(.8, 1.2);
     cell.phase = rand(0, Math.PI * 2); cell.spin = rand(.2, .7) * (Math.random() < .5 ? -1 : 1);
     cell.rot = rand(0, Math.PI); cell.drift = rand(-.15, .15);
-    cell.ox = 0; cell.oy = 0;
+    cell.ox = 0; cell.oy = 0; cell.vx = 0; cell.vy = 0;
     return cell;
   };
   let cells = [];
@@ -146,6 +146,12 @@ export function mountBloodstream(canvas) {
 
   const STRIDE = 9;
   const verts = new Float32Array(160 * 6 * STRIDE);
+  const cellPosition = (c, base, slope, half) => {
+    const persp = 1 / (1.25 - c.z * .5);
+    const xf = c.s * 1.3 - .15;
+    const yc = base + slope * xf + .05 * Math.sin(xf * 4.2 + clock * .25);
+    return [xf * W, (yc + c.lane * half * Math.min(persp, 1.15)) * H];
+  };
   const step = dt => {
     const [base, slope, half] = path();
     for (const c of cells) {
@@ -158,19 +164,13 @@ export function mountBloodstream(canvas) {
     let i = 0;
     for (const c of cells) {
       const persp = 1 / (1.25 - c.z * .5);
-      const xf = c.s * 1.3 - .15;
-      const yc = base + slope * xf + .05 * Math.sin(xf * 4.2 + clock * .25);
-      let x = xf * W, y = (yc + c.lane * half * Math.min(persp, 1.15)) * H;
+      let [x, y] = cellPosition(c, base, slope, half);
       if (dt > 0) {
-        const dx = x + c.ox - mouse.x, dy = y + c.oy - mouse.y;
-        const dist2 = dx * dx + dy * dy, reach = Math.min(180, H * .28);
-        // Nearby cells are carried in the direction of the moving pointer.
-        // The influence falls off smoothly; a stationary pointer leaves the stream alone.
-        const influence = dist2 < 4 * reach * reach ? Math.exp(-dist2 / (reach * reach)) : 0;
-        const depth = 1 / (1 + Math.abs(c.z) * .5);
-        const settle = 1 - Math.exp(-dt * 10);
-        c.ox += (mouse.vx * .075 * influence * depth - c.ox) * settle;
-        c.oy += (mouse.vy * .075 * influence * depth - c.oy) * settle;
+        // Cells keep their momentum after a stroke, then ease back into their flow lane.
+        c.vx -= c.ox * 15 * dt; c.vy -= c.oy * 15 * dt;
+        const drag = Math.exp(-dt * 4.5);
+        c.vx *= drag; c.vy *= drag;
+        c.ox += c.vx * dt; c.oy += c.vy * dt;
       }
       x += c.ox; y += c.oy;
       const rad = (wide ? .03 : .021) * H * persp, ext = rad * 1.35;
@@ -216,10 +216,6 @@ export function mountBloodstream(canvas) {
     if (!visible || document.hidden) return;
     if (!still) {
       clock += dt;
-      if (now - mouse.lastMove > 80) {
-        const fade = Math.exp(-dt * 12);
-        mouse.vx *= fade; mouse.vy *= fade;
-      }
       step(dt);
     }
     draw();
@@ -229,18 +225,33 @@ export function mountBloodstream(canvas) {
   const onMove = e => {
     const r = canvas.getBoundingClientRect();
     const x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now();
-    if (mouse.lastMove && now - mouse.lastMove < 100) {
-      const elapsed = Math.max((now - mouse.lastMove) / 1000, 1 / 120);
-      const vx = Math.max(-1100, Math.min(1100, (x - mouse.x) / elapsed));
-      const vy = Math.max(-1100, Math.min(1100, (y - mouse.y) / elapsed));
-      mouse.vx += (vx - mouse.vx) * .4;
-      mouse.vy += (vy - mouse.vy) * .4;
-    } else {
-      mouse.vx = mouse.vy = 0;
+    if (!still && mouse.lastMove && now - mouse.lastMove < 100) {
+      const dx = x - mouse.x, dy = y - mouse.y, distance = Math.hypot(dx, dy);
+      if (distance > 1) {
+        const ux = dx / distance, uy = dy / distance;
+        const reach = Math.min(135, H * .23), stroke = Math.min(distance, 45);
+        const [base, slope, half] = path();
+        for (const c of cells) {
+          const [cx, cy] = cellPosition(c, base, slope, half);
+          const px = cx + c.ox - mouse.x, py = cy + c.oy - mouse.y;
+          const along = Math.max(0, Math.min(distance, px * ux + py * uy));
+          const sideX = px - along * ux, sideY = py - along * uy;
+          const separation = Math.hypot(sideX, sideY);
+          if (separation >= reach) continue;
+          // A moving pointer opens a wake on both sides of its path. It never
+          // attracts cells to an orbit or keeps pushing once it stops.
+          const side = ux * sideY - uy * sideX < 0 ? -1 : 1;
+          const falloff = Math.pow(1 - separation / reach, 2);
+          const depth = 1 / (1 + Math.abs(c.z) * .5);
+          const impulse = stroke * 18 * falloff * depth;
+          c.vx = Math.max(-480, Math.min(480, c.vx + (-uy * side + ux * .22) * impulse));
+          c.vy = Math.max(-480, Math.min(480, c.vy + (ux * side + uy * .22) * impulse));
+        }
+      }
     }
     mouse.x = x; mouse.y = y; mouse.lastMove = now;
   };
-  const onLeave = () => { mouse.x = mouse.y = -9999; mouse.vx = mouse.vy = 0; mouse.lastMove = 0; };
+  const onLeave = () => { mouse.x = mouse.y = -9999; mouse.lastMove = 0; };
   hero.addEventListener('pointermove', onMove, {passive: true}); hero.addEventListener('pointerleave', onLeave);
   const ro = new ResizeObserver(() => { size(); draw(); }); ro.observe(canvas);
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }); io.observe(canvas);

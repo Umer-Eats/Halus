@@ -1,86 +1,115 @@
-// Hal, drawn as a single cranberry pixel silhouette around a small silver medical staff.
-import {halPose} from './hal-motion.js';
+// Hal's sprite is generated on one shared 48px grid with a fixed ground line.
+// The palette and silhouette stay consistent across every animation frame.
+import {HAL_CLIPS, halPose} from './hal-motion.js';
 
-const OUTLINE = '#22080f';
-const SKIN = {
-  calm: {body: '#e0213f', light: '#ff4a62', shade: '#a3132c'},
-  angry: {body: '#b70f2c', light: '#e2344d', shade: '#760a1d'},
-};
-const r = n => Math.round(n * 100) / 100;
-const rects = (list, fill, extra = '') => `<path fill="${fill}"${extra} d="${list.map(([x, y, w, h]) => `M${r(x)} ${r(y)}h${w}v${h}h-${w}z`).join('')}"/>`;
-const shift = (list, dx) => list.map(([x, y, w, h]) => [x + dx, y, w, h]);
+const W = 48, H = 48;
+const COLOR = {outline: '#291019', body: '#cc2845', light: '#ef5268', shade: '#98203a', white: '#fff8f3', pupil: '#24131b', blush: '#f77e8d', tear: '#91d3ef', gold: '#ffd58a'};
+const index = (x, y) => y * W + x;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-// A rounded pixel band: the building block for every coil, the neck, the head and the tail.
-function band(x, y, w, h) {
-  x = r(x); y = r(y);
-  // Bigger shapes get softer stair-stepped corners, so the head reads round like the original.
-  const c = w >= 12 && h >= 11 ? 3 : h >= 6 && w >= 4 ? 2 : 1;
-  return `M${x + c} ${y}h${w - 2 * c}${'v1h1'.repeat(c)}v${h - 2 * c}${'h-1v1'.repeat(c)}h-${w - 2 * c}${'v-1h-1'.repeat(c)}v-${h - 2 * c}${'h1v-1'.repeat(c)}z`;
+function dot(mask, cx, cy, radius) {
+  for (let y = Math.max(0, Math.floor(cy - radius)); y <= Math.min(H - 1, Math.ceil(cy + radius)); y++)
+    for (let x = Math.max(0, Math.floor(cx - radius)); x <= Math.min(W - 1, Math.ceil(cx + radius)); x++)
+      if ((x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2) mask[index(x, y)] = 1;
 }
-function coil(x, y, w, h, skin) {
-  let out = `<path fill="${OUTLINE}" d="${band(x, y, w, h)}"/><path fill="${skin.body}" d="${band(x + 1, y + 1, w - 2, h - 2)}"/>`;
-  if (w >= 7) out += rects([[x + 3, y + 1, w - 6, 1]], skin.light) + rects([[x + 3, y + h - 2, w - 6, 1]], skin.shade);
-  return out;
-}
-
-const EYES = {
-  open: {whites: [[23, 10, 4, 5]], pupils: [[25, 11, 2, 4]], shine: [[25, 11, 1, 1]]},
-  up: {whites: [[23, 10, 4, 5]], pupils: [[25, 10, 2, 3]], shine: [[25, 10, 1, 1]]},
-  small: {whites: [[23, 10, 4, 5]], pupils: [[24, 12, 2, 2]], shine: []},
-};
-const both = list => [...list, ...shift(list, 8)];
-
-/** Returns Hal's SVG markup for one moment of an action. Facing < 0 mirrors him to look left. */
-export function halSVG({action = 'idle', seconds = 0, facing = 1} = {}) {
-  const {frame: f, bounce, stride, sway, drift, thoughts} = halPose(action, seconds);
-  const angry = action === 'angry', joy = action === 'happy', sad = action === 'sad';
-  const sleep = action === 'sleep', eat = action === 'eat', think = action === 'thinking';
-  const surprised = action === 'surprised', moving = action === 'walk' || action === 'run';
-  const skin = angry ? SKIN.angry : SKIN.calm;
-  const head = stride * 0.6, droop = sleep ? 3 : sad ? 2 : 0;
-  let snake = '';
-
-  // Back to front: tail, bottom coil, neck, middle coil, head.
-  const tail = action === 'wave' || joy
-    ? `<g transform="translate(${r(sway * 2 - 1)} ${r(sway * 2)})">${coil(38, 18, 6, 18, skin)}</g>`
-    : coil(35 + stride, 34, 10, 6, skin) + `<g transform="translate(0 ${r(-sway)})">${coil(41 + stride, 29, 4, 7, skin)}</g>`;
-  snake += coil(5 + stride, 35, 36, 9, skin) + tail;
-  snake += `<g transform="translate(${r(head)} ${r(bounce * 0.5)})">${coil(13, 18, 10, 15, skin)}</g>`;
-  snake += coil(9 - stride, 28, 28, 8, skin);
-
-  let face = coil(16, 7, 24, 13, skin), eyes = '';
-  const blink = sleep || (action === 'idle' && f === 6);
-  if (blink) eyes += rects(both([[22, 13, 6, 1]]), OUTLINE);
-  else if (joy) eyes += rects(both([[22, 14, 1, 2], [23, 13, 1, 1], [24, 12, 2, 1], [26, 13, 1, 1], [27, 14, 1, 2]]), OUTLINE);
-  else {
-    const eye = think ? EYES.up : surprised ? EYES.small : EYES.open;
-    eyes += rects(both([[22, 9, 6, 7]]), OUTLINE) + rects(both(eye.whites), '#fff') + rects(both(eye.pupils), OUTLINE) + rects(both(eye.shine), '#fff');
+function curve(mask, points, radius) {
+  // Samples a cubic spine, then stamps overlapping disks into one connected body.
+  for (let j = 0; j + 3 < points.length; j += 3) {
+    const [a, b, c, d] = points.slice(j, j + 4);
+    for (let i = 0; i <= 80; i++) {
+      const t = i / 80, u = 1 - t;
+      const x = u ** 3 * a[0] + 3 * u ** 2 * t * b[0] + 3 * u * t ** 2 * c[0] + t ** 3 * d[0];
+      const y = u ** 3 * a[1] + 3 * u ** 2 * t * b[1] + 3 * u * t ** 2 * c[1] + t ** 3 * d[1];
+      dot(mask, Math.round(x), Math.round(y), radius);
+    }
   }
-  if (angry) eyes += rects([[22, 8, 2, 1], [24, 9, 2, 1], [26, 10, 2, 1], [30, 10, 2, 1], [32, 9, 2, 1], [34, 8, 2, 1]], OUTLINE);
-  if (sad) eyes += rects([[22, 10, 2, 1], [24, 9, 2, 1], [26, 8, 2, 1], [30, 8, 2, 1], [32, 9, 2, 1], [34, 10, 2, 1]], OUTLINE)
-    + rects([[35, 16 + drift, 1, 2]], '#63c6ee');
-  // Eyes sit forward on the head, toward the snout, like the original art.
-  face += `<g transform="translate(2 0)">${eyes}</g>` + rects([[39, 13, 1, 1]], OUTLINE);
-  if ((eat && f % 2) || surprised) face += rects([[33, 16, 4, 3]], OUTLINE) + rects([[34, 17, 2, 1]], '#7a0a1c');
-  else if (sad) face += rects([[32, 18, 1, 1], [33, 17, 4, 1], [37, 18, 1, 1]], OUTLINE);
-  else face += rects([[32, 17, 1, 1], [33, 18, 4, 1], [37, 17, 1, 1]], OUTLINE);
-  // A forked tongue flick while idling or slithering.
-  if (!eat && !sleep && !sad && ((action === 'idle' && (f === 2 || f === 3)) || (moving && f % 4 < 2)))
-    face += rects([[40, 16, 3, 1], [43, 15, 1, 1], [43, 17, 1, 1]], '#ff6f8a');
-  if (eat) face += `<g transform="translate(0 ${r(sway)})">${rects([[40, 16, 6, 5]], OUTLINE)}${rects([[41, 17, 4, 3]], '#7cc35a')}${rects([[41, 17, 1, 1]], '#c8f0a8')}${rects([[43, 14, 1, 2]], '#6b3a1f')}${rects([[44, 14, 2, 1]], '#3f9a3a')}</g>`;
-  snake += `<g transform="translate(${r(head)} ${r(bounce + droop)})">${face}</g>`;
+}
+function fill(mask, x0, y0, x1, y1) {
+  for (let y = clamp(y0, 0, H - 1); y <= clamp(y1, 0, H - 1); y++)
+    for (let x = clamp(x0, 0, W - 1); x <= clamp(x1, 0, W - 1); x++) mask[index(x, y)] = 1;
+}
+function runs(pixels, color) {
+  let d = '';
+  for (let y = 0; y < H; y++) for (let x = 0; x < W;) {
+    if (pixels[index(x, y)] !== color) { x++; continue; }
+    const start = x;
+    while (x < W && pixels[index(x, y)] === color) x++;
+    d += `M${start} ${y}h${x - start}v1H${start}z`;
+  }
+  return d ? `<path fill="${COLOR[color]}" d="${d}"/>` : '';
+}
+function paint(pixels, x, y, w, h, color) {
+  for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++)
+    if (xx >= 0 && xx < W && yy >= 0 && yy < H) pixels[index(xx, yy)] = color;
+}
 
+/** A complete pixel frame. Every state uses the same centered 48px canvas and y=44 baseline. */
+function renderFrame(action, seconds, facing) {
+  const pose = halPose(action, seconds);
+  const moving = action === 'slither' || action === 'dash';
+  const mask = new Uint8Array(W * H);
+  const wave = moving ? Math.round(pose.stride * 1.4) : 0;
+  const bob = action === 'happy' ? Math.round(pose.bounce)
+    : action === 'wave' ? Math.round(pose.bounce * .7)
+    : action === 'sad' ? 2 + (pose.frame % 3 === 2 ? 1 : 0)
+    : action === 'angry' ? (pose.frame % 2 ? -1 : 0)
+    : action === 'surprised' ? (pose.frame % 2 ? -2 : -1) : 0;
+  if (moving) curve(mask, [[7, 38], [13 + wave, 41], [29 - wave, 42], [27, 34],
+    [25, 27], [13 + wave, 31], [16, 23], [18, 16], [27 - wave, 17], [32, 18]], 4.5);
+  else curve(mask, [[37, 36], [34, 41], [9, 41], [9, 30], [9, 20], [32, 20], [33, 30],
+    [34, 36], [18, 36], [18, 28], [18, 20], [23, 17], [32, 18]], 3.4);
+  // The head overlaps the neck mask, so it remains one silhouette.
+  fill(mask, 25, 11 + bob, 39, 22 + bob);
+  fill(mask, 23, 13 + bob, 42, 20 + bob);
+  fill(mask, 28, 9 + bob, 38, 23 + bob);
+  const pixels = Array(W * H).fill('');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = index(x, y);
+    if (mask[i]) pixels[i] = 'body';
+    else if ([-1, 0, 1].some(dy => [-1, 0, 1].some(dx => dx || dy ? mask[index(clamp(x + dx, 0, W - 1), clamp(y + dy, 0, H - 1))] : false))) pixels[i] = 'outline';
+  }
+  // One palette for all frames; highlights follow the upper edge of the same body mask.
+  for (let y = 2; y < 43; y++) for (let x = 2; x < 46; x++) {
+    const i = index(x, y);
+    if (pixels[i] !== 'body') continue;
+    if (!mask[index(x, y - 1)] && x % 3 !== 0) pixels[i] = 'light';
+    else if (!mask[index(x, y + 1)] && x % 4 !== 0) pixels[i] = 'shade';
+  }
+  if (action === 'angry') {
+    for (let i = 0; i < pixels.length; i++) if (pixels[i] === 'body') pixels[i] = 'shade';
+  }
+  const eyeY = 12 + bob;
+  const blink = action === 'sleep' || action === 'idle' && pose.frame === 6;
+  if (blink) { paint(pixels, 28, eyeY + 3, 4, 1, 'outline'); paint(pixels, 36, eyeY + 3, 4, 1, 'outline'); }
+  else if (action === 'happy') {
+    paint(pixels, 28, eyeY + 3, 1, 2, 'outline'); paint(pixels, 29, eyeY + 2, 2, 1, 'outline'); paint(pixels, 31, eyeY + 3, 1, 2, 'outline');
+    paint(pixels, 36, eyeY + 3, 1, 2, 'outline'); paint(pixels, 37, eyeY + 2, 2, 1, 'outline'); paint(pixels, 39, eyeY + 3, 1, 2, 'outline');
+  } else {
+    paint(pixels, 27, eyeY, 5, 6, 'white'); paint(pixels, 35, eyeY, 5, 6, 'white');
+    paint(pixels, action === 'thinking' ? 28 : 30, eyeY + 2, 2, 3, 'pupil');
+    paint(pixels, action === 'thinking' ? 36 : 38, eyeY + 2, 2, 3, 'pupil');
+  }
+  if (action === 'angry') { paint(pixels, 27, eyeY - 1, 3, 1, 'outline'); paint(pixels, 37, eyeY - 1, 3, 1, 'outline'); }
+  if (action === 'sad') paint(pixels, 40, eyeY + 6 + Math.round(pose.drift / 2), 2, 2, 'tear');
+  if (action === 'surprised' || action === 'eat' && pose.frame % 2) paint(pixels, 37, 20 + bob, 3, 3, 'pupil');
+  else if (action === 'sad') paint(pixels, 36, 21 + bob, 4, 1, 'outline');
+  else { paint(pixels, 36, 21 + bob, 4, 1, 'outline'); paint(pixels, 36, 20 + bob, 1, 1, 'outline'); }
+  if (action === 'wave' || action === 'happy') paint(pixels, 41, 17 + bob, 2 + Math.round(pose.sway), 1, 'blush');
+  const order = ['outline', 'shade', 'body', 'light', 'white', 'pupil', 'blush', 'tear'];
   const flip = facing < 0 ? ' transform="translate(48 0) scale(-1 1)"' : '';
-  const shake = angry ? ` transform="translate(${r(sway - 0.5)} 0)"` : '';
-  let fx = '';
-  if (joy) fx += `<g fill="${f % 2 ? '#ffe79c' : '#f6b84e'}"><path d="M5 4h2v3h3v2H7v3H5V9H2V7h3zM43 22h2v3h3v2h-3v3h-2v-3h-3v-2h3z"/><path d="M${r(34 + drift)} 2h2v2h-2zM6 22h2v2H6z"/></g>`;
-  if (think) fx += thoughts.map((o, i) => `<rect fill="#c81d3a" x="${18 + i * 5}" y="1" width="3" height="3" opacity="${r(o)}"/>`).join('');
-  if (angry) fx += '<path fill="#f16f7d" d="M41 1h2v3h3v2h-5zM44 8h2v4h-4v-2h2z"/>';
-  if (sleep) fx += `<path transform="translate(0 ${r(-drift)})" fill="#8f97a3" d="M38 0h7v2h-2v2h-2v2h4v2h-7V6h2V4h2V2h-4z"/>`;
-  if (surprised) fx += '<path fill="#f6b84e" d="M43 0h2v5h-2zM43 6h2v2h-2z"/>';
+  const effects = action === 'thinking' ? pose.thoughts.map((v, i) => `<rect x="${12 + i * 5}" y="${8 - i * 2}" width="3" height="3" fill="${COLOR.blush}" opacity="${Math.round(v * 100) / 100}"/>`).join('')
+    : action === 'happy' ? `<path fill="${COLOR.gold}" d="M5 6h2v3h3v2H7v3H5v-3H2V9h3z"/>`
+    : action === 'sleep' ? `<path fill="${COLOR.white}" opacity="${Math.round((.55 + pose.drift * .2) * 100) / 100}" d="M40 ${2 - Math.round(pose.drift / 2)}h6v2h-3v2h3v2h-6V6h3V4h-3z"/>`
+    : action === 'surprised' ? `<path fill="${COLOR.gold}" d="M18 3h2v6h-2zm0 8h2v2h-2z"/>` : '';
+  return `<svg class="hal-rig" viewBox="0 0 48 48" width="96" height="96" shape-rendering="crispEdges" aria-hidden="true" focusable="false" data-action="${action}" data-frame="${pose.frame}"><g${flip}>${order.map(c => runs(pixels, c)).join('')}${effects}</g></svg>`;
+}
 
-  return `<svg class="hal-rig" viewBox="0 0 48 48" width="96" height="96" shape-rendering="crispEdges" aria-hidden="true" focusable="false" data-action="${action}" data-frame="${f}">`
-    + '<path fill="#22080f" opacity=".16" d="M8 44h32v2H8z"/>'
-    + '<path fill="#707985" d="M10 5h2v34h-2zM8 5h6v2H8zM8 39h6v2H8z"/><path fill="#d8dfe5" d="M10 6h1v32h-1z"/>'
-    + `<g${shake}><g${flip}>${snake}</g></g>${fx}</svg>`;
+const frameCache = new Map();
+export function halSVG({action = 'idle', seconds = 0, facing = 1} = {}) {
+  const clip = HAL_CLIPS[action] ?? HAL_CLIPS.idle;
+  const frame = Math.floor(Math.max(0, seconds) * clip.fps) % clip.frames;
+  const direction = facing < 0 ? -1 : 1;
+  const key = `${action}:${frame}:${direction}`;
+  if (!frameCache.has(key)) frameCache.set(key, renderFrame(action, frame / clip.fps, direction));
+  return frameCache.get(key);
 }
