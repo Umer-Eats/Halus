@@ -8,10 +8,12 @@
 .hal-companion-body:active { cursor: grabbing; }
 .hal-companion-body:focus-visible { outline: 2px dashed var(--red); outline-offset: 3px; border-radius: 8px; }
 .hal-art, .hal-rig { display: block; width: 96px; height: 96px; image-rendering: pixelated; }
+.hal-art { filter: drop-shadow(0 5px 7px rgba(48, 10, 20, .18)); }
 .hal-nameplate {
-  position: absolute; bottom: -2px; left: 4px; white-space: nowrap;
-  font: 500 9px/1 var(--font-mono); letter-spacing: .08em; color: var(--ink);
-  background: var(--surface); border: 1px solid var(--line-strong); padding: 3px 5px; border-radius: 4px;
+  position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font: 700 9px/1 var(--font-mono); letter-spacing: .1em; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-strong); padding: 5px 8px; border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(30, 10, 20, .12);
 }
 .hal-nameplate span { font-size: 8px; letter-spacing: 0; color: var(--muted); }
 .hal-apple { position: absolute; image-rendering: pixelated; transition: opacity .3s; }
@@ -21,14 +23,14 @@
   position: absolute; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
   border-radius: 12px; box-shadow: var(--shadow);
 }
-.hal-bubble { width: 240px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; }
+.hal-bubble { width: 240px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; border-radius: 14px; }
 .hal-panel { pointer-events: auto; }
 .hal-panel button { font: inherit; color: inherit; cursor: pointer; }
 .hal-panel-title { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
 .hal-panel-title button { border: 0; background: none; font-size: 20px; line-height: 1; padding: 0 4px; color: var(--muted); }
 .hal-panel-title button:hover { color: var(--red); }
 
-.hal-controls { width: 240px; padding: 12px; max-height: calc(100dvh - 16px); overflow-y: auto; }
+.hal-controls { width: 240px; padding: 16px; max-height: calc(100dvh - 16px); overflow-y: auto; border-radius: 18px; }
 .hal-controls p { font-size: 11px; line-height: 1.7; color: var(--muted); margin: 6px 0 10px; }
 .hal-controls > button, .hal-controls-actions button, .hal-moods button {
   font-family: var(--font-button); font-size: 11px; letter-spacing: .01em;
@@ -43,7 +45,7 @@
 .hal-moods { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 .hal-controls .hal-moods button { padding: 4px 7px; font-size: 10px; text-transform: capitalize; }
 
-.hal-chat { display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow: auto; }
+.hal-chat { display: flex; flex-direction: column; gap: 10px; padding: 16px; overflow: auto; border-radius: 18px; }
 .hal-chat[hidden] { display: none; }
 .hal-chat > :not(.hal-chat-log) { flex-shrink: 0; }
 .hal-chat .hal-panel-title { padding-left: 18px; }
@@ -91,3 +93,4 @@
 .hal-chat-form button:disabled { opacity: .45; cursor: default; }
 .hal-companion .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media print { .hal-companion { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hal-art { filter: none; } }

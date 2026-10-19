@@ -40,6 +40,7 @@ export function mountHal(parent = document.body) {
     target: null, apple: null, action: 'wave', since: now0, until: now0 + 2800, facing: -1,
     message: prefs.muted ? '' : 'Hi, I am Hal! Double-click me to chat, or click for more.',
     messageUntil: now0 + 8000, nextTalk: now0 + 60000, nextWalk: now0 + 9000,
+    nextAct: now0 + 5000, actIndex: 0,
   };
   let menuOpen = false, chatOpen = false, held = false, drag = null, suppressClick = false, clickTimer, talkIndex = 0, roamIndex = 0;
 
@@ -59,6 +60,7 @@ export function mountHal(parent = document.body) {
     s.apple = null;
     setAction(action, performance.now() + duration);
     s.nextWalk = s.until + 4000;
+    s.nextAct = s.until + 3500;
   };
   const feed = point => {
     if (prefs.anchored || !canMove()) {
@@ -233,6 +235,13 @@ export function mountHal(parent = document.body) {
         say(pepTalks[talkIndex++ % pepTalks.length]);
         s.nextTalk = now + 75000;
       }
+      // Short ambient beats between walks give Hal a readable, companion-like cycle.
+      if (!s.target && !s.apple && !s.until && !menuOpen && !chatOpen && !held && now >= s.nextAct) {
+        const ambient = ['wave', 'idle', 'thinking', 'idle', 'happy', 'idle', 'sleep', 'idle'];
+        const action = ambient[s.actIndex++ % ambient.length];
+        setAction(action, action === 'idle' ? 0 : now + (action === 'sleep' ? 4200 : 1800));
+        s.nextAct = now + (action === 'idle' ? 3500 : 6000);
+      }
       paint(now);
     }
     raf = requestAnimationFrame(tick);
@@ -265,6 +274,8 @@ export function mountHal(parent = document.body) {
     if (chatOpen) chat.place(s.position);
   }
   raf = requestAnimationFrame(tick);
+  const onVisibility = () => { previous = performance.now(); };
+  document.addEventListener('visibilitychange', onVisibility);
 
   return () => {
     cancelAnimationFrame(raf);
@@ -274,6 +285,7 @@ export function mountHal(parent = document.body) {
     window.removeEventListener('hal:mood', onMood);
     window.removeEventListener('hal:ask', onAsk);
     window.removeEventListener('resize', onResize);
+    document.removeEventListener('visibilitychange', onVisibility);
     root.remove();
   };
 }

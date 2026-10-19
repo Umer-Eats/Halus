@@ -1,4 +1,4 @@
-// Hal, drawn as 48px pixel art from the original coil (assets/hal.png) so every pose can animate.
+// Hal, drawn as a single cranberry pixel silhouette around a small silver medical staff.
 import {halPose} from './hal-motion.js';
 
 const OUTLINE = '#22080f';
@@ -81,5 +81,6 @@ export function halSVG({action = 'idle', seconds = 0, facing = 1} = {}) {
 
   return `<svg class="hal-rig" viewBox="0 0 48 48" width="96" height="96" shape-rendering="crispEdges" aria-hidden="true" focusable="false" data-action="${action}" data-frame="${f}">`
     + '<path fill="#22080f" opacity=".16" d="M8 44h32v2H8z"/>'
+    + '<path fill="#707985" d="M10 5h2v34h-2zM8 5h6v2H8zM8 39h6v2H8z"/><path fill="#d8dfe5" d="M10 6h1v32h-1z"/>'
     + `<g${shake}><g${flip}>${snake}</g></g>${fx}</svg>`;
 }

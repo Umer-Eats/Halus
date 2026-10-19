@@ -18,21 +18,24 @@ export const HAL_SIZE = 96;
 /** Samples a pose between two keyframes so the 48px art moves smoothly at any refresh rate. */
 export function halPose(action, seconds) {
   const clip = HAL_CLIPS[action] ?? HAL_CLIPS.idle;
-  const phase = Math.max(0, seconds) * clip.fps;
+  const time = Math.max(0, seconds);
+  const phase = time * clip.fps;
   const frame = Math.floor(phase) % clip.frames;
   const next = (frame + 1) % clip.frames;
   const t = phase - Math.floor(phase);
   const blend = t * t * (3 - 2 * t);
   const sample = value => value(frame) + (value(next) - value(frame)) * blend;
   const moving = action === 'walk' || action === 'run';
+  // Continuous waves keep the silhouette moving between expression frames.
+  const wave = Math.sin(time * (moving ? action === 'run' ? 17 : 11 : 3.4));
   return {
     frame,
     // Head and neck rise and dip; the coils stay planted.
-    bounce: sample(f => moving ? [0, -1, -1, 0, 0, -1, -1, 0][f] : action === 'happy' ? [0, -2, -4, -3, -1, 0][f] : f % 4 === 2 ? -1 : 0),
+    bounce: moving ? -1.2 + wave * 1.2 : action === 'happy' ? sample(f => [0, -2, -4, -3, -1, 0][f]) : wave * 0.65,
     // Slither: the coils shift against each other like a travelling wave.
-    stride: moving ? sample(f => [0, 1, 2, 1, 0, -1, -2, -1][f]) : 0,
-    sway: sample(f => f % 2),
-    drift: sample(f => f % 3),
+    stride: moving ? Math.sin(time * (action === 'run' ? 13 : 8)) * 2.2 : 0,
+    sway: (wave + 1) / 2,
+    drift: (Math.sin(time * 2.1) + 1),
     thoughts: [0, 1, 2].map(i => sample(f => (f % 3 === i ? 1 : 0.25))),
   };
 }
