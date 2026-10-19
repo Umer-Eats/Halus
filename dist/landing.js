@@ -1,4 +1,4 @@
-// Public-page behaviour: quiet reveals, header state, and the bloodstream centerpiece.
+// Public-page behaviour: restrained reveals, header state, preview tabs, live sculpture.
 import {mountBloodstream} from './bloodstream.js';
 
 export function initLanding(root) {
@@ -19,8 +19,24 @@ export function initLanding(root) {
   const onScroll = () => header?.classList.toggle('scrolled', scrollY > 24);
   on(window, 'scroll', onScroll, {passive: true}); onScroll();
 
+  // Live hero bloodstream.
   const canvas = root.querySelector('canvas.sculpture');
   if (canvas) cleanups.push(mountBloodstream(canvas));
+
+  // Product preview tabs.
+  const preview = root.querySelector('.preview-window');
+  if (preview) {
+    const tabs = [...preview.querySelectorAll('[data-tab]')], ink = preview.querySelector('.tab-ink');
+    const place = t => { ink.style.width = t.offsetWidth + 'px'; ink.style.transform = `translateX(${t.offsetLeft}px)`; };
+    const pick = t => {
+      tabs.forEach(x => { x.classList.toggle('on', x === t); x.setAttribute('aria-selected', x === t); });
+      preview.querySelectorAll('[data-pane]').forEach(p => p.classList.toggle('on', p.dataset.pane === t.dataset.tab));
+      place(t);
+    };
+    tabs.forEach(t => on(t, 'click', () => pick(t)));
+    requestAnimationFrame(() => place(tabs[0]));
+    on(window, 'resize', () => place(preview.querySelector('[data-tab].on')));
+  }
 
   // Departures board: rows expand on hover/focus (and tap on touch).
   root.querySelectorAll('.board-row').forEach(row => {

@@ -1,5 +1,5 @@
 // Hal's clips, pose sampling and movement maths. Pure functions so the server tests can import them.
-export const HAL_ACTIONS = ['idle', 'wave', 'thinking', 'angry', 'happy', 'sad', 'slither', 'dash', 'eat', 'sleep', 'surprised'];
+export const HAL_ACTIONS = ['idle', 'wave', 'thinking', 'angry', 'happy', 'sad', 'walk', 'run', 'eat', 'sleep', 'surprised'];
 export const HAL_CLIPS = {
   idle: {frames: 8, fps: 3},
   wave: {frames: 6, fps: 7},
@@ -7,8 +7,8 @@ export const HAL_CLIPS = {
   angry: {frames: 4, fps: 7},
   happy: {frames: 6, fps: 8},
   sad: {frames: 6, fps: 3},
-  slither: {frames: 8, fps: 12},
-  dash: {frames: 8, fps: 14},
+  walk: {frames: 8, fps: 10},
+  run: {frames: 8, fps: 14},
   eat: {frames: 6, fps: 7},
   sleep: {frames: 6, fps: 2},
   surprised: {frames: 4, fps: 5},
@@ -25,20 +25,15 @@ export function halPose(action, seconds) {
   const t = phase - Math.floor(phase);
   const blend = t * t * (3 - 2 * t);
   const sample = value => value(frame) + (value(next) - value(frame)) * blend;
-  const moving = action === 'slither' || action === 'dash';
+  const moving = action === 'walk' || action === 'run';
   // Continuous waves keep the silhouette moving between expression frames.
-  const wave = Math.sin(time * (moving ? action === 'dash' ? 17 : 11 : 3.4));
+  const wave = Math.sin(time * (moving ? action === 'run' ? 17 : 11 : 3.4));
   return {
     frame,
     // Head and neck rise and dip; the coils stay planted.
-    bounce: moving ? -1.2 + wave * 1.2
-      : action === 'happy' ? sample(f => [0, -2, -4, -3, -1, 0][f])
-      : action === 'wave' ? Math.sin(time * 8) * 2
-      : action === 'surprised' ? sample(f => [0, -3, -2, 0][f])
-      : action === 'sad' ? 1 + Math.sin(time * 2) * .4
-      : action === 'sleep' ? Math.sin(time * 2) * .35 : wave * 0.65,
+    bounce: moving ? -1.2 + wave * 1.2 : action === 'happy' ? sample(f => [0, -2, -4, -3, -1, 0][f]) : wave * 0.65,
     // Slither: the coils shift against each other like a travelling wave.
-    stride: moving ? Math.sin(time * (action === 'dash' ? 13 : 8)) * 2.2 : 0,
+    stride: moving ? Math.sin(time * (action === 'run' ? 13 : 8)) * 2.2 : 0,
     sway: (wave + 1) / 2,
     drift: (Math.sin(time * 2.1) + 1),
     thoughts: [0, 1, 2].map(i => sample(f => (f % 3 === i ? 1 : 0.25))),

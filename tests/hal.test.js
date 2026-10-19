@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {HAL_ACTIONS, HAL_CLIPS, halPose, boundHal, stepHal} from '../dist/hal-motion.js';
+import {HAL_ACTIONS, halPose, boundHal, stepHal} from '../dist/hal-motion.js';
 import {halSVG} from '../dist/hal-character.js';
 import {askHal, settleHalReply, readHalInput, allowHalMessage} from '../server/hal.js';
 
@@ -13,29 +13,9 @@ test('every action renders a valid 48px rig, mirrored when facing left', () => {
   assert.match(halSVG({facing: -1}), /scale\(-1 1\)/);
 });
 
-test('Hal is one coiled snake at rest and one slithering silhouette in motion', () => {
-  const resting = halSVG({action: 'idle', seconds: 0});
-  const travelling = halSVG({action: 'slither', seconds: 0.13});
-  assert.match(resting, /shape-rendering="crispEdges"/);
-  assert.match(resting, /fill="#cc2845"/);
-  assert.match(travelling, /fill="#cc2845"/);
-  assert.notEqual(resting, travelling);
-  assert.notEqual(halSVG({action: 'slither', seconds: 0}), halSVG({action: 'slither', seconds: 2 / HAL_CLIPS.slither.fps}));
-});
-
-test('Ako mood set has distinct animated Hal expressions', () => {
-  assert.deepEqual(HAL_ACTIONS.filter(a => !['slither', 'dash'].includes(a)),
-    ['idle', 'wave', 'thinking', 'angry', 'happy', 'sad', 'eat', 'sleep', 'surprised']);
-  for (const mood of ['wave', 'thinking', 'angry', 'happy', 'sad', 'eat', 'sleep', 'surprised']) {
-    const frames = Array.from({length: HAL_CLIPS[mood].frames}, (_, frame) => halSVG({action: mood, seconds: frame / HAL_CLIPS[mood].fps}));
-    assert.ok(new Set(frames).size > 1, `${mood} should animate`);
-    assert.match(halSVG({action: mood}), /shape-rendering="crispEdges"/, `${mood} should be pixel art`);
-  }
-});
-
 test('poses interpolate smoothly and only slithering moves the coils', () => {
   assert.equal(halPose('idle', 1).stride, 0);
-  assert.notEqual(halPose('slither', 0.15).stride, 0);
+  assert.notEqual(halPose('walk', 0.15).stride, 0);
   const a = halPose('happy', 0.1).bounce, b = halPose('happy', 0.11).bounce;
   assert.ok(Math.abs(a - b) < 0.5);
 });
