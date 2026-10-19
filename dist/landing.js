@@ -1,5 +1,6 @@
 // Public-page behaviour: restrained reveals, header state, preview tabs, live sculpture.
 import {mountBloodstream} from './bloodstream.js';
+import {mountCellularAtlas} from './cellular.js';
 
 export function initLanding(root) {
   const cleanups = [];
@@ -22,6 +23,22 @@ export function initLanding(root) {
   // Live hero bloodstream.
   const canvas = root.querySelector('canvas.sculpture');
   if (canvas) cleanups.push(mountBloodstream(canvas));
+  const bloodPause = root.querySelector('[data-blood-pause]');
+  if (bloodPause) {
+    bloodPause.setAttribute('aria-pressed', String(still));
+    bloodPause.textContent = still ? 'Play motion' : 'Pause motion';
+    if (canvas) canvas.dataset.paused = String(still);
+    on(bloodPause, 'click', () => {
+      const paused = canvas.dataset.paused !== 'true';
+      canvas.dataset.paused = String(paused);
+      bloodPause.setAttribute('aria-pressed', String(paused));
+      bloodPause.textContent = paused ? 'Play motion' : 'Pause motion';
+    });
+  }
+  const atlas = root.querySelector('.cellular-atlas');
+  if (atlas) cleanups.push(mountCellularAtlas(atlas));
+  const closer = root.querySelector('a[href="#living-world"]');
+  if (closer) on(closer, 'click', e => { e.preventDefault(); atlas?.scrollIntoView({behavior: still ? 'instant' : 'smooth'}); });
 
   // Product preview tabs.
   const preview = root.querySelector('.preview-window');

@@ -9,7 +9,7 @@ import { checkPasswordSettings } from './server/communities.js';
 import { createDb } from './server/db.js';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, 'dist');
-const types = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'};
+const types = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.ttf':'font/ttf'};
 // Without a Turso URL, local development uses a file database that never leaves this machine.
 if (!process.env.TURSO_DATABASE_URL) { mkdirSync(path.join(here, '.data'), { recursive: true }); process.env.TURSO_DATABASE_URL = 'file:.data/halus.db'; }
 for (const problem of checkPasswordSettings()) console.warn('Community settings: ' + problem);

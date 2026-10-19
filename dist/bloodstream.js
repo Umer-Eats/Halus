@@ -117,6 +117,8 @@ export function mountBloodstream(canvas) {
   const loc = {bgA: gl.getAttribLocation(bgProg, 'a'), pos: gl.getAttribLocation(cellProg, 'aPos'), uv: gl.getAttribLocation(cellProg, 'aUv'), axis: gl.getAttribLocation(cellProg, 'aAxis'), p: gl.getAttribLocation(cellProg, 'aP')};
 
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Full-bleed: the vessel fills the whole opening instead of a narrow band.
+  const fullBleed = Boolean(canvas.closest('.organism-hero'));
   const rand = (a, b) => a + Math.random() * (b - a);
   let W = 1, H = 1, dpr = 1, maxDpr = Math.min(devicePixelRatio || 1, 1.75), slow = 0, wide = true, frame = 0, last = performance.now(), clock = 0, visible = true;
   const mouse = {x: -9999, y: -9999, lastMove: 0};
@@ -133,9 +135,9 @@ export function mountBloodstream(canvas) {
     return cell;
   };
   let cells = [];
-  const populate = () => { const n = wide ? 84 : 46; cells = Array.from({length: n}, () => spawn({}, true)); };
+  const populate = () => { const n = fullBleed ? (wide ? 150 : 90) : wide ? 84 : 46; cells = Array.from({length: n}, () => spawn({}, true)); };
 
-  const path = () => wide ? [.25, .2, .14] : [.27, .05, .11];
+  const path = () => fullBleed ? (wide ? [.53, -.06, .4] : [.5, 0, .42]) : wide ? [.25, .2, .14] : [.27, .05, .11];
   const size = () => {
     dpr = maxDpr;
     W = canvas.clientWidth; H = canvas.clientHeight;
@@ -173,7 +175,7 @@ export function mountBloodstream(canvas) {
         c.ox += c.vx * dt; c.oy += c.vy * dt;
       }
       x += c.ox; y += c.oy;
-      const rad = (wide ? .03 : .021) * H * persp, ext = rad * 1.35;
+      const rad = (fullBleed ? (wide ? .034 : .024) : wide ? .03 : .021) * H * persp, ext = rad * 1.35;
       const blur = Math.min(Math.abs(c.z - .12) * .5 + (c.z > 1.1 ? .35 : 0), 1);
       const fog = Math.max(0, Math.min((-c.z - .1) * .55, .6));
       const st = Math.sin(c.phase), ax = st * Math.cos(c.rot), ay = st * Math.sin(c.rot), az = Math.cos(c.phase);
@@ -186,7 +188,7 @@ export function mountBloodstream(canvas) {
   };
 
   const draw = () => {
-    const dark = document.documentElement.dataset.theme === 'dark' ? 1 : 0;
+    const dark = canvas.dataset.palette === 'light' ? 0 : document.documentElement.dataset.theme === 'dark' ? 1 : 0;
     gl.disable(gl.BLEND);
     gl.useProgram(bgProg);
     gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
@@ -214,7 +216,7 @@ export function mountBloodstream(canvas) {
     frame = requestAnimationFrame(loop);
     const dt = Math.min(now - last, 60) / 1000; last = now;
     if (!visible || document.hidden) return;
-    if (!still) {
+    if (canvas.dataset.paused !== 'true' && (!still || canvas.dataset.paused === 'false')) {
       clock += dt;
       step(dt);
     }
@@ -225,7 +227,7 @@ export function mountBloodstream(canvas) {
   const onMove = e => {
     const r = canvas.getBoundingClientRect();
     const x = e.clientX - r.left, y = e.clientY - r.top, now = performance.now();
-    if (!still && mouse.lastMove && now - mouse.lastMove < 100) {
+    if (!still && canvas.dataset.paused !== 'true' && mouse.lastMove && now - mouse.lastMove < 100) {
       const dx = x - mouse.x, dy = y - mouse.y, distance = Math.hypot(dx, dy);
       if (distance > 1) {
         const ux = dx / distance, uy = dy / distance;
