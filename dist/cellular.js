@@ -1,23 +1,15 @@
-// Original illustrative geometry, informed by the cited Allen Institute microscopy.
+// Original illustrative geometry, informed by Allen Institute microscopy (allencell.org).
 // No measured coordinates, physical dimensions, or experimental time are implied.
-const specimens = {
-  cell: {title:'A world within a cell.', name:'Cell architecture', caption:'A membrane. A nucleus. Thousands of connections. Explore the intricate structures that make a single cell a living system.', labels:['Cell membrane','Nucleus','Internal structures']},
-  mitosis: {title:'One becomes two.', name:'Cell division', caption:'Watch spindle-like fibres organise and the chromosome groups separate. A small change, with the possibility of something entirely new.', labels:['Cell membrane','Chromosomes','Spindle fibres']},
-  network: {title:'Life is connected.', name:'Mitochondrial network', caption:'Mitochondria form branching tubules and smaller, separate structures. Their living networks continually move and reorganise within the cell.', labels:['Cell boundary','Nucleus','Mitochondrial tubules']}
-};
+const KINDS = ['cell', 'mitosis', 'network'];
 
 export function cellularAtlas() {
   return `<section class="cellular-atlas" id="living-world" aria-labelledby="atlas-heading">
-    <div class="atlas-intro"><div><span class="eyebrow">Welcome to the invisible.</span><h2 id="atlas-heading">Small things.<br><span>Infinite wonder.</span></h2></div><p>A living world, hiding in plain sight.<br>Choose a structure. Turn it around. Look within.</p></div>
-    <div class="atlas-shell">
-      <div class="specimen-tabs" role="group" aria-label="Choose a biological structure">${Object.entries(specimens).map(([key,s],i)=>`<button data-specimen="${key}" aria-pressed="${i===0}"><span>0${i+1}</span>${s.name}</button>`).join('')}</div>
-      <div class="atlas-view"><div class="specimen-stage"><canvas class="specimen-canvas" role="img" aria-label="Animated illustrative 3D cell with membrane, nucleus and internal structures"></canvas><span class="specimen-badge"><i></i>Living structures</span><span class="specimen-axis" aria-hidden="true">Y<br>└── X<br>╱ Z</span><span class="specimen-kind">3D illustration · Microscopy inspired</span></div>
-      <div class="specimen-info"><span class="eyebrow">Inside the invisible</span><h3 data-specimen-title>${specimens.cell.title}</h3><p data-specimen-caption>${specimens.cell.caption}</p><ul class="specimen-legend">${specimens.cell.labels.map((l,i)=>`<li><i class="channel-${i}"></i><span>${l}</span></li>`).join('')}</ul><div class="specimen-controls"><button class="specimen-play" aria-pressed="false">Pause animation <span aria-hidden="true">Ⅱ</span></button><label>Rotate the view<input type="range" min="-180" max="180" value="0" data-rotation aria-label="Rotate the specimen"></label><label>Explore the depth<input type="range" min="0" max="100" value="100" data-depth aria-label="Specimen depth cutaway"></label></div><span class="specimen-disclaimer">An artistic interpretation, not a measured scan. Colours distinguish structures.</span></div></div>
-      <details class="microscopy-sources"><summary>Inspired by real microscopy <span>View the research ↗</span></summary><div class="source-grid"><a href="https://www.allencell.org/allen-integrated-cell.html" target="_blank" rel="noreferrer"><img src="assets/references/allen-3d-cell.png" loading="lazy" width="534" height="462" alt="Allen Institute 3D cell model showing the nucleus and surrounding cellular structures"><strong>Cell architecture in 3D ↗</strong><span>Allen Integrated Cell · Allen Institute</span></a><a href="https://www.allencell.org/hips-cells-during-mitosis.html" target="_blank" rel="noreferrer"><img src="assets/references/allen-mitosis.png" loading="lazy" width="863" height="800" alt="Allen Institute confocal microscopy comparison of interphase and seven stages of mitosis"><strong>Cell division, through time ↗</strong><span>Confocal microscopy & time series · Allen Institute</span></a><div class="source-notes"><h4>From observation to imagination.</h4><p>The cell model and microscopy figures inform the shapes here. The animations are original illustrations; they do not reproduce a scientific dataset.</p><a href="https://www.allencell.org/cell-observations/mitochondria-visualized-via-tom20" target="_blank" rel="noreferrer">See mitochondrial z-stacks & 3D time-lapse ↗</a><p>Reference images: Allen Institute for Cell Science. Original colours retained. 4D microscopy means three spatial dimensions observed over time.</p></div></div></details>
-    </div></section>`;
+    <div class="atlas-intro"><div><span class="eyebrow">Welcome to the invisible.</span><h2 id="atlas-heading">Small things.<br><span>Infinite wonder.</span></h2></div></div>
+    <div class="atlas-shell"><div class="atlas-view"><div class="specimen-stage"><canvas class="specimen-canvas" role="img" aria-label="Rotating illustration of a cell that slowly changes between cell architecture, cell division and a mitochondrial network"></canvas></div></div></div>
+    </section>`;
 }
 
-// Seeded geometry makes switching specimens stable and avoids per-frame randomness.
+// Seeded geometry keeps every specimen stable from visit to visit.
 export function makeSpecimen(kind) {
   let seed = 613;
   const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -71,76 +63,92 @@ export function makeSpecimen(kind) {
   return points;
 }
 
-export function mountSpecimen(canvas, {kind='cell'}={}) {
+// Every specimen shares one set of slots so any shape can melt into any other. The membrane
+// comes first in each set, so it holds steady while the interior reorganises. Shorter sets
+// are padded with invisible points that sit inside their structure and fade in or out.
+function buildSlots() {
+  const sets = KINDS.map(makeSpecimen), count = Math.max(...sets.map(s => s.length));
+  let seed = 97;
+  const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  return sets.map(set => {
+    const inner = set.filter(p => p.channel);
+    return Array.from({length: count}, (_, i) => set[i] ? {...set[i], alpha: 1} : {...inner[Math.floor(random() * inner.length)], alpha: 0});
+  });
+}
+
+const COLORS = [[242,65,91],[255,226,223],[255,125,139]], ALPHA = [.24,.48,.7];
+const HOLD = [7, 12], MORPH = 3.2;
+
+export function mountSpecimen(canvas) {
   const context=canvas.getContext('2d');
-  if(!context) { canvas.replaceWith(Object.assign(document.createElement('p'),{textContent:'Explore the microscopy references below to see these cellular structures.'})); return {set(){},destroy(){}}; }
+  if(!context) return {destroy(){}};
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
-  let state={kind, paused:motion.matches, rotation:0, depth:100}, points=makeSpecimen(kind);
+  const slots=buildSlots();
+  const pick=(not)=>{const options=KINDS.map((_,i)=>i).filter(i=>i!==not);return options[Math.floor(Math.random()*options.length)];};
+  let from=Math.floor(Math.random()*KINDS.length), to=from, blend=1, hold=HOLD[0]+Math.random()*(HOLD[1]-HOLD[0]);
   let width=1,height=1,frame=0,time=0,last=0,visible=false,disposed=false;
+
+  const place=(p,kind,out)=>{
+    let {x,y,z}=p;
+    if(kind==='mitosis') {
+      const division=(1-Math.cos(time*.38))*.27;
+      if(p.group) x+=p.group*(.08+division);
+      if(p.channel===0) {x*=1+division*.35;y*=1-division*.25*Math.exp(-x*x*6);}
+    } else if(p.channel===2) {x+=Math.sin(time*.55+p.phase)*.012;y+=Math.cos(time*.4+p.phase)*.012;}
+    out[0]=x;out[1]=y;out[2]=z;
+  };
+  const a=[0,0,0], b=[0,0,0], projected=[];
   const render=()=>{
     context.clearRect(0,0,width,height);
-    const scale=Math.min(width/3.5,height/2.9), a=state.rotation*Math.PI/180+time*.065;
-    const ca=Math.cos(a),sa=Math.sin(a),tilt=-.25,ct=Math.cos(tilt),st=Math.sin(tilt);
-    const division=(1-Math.cos(time*.38))*.27;
-    const transformed=[];
-    for(const p of points) {
-      let {x,y,z}=p;
-      if(state.kind==='mitosis') {
-        if(p.group) x+=p.group*(.08+division);
-        if(p.channel===0) {x*=1+division*.35;y*=1-division*.25*Math.exp(-x*x*6);}
-      } else if(p.channel===2) {x+=Math.sin(time*.55+p.phase)*.012;y+=Math.cos(time*.4+p.phase)*.012;}
-      if(z>(state.depth/100*2-1)*.95) continue;
+    const scale=Math.min(width/3.5,height/2.9), turn=time*.22;
+    const ca=Math.cos(turn),sa=Math.sin(turn),tilt=-.25+Math.sin(time*.13)*.12,ct=Math.cos(tilt),st=Math.sin(tilt);
+    const t=blend*blend*(3-2*blend), A=slots[from], B=slots[to], kindA=KINDS[from], kindB=KINDS[to];
+    projected.length=0;
+    for(let i=0;i<A.length;i++) {
+      const p=A[i], q=B[i];
+      const alpha=p.alpha+(q.alpha-p.alpha)*t;
+      if(alpha<.01) continue;
+      place(p,kindA,a); place(q,kindB,b);
+      const x=a[0]+(b[0]-a[0])*t, y=a[1]+(b[1]-a[1])*t, z=a[2]+(b[2]-a[2])*t;
       const xx=x*ca+z*sa,zz=z*ca-x*sa, yy=y*ct-zz*st,depth=zz*ct+y*st;
-      const perspective=3.8/(3.8-depth);
-      transformed.push({x:width/2+xx*scale*perspective,y:height/2+yy*scale*perspective,z:depth,r:p.size*perspective,c:p.channel});
+      const perspective=3.8/(3.8-depth), cp=COLORS[p.channel], cq=COLORS[q.channel];
+      projected.push({
+        x:width/2+xx*scale*perspective, y:height/2+yy*scale*perspective, z:depth,
+        r:(p.size+(q.size-p.size)*t)*perspective,
+        rgb:`${Math.round(cp[0]+(cq[0]-cp[0])*t)},${Math.round(cp[1]+(cq[1]-cp[1])*t)},${Math.round(cp[2]+(cq[2]-cp[2])*t)}`,
+        a:alpha*(ALPHA[p.channel]+(ALPHA[q.channel]-ALPHA[p.channel])*t)*Math.max(.22,(depth+1.4)/2.5)
+      });
     }
-    transformed.sort((a,b)=>a.z-b.z);
+    projected.sort((m,n)=>m.z-n.z);
     context.globalCompositeOperation='lighter';
-    const colors=['242,65,91','255,226,223','255,125,139'];
-    for(const p of transformed) {
-      const alpha=(p.c===0?.24:p.c===1?.48:.7)*Math.max(.22,(p.z+1.4)/2.5);
-      context.fillStyle=`rgba(${colors[p.c]},${alpha})`;
+    for(const p of projected) {
+      context.fillStyle=`rgba(${p.rgb},${p.a})`;
       context.beginPath();context.arc(p.x,p.y,Math.max(.35,p.r),0,Math.PI*2);context.fill();
     }
     context.globalCompositeOperation='source-over';
   };
+  const advance=dt=>{
+    time+=dt;
+    if(blend<1) { blend=Math.min(1,blend+dt/MORPH); if(blend===1) { from=to; hold=HOLD[0]+Math.random()*(HOLD[1]-HOLD[0]); } }
+    else if((hold-=dt)<=0) { to=pick(from); blend=0; }
+  };
   const loop=now=>{
     frame=0;
-    if(disposed||!visible||document.hidden||state.paused) return;
-    time+=last?Math.min((now-last)/1000,.05):0;last=now;
+    if(disposed||!visible||document.hidden||motion.matches) return;
+    advance(last?Math.min((now-last)/1000,.05):0);last=now;
     render();frame=requestAnimationFrame(loop);
   };
-  const schedule=()=>{cancelAnimationFrame(frame);frame=0;last=0;render();if(!state.paused&&visible&&!document.hidden)frame=requestAnimationFrame(loop);};
+  const schedule=()=>{cancelAnimationFrame(frame);frame=0;last=0;render();if(!motion.matches&&visible&&!document.hidden)frame=requestAnimationFrame(loop);};
   const resize=()=>{const r=canvas.getBoundingClientRect();width=r.width;height=r.height;const dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);context.setTransform(dpr,0,0,dpr,0,0);render();};
   const ro=new ResizeObserver(resize);ro.observe(canvas);
   const io=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;schedule();});io.observe(canvas);
-  const visibility=()=>schedule();document.addEventListener('visibilitychange',visibility);
-  const reduced=()=>{state.paused=motion.matches;schedule();canvas.dispatchEvent(new CustomEvent('specimen-motion',{detail:state.paused}));};motion.addEventListener('change',reduced);
+  document.addEventListener('visibilitychange',schedule);
+  motion.addEventListener('change',schedule);
   resize();
-  return {
-    set(update){if(update.kind&&update.kind!==state.kind){points=makeSpecimen(update.kind);time=0;}state={...state,...update};schedule();},
-    destroy(){disposed=true;cancelAnimationFrame(frame);ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',visibility);motion.removeEventListener('change',reduced);}
-  };
+  return {destroy(){disposed=true;cancelAnimationFrame(frame);ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',schedule);motion.removeEventListener('change',schedule);}};
 }
 
 export function mountCellularAtlas(root) {
-  const canvas=root.querySelector('canvas'), view=mountSpecimen(canvas), cleanups=[];
-  const on=(el,type,fn)=>{el.addEventListener(type,fn);cleanups.push(()=>el.removeEventListener(type,fn));};
-  const play=root.querySelector('.specimen-play');let paused=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const showPause=()=>{play.setAttribute('aria-pressed',String(paused));play.innerHTML=paused?'Play animation <span aria-hidden="true">▷</span>':'Pause animation <span aria-hidden="true">Ⅱ</span>';};showPause();
-  on(play,'click',()=>{paused=!paused;view.set({paused});showPause();});
-  on(canvas,'specimen-motion',e=>{paused=e.detail;showPause();});
-  for(const button of root.querySelectorAll('[data-specimen]')) on(button,'click',()=>{
-    const key=button.dataset.specimen,s=specimens[key];
-    root.querySelectorAll('[data-specimen]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
-    root.querySelector('[data-specimen-title]').textContent=s.title;
-    root.querySelector('[data-specimen-caption]').textContent=s.caption;
-    root.querySelectorAll('.specimen-legend li span').forEach((el,i)=>el.textContent=s.labels[i]);
-    canvas.setAttribute('aria-label',`Illustrative 3D ${s.name.toLowerCase()}: ${s.labels.join(', ')}`);
-    root.querySelector('[data-rotation]').value=0;root.querySelector('[data-depth]').value=100;
-    view.set({kind:key,rotation:0,depth:100});
-  });
-  on(root.querySelector('[data-rotation]'),'input',e=>view.set({rotation:Number(e.target.value)}));
-  on(root.querySelector('[data-depth]'),'input',e=>view.set({depth:Number(e.target.value)}));
-  return ()=>{cleanups.forEach(f=>f());view.destroy();};
+  const view=mountSpecimen(root.querySelector('canvas'));
+  return view.destroy;
 }
