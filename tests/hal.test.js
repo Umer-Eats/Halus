@@ -58,7 +58,7 @@ test('askHal sends the lesson to Gemini with the key in a header, and fails clos
   assert.equal(payload.lesson.answer, 'The current official event guidelines');
   const broken = async () => new Response('{}', {status: 500});
   await assert.rejects(askHal({message: 'hello'}, {apiKey: 'k', fetcher: broken}), /nap/);
-  await assert.rejects(askHal({message: 'hello'}, {apiKey: ' '}), /GEMINI_API_KEY/);
+  await assert.rejects(askHal({message: 'hello'}, {apiKey: ' '}), /teaching service/);
 });
 
 test('the rate limiter blocks after the limit within the window', () => {
@@ -67,3 +67,10 @@ test('the rate limiter blocks after the limit within the window', () => {
   assert.equal(allowHalMessage(log, 'a', 1000, 3), false);
   assert.ok(allowHalMessage(log, 'a', 1000 + 11 * 60_000, 3));
 });
+
+test('Mr. DNA has distinct excited frames and Gemini can celebrate a breakthrough', () => {
+  assert.ok(HAL_ACTIONS.includes('excited'));
+  assert.notEqual(halSVG({action: 'excited', seconds: 0}), halSVG({action: 'excited', seconds: 0.5}));
+  assert.equal(settleHalReply({reply: 'Great!', mood: 'excited', verdict: 'correct', askedWhy: false}, {pendingWhy: true, missedWhys: 0}).mood, 'excited');
+});
+

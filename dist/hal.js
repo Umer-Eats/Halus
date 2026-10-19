@@ -1,10 +1,10 @@
-// Hal, the one global study buddy: roams the screen, reacts, eats apples and chats through Gemini.
+// Mr. DNA, the one global study buddy: roams the screen, reacts, eats apples and chats through Gemini.
 import {HAL_ACTIONS, HAL_SIZE, boundHal, stepHal} from './hal-motion.js';
 import {halSVG} from './hal-character.js';
 import {LESSONS} from './model.js';
 
 const LIMITS = {message: 1000, turn: 1500, turns: 12};
-// How long Hal waits for the student's "why" before he loses his patience.
+// How long Mr. DNA waits for the student's "why" before he loses his patience.
 const PATIENCE_MS = 60000;
 const pepTalks = [
   'One small step still counts. You have got this.',
@@ -12,7 +12,7 @@ const pepTalks = [
   'Take a breath. Then try the next tiny step.',
   'Every clinician started exactly where you are now.',
   'Stay curious. Your next good answer is close.',
-  'How about a sip of water and a stretch? Even snakes take breaks.',
+  'How about a sip of water and a stretch? Even DNA buddies take breaks.',
 ];
 
 const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
@@ -39,7 +39,7 @@ export function mountHal(parent = document.body) {
   const s = {
     position: boundHal(read('hal-position', null) ?? {x: innerWidth - 140, y: innerHeight - 130}, innerWidth, innerHeight),
     target: null, apple: null, action: 'wave', since: now0, until: now0 + 2800, facing: -1,
-    message: prefs.muted ? '' : 'Hi, I am Hal! Double-click me to chat, or click for more.',
+    message: prefs.muted ? '' : 'Hi, I am Mr. DNA! Double-click me to chat, or click for more.',
     messageUntil: now0 + 8000, nextTalk: now0 + 60000, nextWalk: now0 + 9000,
     nextAct: now0 + 5000, actIndex: 0,
   };
@@ -55,7 +55,7 @@ export function mountHal(parent = document.body) {
     s.message = message;
     s.messageUntil = performance.now() + 6500;
   };
-  /** A reaction pins Hal in place with an expression for a while. */
+  /** A reaction pins Mr. DNA in place with an expression for a while. */
   const react = (action, duration = 4500) => {
     s.target = null;
     s.apple = null;
@@ -94,13 +94,13 @@ export function mountHal(parent = document.body) {
 
   // DOM ------------------------------------------------------------------------------------------
   const root = el('div', {class: 'hal-companion', 'data-testid': 'hal-companion'});
-  const apple = el('div', {class: 'hal-apple', role: 'img', 'aria-label': 'An apple for Hal', hidden: true});
+  const apple = el('div', {class: 'hal-apple', role: 'img', 'aria-label': 'An apple for Mr. DNA', hidden: true});
   apple.innerHTML = '<svg viewBox="0 0 8 8" width="24" height="24" shape-rendering="crispEdges"><path fill="#22080f" d="M2 2h4v1h1v4H6v1H2V7H1V3h1z"/><path fill="#7cc35a" d="M2 3h4v4H2z"/><path fill="#c8f0a8" d="M2 3h1v1H2z"/><path fill="#6b3a1f" d="M4 0h1v2H4z"/><path fill="#3f9a3a" d="M5 0h2v1H5z"/></svg>';
   const bubble = el('div', {class: 'hal-bubble', role: 'status', hidden: true});
   const art = el('span', {class: 'hal-art'});
   const plate = el('span', {class: 'hal-nameplate'});
   const body = el('button', {type: 'button', class: 'hal-companion-body', 'aria-expanded': 'false', 'aria-controls': 'hal-controls'}, art, plate);
-  const menu = el('div', {id: 'hal-controls', class: 'hal-panel hal-controls', role: 'region', 'aria-label': 'Hal controls', hidden: true});
+  const menu = el('div', {id: 'hal-controls', class: 'hal-panel hal-controls', role: 'region', 'aria-label': 'Mr. DNA controls', hidden: true});
   const chat = createChat({react, onClose: () => setChat(false)});
   root.append(apple, bubble, body, menu, chat.node);
   parent.append(root);
@@ -118,17 +118,17 @@ export function mountHal(parent = document.body) {
     root.dataset.chat = String(open);
   }
   function renderMenu() {
-    plate.innerHTML = 'HAL <span>' + (prefs.muted ? '· quiet' : '· study buddy') + '</span>';
-    body.setAttribute('aria-label', `Hal, your study buddy. ${prefs.muted ? 'Talking muted.' : 'Talking enabled.'} Click for controls, double-click to chat, right-click to toggle talking.`);
+    plate.innerHTML = 'MR. DNA <span>' + (prefs.muted ? '· quiet' : '· study buddy') + '</span>';
+    body.setAttribute('aria-label', `Mr. DNA, your study buddy. ${prefs.muted ? 'Talking muted.' : 'Talking enabled.'} Click for controls, double-click to chat, right-click to toggle talking.`);
     root.dataset.muted = String(prefs.muted);
     root.dataset.anchored = String(prefs.anchored);
     if (!menuOpen) return;
     const moods = el('div', {class: 'hal-moods', 'aria-label': 'Try an expression'},
-      ...['thinking', 'happy', 'sad', 'angry', 'wave', 'sleep', 'surprised'].map(a => el('button', {type: 'button', 'aria-pressed': String(s.action === a), onclick: () => { react(a); renderMenu(); }}, a)));
+      ...['thinking', 'happy', 'excited', 'sad', 'angry', 'wave', 'sleep', 'surprised'].map(a => el('button', {type: 'button', 'aria-pressed': String(s.action === a), onclick: () => { react(a); renderMenu(); }}, a)));
     menu.replaceChildren(
-      el('div', {class: 'hal-panel-title'}, el('strong', {}, 'A little lab snake.'), el('button', {type: 'button', 'aria-label': 'Close Hal controls', onclick: () => setMenu(false)}, '×')),
-      el('p', {}, 'Drag Hal to place and anchor him.', el('br'), 'Triple-click anywhere to leave an apple.', el('br'), 'Right-click Hal to toggle his pep talks.'),
-      el('button', {type: 'button', class: 'hal-primary', onclick: () => setChat(true)}, 'Chat with Hal'),
+      el('div', {class: 'hal-panel-title'}, el('strong', {}, 'Your little DNA study buddy.'), el('button', {type: 'button', 'aria-label': 'Close Mr. DNA controls', onclick: () => setMenu(false)}, '×')),
+      el('p', {}, 'Drag Mr. DNA to place and anchor him.', el('br'), 'Triple-click anywhere to leave an apple.', el('br'), 'Right-click Mr. DNA to toggle his pep talks.'),
+      el('button', {type: 'button', class: 'hal-primary', onclick: () => setChat(true)}, 'Chat with Mr. DNA'),
       el('div', {class: 'hal-controls-actions'},
         el('button', {type: 'button', onclick: () => feed()}, 'Give apple'),
         el('button', {type: 'button', 'aria-pressed': String(prefs.muted), onclick: toggleTalking}, prefs.muted ? 'Unmute talks' : 'Mute talks')),
@@ -208,7 +208,7 @@ export function mountHal(parent = document.body) {
     previous = now;
     if (!document.hidden && !drag?.moved) {
       if (s.message && now > s.messageUntil) s.message = '';
-      // An open panel keeps Hal beside it instead of wandering off mid-conversation.
+      // An open panel keeps Mr. DNA beside it instead of wandering off mid-conversation.
       if (!menuOpen && !chatOpen && (!held || s.apple)) {
         if (s.target) {
           if (Math.abs(s.target.x - s.position.x) > 1) s.facing = s.target.x < s.position.x ? -1 : 1;
@@ -225,7 +225,7 @@ export function mountHal(parent = document.body) {
             say('Crunchy. Ready for another small win?');
           } else setAction('idle');
         } else if (!s.until && now > s.nextWalk && canMove() && !prefs.anchored) {
-          // Hal roams the whole viewport, below the site header.
+          // Mr. DNA roams the whole viewport, below the site header.
           roamIndex++;
           s.target = boundHal({x: 16 + Math.random() * (innerWidth - HAL_SIZE - 32), y: 72 + Math.random() * (innerHeight - HAL_SIZE - 88)}, innerWidth, innerHeight);
           setAction(roamIndex % 4 === 0 ? 'run' : 'walk');
@@ -236,15 +236,15 @@ export function mountHal(parent = document.body) {
         say(pepTalks[talkIndex++ % pepTalks.length]);
         s.nextTalk = now + 75000;
       }
-      // Short ambient beats between walks give Hal a readable, companion-like cycle.
+      // Short ambient beats between walks give Mr. DNA a readable, companion-like cycle.
       if (!s.target && !s.apple && !s.until && !menuOpen && !chatOpen && !held && now >= s.nextAct) {
         const ambient = ['wave', 'idle', 'thinking', 'idle', 'happy', 'idle', 'sleep', 'idle'];
         const action = ambient[s.actIndex++ % ambient.length];
         setAction(action, action === 'idle' ? 0 : now + (action === 'sleep' ? 4200 : 1800));
         s.nextAct = now + (action === 'idle' ? 3500 : 6000);
       }
-      paint(now);
     }
+    if (!document.hidden) paint(now);
     raf = requestAnimationFrame(tick);
   };
   function paint(now) {
@@ -291,24 +291,24 @@ export function mountHal(parent = document.body) {
   };
 }
 
-/** The chat panel. Closing it keeps the thread; switching what Hal is looking at starts a new one. */
+/** The chat panel. Closing it keeps the thread; switching what Mr. DNA is looking at starts a new one. */
 function createChat({react, onClose}) {
   let open = false, focus = '', turns = [], sending = false, error = '', why = {pending: false, missed: 0}, session = 0, patience, size = null;
   const log = el('div', {class: 'hal-chat-log', role: 'log', 'aria-live': 'polite', 'aria-label': 'Conversation'});
-  const select = el('select', {'aria-label': 'What Hal is looking at', onchange: () => setFocus(select.value)});
+  const select = el('select', {'aria-label': 'What Mr. DNA is looking at', onchange: () => setFocus(select.value)});
   const helps = el('div', {class: 'hal-chat-prompts'});
   const status = el('p', {class: 'hal-chat-why', role: 'status', hidden: true});
   const errorBox = el('p', {class: 'hal-chat-error', role: 'alert', hidden: true});
-  const input = el('textarea', {rows: '2', maxlength: String(LIMITS.message), placeholder: 'Ask Hal…', 'aria-label': 'Message Hal'});
+  const input = el('textarea', {rows: '2', maxlength: String(LIMITS.message), placeholder: 'Ask Mr. DNA…', 'aria-label': 'Message Mr. DNA'});
   const sendButton = el('button', {type: 'submit', disabled: true}, 'Send');
-  const resize = el('button', {type: 'button', class: 'hal-chat-resize', 'aria-label': 'Resize Hal chat', title: 'Drag to resize'}, '⤢');
-  const node = el('section', {id: 'hal-chat', class: 'hal-panel hal-chat', 'aria-label': 'Chat with Hal', hidden: true},
+  const resize = el('button', {type: 'button', class: 'hal-chat-resize', 'aria-label': 'Resize Mr. DNA chat', title: 'Drag to resize'}, '⤢');
+  const node = el('section', {id: 'hal-chat', class: 'hal-panel hal-chat', 'aria-label': 'Chat with Mr. DNA', hidden: true},
     resize,
-    el('div', {class: 'hal-panel-title'}, el('strong', {}, 'Study with Hal'), el('button', {type: 'button', 'aria-label': 'Close Hal chat', onclick: () => onClose()}, '×')),
+    el('div', {class: 'hal-panel-title'}, el('strong', {}, 'Study with Mr. DNA'), el('button', {type: 'button', 'aria-label': 'Close Mr. DNA chat', onclick: () => onClose()}, '×')),
     el('label', {class: 'hal-chat-focus'}, el('span', {}, 'Looking at'), select),
     log, helps, status, errorBox,
     el('form', {class: 'hal-chat-form', onsubmit: e => { e.preventDefault(); send(input.value); }}, input, sendButton),
-    el('p', {class: 'hal-chat-note'}, 'Hal is powered by Google Gemini and can be wrong. Check the official HOSA guidelines, and do not share personal information.'),
+    el('p', {class: 'hal-chat-note'}, 'Mr. DNA can make mistakes. Check the official HOSA guidelines, and do not share personal information.'),
   );
   node.addEventListener('keydown', e => { if (e.key === 'Escape') onClose(); });
   input.addEventListener('input', () => { sendButton.disabled = sending || !input.value.trim(); clearTimeout(patience); });
@@ -354,9 +354,9 @@ function createChat({react, onClose}) {
         ? `I can see "${lesson.title}". Ask me anything about it, or let me quiz you. If I give you an answer, I will want to know why it is right!`
         : studentEvent() ? `I know you are preparing for ${studentEvent()}. Ask me a question, or let me quiz you.` : 'Ask me about HOSA events, study habits or health science. Pick a lesson above to focus on it.')]),
       ...turns.map(t => el('div', {class: 'hal-chat-turn hal-chat-' + t.role},
-        el('span', {class: 'sr-only'}, t.role === 'hal' ? 'Hal: ' : 'You: '),
+        el('span', {class: 'sr-only'}, t.role === 'hal' ? 'Mr. DNA: ' : 'You: '),
         ...(t.role === 'hal' ? t.text.split(/\n\s*\n/).map(p => el('p', {}, p.trim())) : [t.text]))),
-      ...(sending ? [el('p', {class: 'hal-chat-turn hal-chat-hal hal-chat-pending'}, 'Hal is thinking…')] : []),
+      ...(sending ? [el('p', {class: 'hal-chat-turn hal-chat-hal hal-chat-pending'}, 'Mr. DNA is thinking…')] : []),
     );
     log.scrollTop = log.scrollHeight;
     const prompts = lesson ? ['Explain this more simply', 'Give me an example', 'Quiz me on this lesson']
@@ -364,11 +364,11 @@ function createChat({react, onClose}) {
     helps.hidden = sending || turns.length > 0;
     helps.replaceChildren(...prompts.map(p => el('button', {type: 'button', onclick: () => send(p)}, p)));
     status.hidden = !why.pending || sending;
-    status.textContent = 'Hal is waiting for your why.';
+    status.textContent = 'Mr. DNA is waiting for your why.';
     errorBox.hidden = !error;
     errorBox.textContent = error;
-    input.placeholder = why.pending ? 'Explain why…' : 'Ask Hal…';
-    input.setAttribute('aria-label', why.pending ? 'Explain why to Hal' : 'Message Hal');
+    input.placeholder = why.pending ? 'Explain why…' : 'Ask Mr. DNA…';
+    input.setAttribute('aria-label', why.pending ? 'Explain why to Mr. DNA' : 'Message Mr. DNA');
     sendButton.disabled = sending || !input.value.trim();
   }
   async function send(text) {
@@ -390,7 +390,7 @@ function createChat({react, onClose}) {
         body: JSON.stringify({message, history, lessonId: focus || undefined, event: studentEvent() ?? undefined, pendingWhy: why.pending, missedWhys: why.missed}),
       });
       const reply = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(reply.error || 'Hal could not answer right now. Try again in a moment.');
+      if (!response.ok) throw new Error(reply.error || 'Mr. DNA could not answer right now. Try again in a moment.');
       if (id !== session) return;
       turns.push({role: 'hal', text: reply.reply});
       why = {pending: reply.awaitingWhy, missed: reply.missedWhys};
@@ -423,7 +423,7 @@ function createChat({react, onClose}) {
       render();
       setTimeout(() => input.focus(), 0);
     },
-    /** Sits beside Hal so his reactions stay visible; on narrow screens it stacks instead. */
+    /** Sits beside Mr. DNA so his reactions stay visible; on narrow screens it stacks instead. */
     place({x, y}) {
       const width = Math.min(size?.width ?? 340, innerWidth - 16), height = Math.min(size?.height ?? 460, innerHeight - 16);
       const beside = x - width - 8 >= 8 ? x - width - 8 : x + HAL_SIZE + 8 + width <= innerWidth - 8 ? x + HAL_SIZE + 8 : null;
@@ -434,3 +434,5 @@ function createChat({react, onClose}) {
     destroy() { clearTimeout(patience); window.removeEventListener('resize', onWindowResize); },
   };
 }
+
+

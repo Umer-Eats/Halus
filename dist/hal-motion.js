@@ -1,11 +1,12 @@
 // Hal's clips, pose sampling and movement maths. Pure functions so the server tests can import them.
-export const HAL_ACTIONS = ['idle', 'wave', 'thinking', 'angry', 'happy', 'sad', 'walk', 'run', 'eat', 'sleep', 'surprised'];
+export const HAL_ACTIONS = ['idle', 'wave', 'thinking', 'angry', 'happy', 'excited', 'sad', 'walk', 'run', 'eat', 'sleep', 'surprised'];
 export const HAL_CLIPS = {
   idle: {frames: 8, fps: 3},
   wave: {frames: 6, fps: 7},
   thinking: {frames: 8, fps: 4},
   angry: {frames: 4, fps: 7},
   happy: {frames: 6, fps: 8},
+  excited: {frames: 12, fps: 12},
   sad: {frames: 6, fps: 3},
   walk: {frames: 8, fps: 10},
   run: {frames: 8, fps: 14},
@@ -58,3 +59,4 @@ export function stepHal(from, to, seconds, speed) {
 export function setHalMood(action, duration = 5000) {
   window.dispatchEvent(new CustomEvent('hal:mood', {detail: {action, duration}}));
 }
+
