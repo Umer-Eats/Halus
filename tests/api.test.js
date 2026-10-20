@@ -92,13 +92,25 @@ test('repeated wrong passwords are rate limited', async () => {
   assert.equal((await join('guesser', 'student', 'pines-student')).status, 429);
 });
 
-test('students pick one annual event; instructors can change it', async () => {
+test('student event changes persist and feed teacher roster and global rankings', async () => {
   assert.equal((await call('PUT', '/me/event', { as: 'maya', body: { event: 'Not an event' } })).status, 400);
   assert.equal((await call('PUT', '/me/event', { as: 'maya', body: { event: 'Nursing Assisting' } })).data.profile.event, 'Nursing Assisting');
-  assert.equal((await call('PUT', '/me/event', { as: 'maya', body: { event: 'Medical Terminology' } })).status, 409);
+  assert.equal((await call('PUT', '/me/event', { as: 'maya', body: { event: 'Medical Terminology' } })).status, 200);
+  let roster = (await call('GET', '/students', { as: 'rivera' })).data.students;
+  assert.equal(roster.find(s=>s.uid==='maya').event,'Medical Terminology');
+  let rankings = (await call('GET', '/rankings', { as: 'maya' })).data.students;
+  assert.equal(rankings.find(s=>s.isYou).event,'Medical Terminology');
+  assert.ok(rankings.every(s=>!('email' in s)&&!('uid' in s)), 'rankings omit private account fields');
+  assert.equal((await call('GET','/rankings')).status,401);
+  assert.equal((await call('PUT','/me/event',{as:'rivera',body:{event:'HOSA Bowl'}})).status,403);
+  assert.equal((await call('PUT','/me/event',{as:'maya',body:{event:null}})).data.profile.event,null);
+  rankings = (await call('GET','/rankings',{as:'maya'})).data.students;
+  assert.ok(!rankings.some(s=>s.isYou));
   assert.equal((await call('PATCH', '/students/maya', { as: 'maya', body: { event: 'Medical Terminology' } })).status, 403);
   assert.equal((await call('PATCH', '/students/maya', { as: 'rivera', body: { event: 'Medical Terminology' } })).status, 200);
   assert.equal((await call('GET', '/me', { as: 'maya' })).data.profile.event, 'Medical Terminology');
+  rankings = (await call('GET','/rankings',{as:'maya'})).data.students;
+  assert.equal(rankings.find(s=>s.isYou).event,'Medical Terminology');
 });
 
 test('assignments reach only the matching community and event', async () => {

@@ -51,7 +51,8 @@ All routes except `health`, `config`, `communities` and `hal` need `Authorizatio
 | `GET /api/communities` | anyone | `[{ id, name }]` |
 | `POST /api/auth/register` | signed in | Join a community as a student or instructor |
 | `GET /api/me`, `PATCH /api/me` | signed in | Profile (`enrolled: false` before joining); rename |
-| `PUT /api/me/event` | student | Choose the annual event (once) |
+| `PUT /api/me/event` | student | Set or replace the selected event; explicit `null` clears it |
+| `GET /api/rankings` | enrolled member | Global student names and selected events; no email, private IDs, or fabricated scores |
 | `GET /api/students` | instructor | Roster with event, lesson progress, last quiz score |
 | `PATCH /api/students/:uid` | instructor | Change a student's event |
 | `DELETE /api/students/:uid` | instructor | Remove a student's enrollment (their progress is kept) |

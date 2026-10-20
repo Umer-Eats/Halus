@@ -204,21 +204,26 @@ route('PATCH', '/me', async (ctx) => {
   return { profile: profile({ ...user, display_name: displayName }, ctx.communities) };
 });
 
-// Students pick one annual event. Changing it afterwards is an instructor decision.
+// One shared event selection drives the roster, rankings and assignment audience.
 route('PUT', '/me/event', async (ctx) => {
   const user = await member(ctx, 'student');
-  const event = eventName(ctx.body.event);
-  if (user.event && user.event !== event)
-    throw new AppError(409, 'Your annual event is already selected. Ask your instructor to change it.');
-  if (!user.event) {
-    await ctx.db.execute({
-      sql: "UPDATE users SET event = ?, event_selected_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ? AND event IS NULL",
-      args: [event, user.id],
-    });
-  }
+  if (!('event' in ctx.body)) throw new AppError(400, 'Choose an event or explicitly clear your selection.');
+  const event = eventName(ctx.body.event, { allowEmpty: true });
+  await ctx.db.execute({
+    sql: "UPDATE users SET event = ?, event_selected_at = CASE WHEN ? IS NULL THEN NULL ELSE strftime('%Y-%m-%dT%H:%M:%fZ','now') END WHERE id = ?",
+    args: [event, event, user.id],
+  });
   const fresh = one(await ctx.db.execute({ sql: 'SELECT * FROM users WHERE id = ?', args: [user.id] }));
-  if (fresh.event !== event) throw new AppError(409, 'Your annual event is already selected. Ask your instructor to change it.');
   return { profile: profile(fresh, ctx.communities) };
+});
+
+route('GET', '/rankings', async (ctx) => {
+  const user = await member(ctx);
+  const result = await ctx.db.execute({
+    sql: "SELECT id, display_name, event FROM users WHERE role = 'student' AND community_id IS NOT NULL AND event IS NOT NULL ORDER BY display_name COLLATE NOCASE, id",
+    args: [],
+  });
+  return { students: rows(result).map(s => ({ displayName: s.display_name, event: s.event, isYou: s.id === user.id })) };
 });
 
 route('GET', '/students', async (ctx) => {

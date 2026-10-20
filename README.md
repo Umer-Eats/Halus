@@ -9,14 +9,16 @@ Valus is an independent project and is not affiliated with or endorsed by HOSA. 
 - Public landing page, mission page, searchable event catalog, and rankings preview.
 - Student and instructor accounts through Google or email/password.
 - Password-gated school enrollment, with separate student and instructor passwords.
-- One annual event per student; instructors can change or clear that selection.
+- All 64 regular secondary event cards directly in My event, with search, category and format filters.
+- One selected event per student; students and instructors can change or clear it. Selection feeds the teacher roster, event assignments, and the signed-in global event directory.
+- Event pages replace the dashboard sidebar with a right-side toolkit. Rules, Lessons and event-specific tools are Coming soon; each event links to its reviewed official guideline.
 - Three shared orientation lessons, a practice check, account-specific notes, and a preparation checklist.
 - Assignments for an entire chapter or a particular event, plus student responses.
 - Chapter posts, instructor roster management, and progress analytics.
 - Mr. DNA, an animated study companion with optional Gemini-powered chat.
 - Light/dark appearance, reduced-motion support, a live bloodstream hero, and a cellular atlas.
 
-The rankings pages are placeholders: there are nine displayed tiers, but no live ranked assessments, ranking points, or competitive leaderboard. Starter lessons are general preparation guidance, not a complete event-specific curriculum. Assignment types are labels; selecting “Quiz” or “Skill checklist” does not generate a separate assessment engine.
+The rankings pages display students and selected events to signed-in members. There are nine displayed tiers, but no live ranked assessments, ranking points, or competitive scores. Event tools are Coming soon. Existing orientation progress is preserved. Assignment types are labels; selecting “Quiz” or “Skill checklist” does not generate a separate assessment engine. See HOSA_EVENT_RESEARCH.md for the source and tool mapping for every event.
 
 ## Run locally
 
