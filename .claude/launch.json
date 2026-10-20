@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "halus",
+      "name": "valus",
       "runtimeExecutable": "node",
       "runtimeArgs": [
         "--env-file-if-exists=.env",
@@ -11,7 +11,7 @@
       "port": 4173
     },
     {
-      "name": "halus-alt",
+      "name": "valus-alt",
       "runtimeExecutable": "node",
       "runtimeArgs": [
         "--env-file-if-exists=.env",

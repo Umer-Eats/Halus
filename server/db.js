@@ -58,8 +58,8 @@ export const SCHEMA = [
 
 export function createDb(env = process.env) {
   const url = env.TURSO_DATABASE_URL;
-  if (!url) throw new AppError(503, 'The Halus database is not configured yet.');
-  if (!url.startsWith('file:') && !env.TURSO_AUTH_TOKEN) throw new AppError(503, 'The Halus database is not configured yet.');
+  if (!url) throw new AppError(503, 'The Valus database is not configured yet.');
+  if (!url.startsWith('file:') && !env.TURSO_AUTH_TOKEN) throw new AppError(503, 'The Valus database is not configured yet.');
   return createClient({ url, authToken: env.TURSO_AUTH_TOKEN });
 }
 

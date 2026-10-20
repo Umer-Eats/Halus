@@ -18,8 +18,8 @@ export function failure(res, error) {
   if (error instanceof AppError) return send(res, error.status, { error: error.message });
   if (error instanceof SyntaxError) return send(res, 400, { error: 'The request could not be read.' });
   // Never log tokens, passwords or SQL. The error name is enough to start debugging.
-  console.error('Halus request failed:', error instanceof Error ? error.name : 'Unknown error');
-  return send(res, 503, { error: 'Halus is temporarily unavailable. Please try again.' });
+  console.error('Valus request failed:', error instanceof Error ? error.name : 'Unknown error');
+  return send(res, 503, { error: 'Valus is temporarily unavailable. Please try again.' });
 }
 
 const MAX_BODY = 64 * 1024;

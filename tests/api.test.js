@@ -23,7 +23,7 @@ const verifyToken = async (token) => {
 
 let dir, server, base;
 before(async () => {
-  dir = mkdtempSync(path.join(tmpdir(), 'halus-test-'));
+  dir = mkdtempSync(path.join(tmpdir(), 'valus-test-'));
   const db = createDb({ TURSO_DATABASE_URL: 'file:' + path.join(dir, 'test.db').replaceAll('\\', '/') });
   server = http.createServer(createApp({ db, verifyToken, env, communities }));
   await new Promise((r) => server.listen(0, '127.0.0.1', r));

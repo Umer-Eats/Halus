@@ -1,7 +1,7 @@
-/* Halus: living forms, clear reading, and the rounded geometry of its wordmark.
+/* Valus: living forms, clear reading, and the rounded geometry of its wordmark.
    Audiowide is a complementary display face, not the original logo font. */
-@font-face{font-family:'Halus Rounded';src:url('assets/fonts/Audiowide-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
-:root{--font-display:'Halus Rounded',Arial,sans-serif;--font-body:Arial,Helvetica,sans-serif;--font-mono:Arial,Helvetica,sans-serif;--font-button:Arial,Helvetica,sans-serif;--bg:#fcfaf8;--bg-deep:#f1e9e7;--ink:#30191e;--ink-2:#59464b;--muted:#78646a;--red:#c51e3e;--red-hover:#a61330;--red-ink:#ad1835;--red-soft:#f9e9eb;--line:#612a3515;--line-strong:#612a352d;--radius:24px}
+@font-face{font-family:'Valus Rounded';src:url('assets/fonts/Audiowide-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+:root{--font-display:'Valus Rounded',Arial,sans-serif;--font-body:Arial,Helvetica,sans-serif;--font-mono:Arial,Helvetica,sans-serif;--font-button:Arial,Helvetica,sans-serif;--bg:#fcfaf8;--bg-deep:#f1e9e7;--ink:#30191e;--ink-2:#59464b;--muted:#78646a;--red:#c51e3e;--red-hover:#a61330;--red-ink:#ad1835;--red-soft:#f9e9eb;--line:#612a3515;--line-strong:#612a352d;--radius:24px}
 :root[data-theme='dark']{--bg:#140d10;--bg-deep:#0b0709;--surface:#21161a;--surface-2:#291b20;--surface-3:#35252b;--ink:#fcf3f3;--ink-2:#d9c6cd;--muted:#b49aa5;--red:#ef4b68;--red-hover:#ff607b;--red-ink:#ff8ba2;--red-soft:#ef4b6818;--line:#f4b8c514;--line-strong:#f4b8c530}
 body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);line-height:1.6}
 .landing{--wrap:min(1280px,calc(100% - 96px))}

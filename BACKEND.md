@@ -1,4 +1,4 @@
-# Halus backend
+# Valus backend
 
 The static site in `dist/` and a single serverless function in `api/index.js` deploy together on Vercel. `vercel.json` rewrites every `/api/*` request to that function, and `server/app.js` routes it. Data lives in Turso. Accounts are Firebase Authentication. The server verifies each Firebase ID token with the Admin SDK and checks for revoked tokens.
 
@@ -16,7 +16,7 @@ authentication runtime test checks startup with synchronous ESM loading disabled
 4. `npm run dev` serves the site and the API at http://127.0.0.1:4173. Run `npm test` to run the tests.
 5. On Vercel, add the same variables under Project > Settings > Environment Variables, then deploy. Tables are created automatically on the first request.
 
-Turso: `turso db create halus`, then `turso db show halus --url` and `turso db tokens create halus`.
+Turso: `turso db create valus`, then `turso db show valus --url` and `turso db tokens create valus`.
 Firebase: enable the **Google** and **Email/Password** sign-in providers (Authentication > Sign-in method). Students and teachers can make an account with either. Download a service account key (Project settings > Service accounts) for the three `FIREBASE_*` Admin settings. Add your Vercel domain under Authentication > Settings > Authorized domains.
 
 ## Communities
@@ -41,10 +41,12 @@ Communities are listed in [`communities.json`](communities.json), which is commi
 
 ## API
 
-All routes except `health`, `config` and `communities` need `Authorization: Bearer <Firebase ID token>`.
+All routes except `health`, `config`, `communities` and `hal` need `Authorization: Bearer <Firebase ID token>`.
 
 | Route | Who | Purpose |
 | --- | --- | --- |
+| `GET /api/health` | anyone | Service health check |
+| `POST /api/hal` | anyone, rate limited | Mr. DNA study chat through Gemini |
 | `GET /api/config` | anyone | Firebase web config and the public community list |
 | `GET /api/communities` | anyone | `[{ id, name }]` |
 | `POST /api/auth/register` | signed in | Join a community as a student or instructor |

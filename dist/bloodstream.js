@@ -216,7 +216,7 @@ export function mountBloodstream(canvas) {
   };
   let bgProg, cellProg;
   try { bgProg = program(VERT, BG_FRAG); cellProg = program(CELL_VERT, CELL_FRAG); }
-  catch (err) { console.warn('Halus bloodstream disabled:', err.message); canvas.closest('.hero')?.classList.add('no-webgl'); return () => {}; }
+  catch (err) { console.warn('Valus bloodstream disabled:', err.message); canvas.closest('.hero')?.classList.add('no-webgl'); return () => {}; }
 
   const triBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, triBuf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);

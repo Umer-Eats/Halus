@@ -1,4 +1,4 @@
-// Firebase sign-in (Google or email and password) plus the Halus API. The Firebase web config comes from GET /api/config,
+// Firebase sign-in (Google or email and password) plus the Valus API. The Firebase web config comes from GET /api/config,
 // so nothing project-specific is committed to the static site.
 const SDK = 'https://www.gstatic.com/firebasejs/12.19.0/';
 
@@ -6,7 +6,7 @@ export const session = {
   ready: false,       // first auth check finished
   unavailable: '',    // sign-in cannot start (missing config, offline)
   user: null,         // Firebase user
-  profile: null,      // Halus profile once enrolled
+  profile: null,      // Valus profile once enrolled
   enrolled: false,
   error: '',
   communities: [],
@@ -29,11 +29,11 @@ export async function api(method, path, body) {
       body: body && JSON.stringify(body),
     });
   } catch {
-    throw new Error('Halus could not be reached. Check your connection and try again.');
+    throw new Error('Valus could not be reached. Check your connection and try again.');
   }
   if (res.status === 204) return null;
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(data.error || 'Halus is temporarily unavailable. Please try again.'), { status: res.status });
+  if (!res.ok) throw Object.assign(new Error(data.error || 'Valus is temporarily unavailable. Please try again.'), { status: res.status });
   return data;
 }
 
@@ -76,10 +76,10 @@ export async function startSession() {
 }
 
 const AUTH_ERRORS = {
-  'auth/popup-blocked': 'Your browser blocked the Google window. Allow pop-ups for Halus and try again.',
+  'auth/popup-blocked': 'Your browser blocked the Google window. Allow pop-ups for Valus and try again.',
   'auth/unauthorized-domain': 'Google sign-in is not enabled for this address yet.',
-  'auth/operation-not-allowed': 'This sign-in method is not enabled for Halus yet.',
-  'auth/network-request-failed': 'Halus could not reach the sign-in service. Check your connection and try again.',
+  'auth/operation-not-allowed': 'This sign-in method is not enabled for Valus yet.',
+  'auth/network-request-failed': 'Valus could not reach the sign-in service. Check your connection and try again.',
   'auth/account-exists-with-different-credential': 'This email already uses a different sign-in method.',
   'auth/user-disabled': 'This account has been disabled.',
   'auth/email-already-in-use': 'An account already uses this email. Sign in instead.',

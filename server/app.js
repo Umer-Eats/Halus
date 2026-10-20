@@ -83,7 +83,7 @@ async function member(ctx, role) {
   const who = await identity(ctx);
   const user = one(await ctx.db.execute({ sql: 'SELECT * FROM users WHERE id = ?', args: [who.uid] }));
   if (!user) throw new AppError(403, 'Finish joining your school community to continue.');
-  if (!findCommunity(user.community_id, ctx.communities)) throw new AppError(403, 'Your school community is no longer active on Halus.');
+  if (!findCommunity(user.community_id, ctx.communities)) throw new AppError(403, 'Your school community is no longer active on Valus.');
   if (role && user.role !== role) throw new AppError(403, `This needs an ${role} account.`);
   return user;
 }
@@ -179,7 +179,7 @@ route('POST', '/auth/register', async (ctx) => {
   } else {
     // Compare against every community so the time taken does not hint at which one matched.
     const matches = ctx.communities.filter((c) => ctx.env[c.studentEnv] && equalSecret(body.password, ctx.env[c.studentEnv]));
-    if (matches.length !== 1) throw new AppError(403, 'That student password does not match a school community on Halus.');
+    if (matches.length !== 1) throw new AppError(403, 'That student password does not match a school community on Valus.');
     community = matches[0];
   }
 

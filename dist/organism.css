@@ -1,4 +1,4 @@
-/* A distinct Halus composition: carmine posters, circular specimens, open layouts.
+/* A distinct Valus composition: carmine posters, circular specimens, open layouts.
    Scoped to the existing homepage; the application and its routes are retained. */
 .home-editorial{--poster:#bf1736;--paper:#fffdf7;--night:#160b10;--wrap:min(1360px,calc(100% - 112px));background:var(--paper);color:#391b24}
 body:has(.home-editorial) .site-header{height:88px;padding:0 56px;gap:40px;background:#bf1736;color:#fffdf7;border:0;backdrop-filter:none;flex-wrap:nowrap}
