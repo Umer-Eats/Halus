@@ -4,6 +4,12 @@ The static site in `dist/` and a single serverless function in `api/index.js` de
 
 ## Setup
 
+The `jwks-rsa` dependency uses a CommonJS-compatible `jose` 5.10.0 override.
+Firebase Admin 14's default `jose` 6 dependency crashes during function startup
+in Vercel's loader (`ERR_REQUIRE_ESM`), including on public `/api/config` requests.
+Keep the override until the upstream dependency works with that loader; the
+authentication runtime test checks startup with synchronous ESM loading disabled.
+
 1. `npm install`
 2. Copy `.env.example` to `.env` and fill it in. Locally, leave `TURSO_DATABASE_URL` unset to use a file database in `.data/`.
 3. `npm run communities:check` confirms every community password is set.

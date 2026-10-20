@@ -397,7 +397,10 @@
 .auth-fields .auth-step { margin-top: 6px; }
 .auth-fields .auth-step:first-child { margin-top: 0; }
 .auth-hint { margin-top: -6px; color: var(--muted); font-size: 13px; }
-.auth-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.auth-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+/* Inputs have a browser minimum width; without these the side-by-side name fields push every control past the card. */
+.auth-card, .auth-fields { grid-template-columns: minmax(0, 1fr); }
+.auth-card .field input, .auth-card .field select { width: 100%; min-width: 0; }
 .auth-or { display: flex; align-items: center; gap: 12px; color: var(--muted); font: 400 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
 .auth-or::before, .auth-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 .auth-forgot { justify-self: end; margin-top: -6px; font-size: 13px; text-decoration: underline; }
