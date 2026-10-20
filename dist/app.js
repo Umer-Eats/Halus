@@ -128,7 +128,7 @@ function schoolFields(role){const list=session.communities;
 const nameFields=()=>'<div class="auth-pair">'+field('First name','<input name="firstName" maxlength="40" required autocomplete="given-name" value="'+val('firstName')+'">')+field('Last name','<input name="lastName" maxlength="40" required autocomplete="family-name" value="'+val('lastName')+'">')+'</div>';
 const orLine=t=>'<div class="auth-or"><span>'+t+'</span></div>';
 const errorSlot=()=>{const err=authError||session.error;return '<p class="auth-error" role="alert"'+(err?'':' hidden')+'>'+esc(err)+'</p>';};
-function authTabs(){return '<div class="auth-tabs" role="tablist" aria-label="Account">'+[['create','Create account'],['signin','Sign in']].map(([k,l])=>'<button type="button" role="tab" data-action="auth-tab" data-value="'+k+'" aria-selected="'+(authTab===k)+'" class="'+(authTab===k?'on':'')+'">'+l+'</button>').join('')+'</div>';}
+function authTabs(){return '<div class="auth-tabs" role="tablist" aria-label="Account"'+(authSwap?' data-from="'+authSwap+'"':'')+'>'+[['create','Create account'],['signin','Sign in']].map(([k,l])=>'<button type="button" role="tab" data-action="auth-tab" data-value="'+k+'" aria-selected="'+(authTab===k)+'" class="'+(authTab===k?'on':'')+'">'+l+'</button>').join('')+'</div>';}
 function createForm(role){const student=role==='student';
  return '<form id="create-form" data-role="'+role+'" class="auth-fields"><span class="auth-step micro">01 / YOUR SCHOOL</span>'+schoolFields(role)+
   '<span class="auth-step micro">02 / YOUR ACCOUNT</span><button type="button" class="button google" data-action="google-create">'+googleMark+'Create with Google</button>'+orLine('or use your email')+nameFields()+
@@ -149,9 +149,9 @@ function loginPage(role){const student=role==='student';let card;
  const roleWord=r=>r==='instructor'?'teacher':'student';
  if(!session.ready)card='<div class="auth-wait"><span class="spinner" aria-hidden="true"></span><p>Checking your session…</p></div>';
  else if(session.unavailable)card='<h2>Sign-in is offline.</h2><p class="auth-error" role="alert">'+esc(session.unavailable)+'</p><p class="auth-note">Please try again in a little while.</p>';
- else if(!session.user)card=authTabs()+(authTab==='create'
+ else if(!session.user)card=authTabs()+'<div class="auth-pane'+(authSwap?' swapped':'')+'">'+(authTab==='create'
   ?'<h2>'+(student?'Make your student account.':'Make your teacher account.')+'</h2><p>'+(student?'Your account joins your school community the moment it is made.':'Choose your school, then make the account you will teach with.')+'</p>'+errorSlot()+createForm(role)
-  :'<h2>'+(student?'Welcome back.':'Welcome back to your desk.')+'</h2><p>Sign in the same way you made your account.</p>'+errorSlot()+signInForm());
+  :'<h2>'+(student?'Welcome back.':'Welcome back to your desk.')+'</h2><p>Sign in the same way you made your account.</p>'+errorSlot()+signInForm())+'</div>';
  else if(session.enrolled&&me().role!==role)card='<h2>This is a '+roleWord(me().role)+' account.</h2><p>'+esc(session.user.email)+' is registered as a '+roleWord(me().role)+' at '+esc(me().community?.name||'your school')+'. Each account holds one role in one school.</p>'+linkButton('Open my '+roleWord(me().role)+' space',home())+signedAs;
  else if(session.error&&!session.enrolled)card='<h2>We could not open your account.</h2>'+errorSlot()+button('Try again','retry-profile')+signedAs;
  else card=joinForm(role)+signedAs;
@@ -205,7 +205,8 @@ function rankings(){return heading('GLOBAL RANKINGS','Find your next level.','A 
 const PUBLIC=['/','/about','/instructors','/events','/start','/mission','/leaderboard'];
 const WORKSPACE={'/my-event':[myEvent,'event','student'],'/students':[studentsPage,'students','instructor'],'/assignments':[assignmentsPage,'assignments'],'/analytics':[analytics,'analytics'],'/community':[community,'community'],'/rankings':[rankings,'rankings']};
 let stopLanding=null;
-function render(){stopLanding?.();stopLanding=null;const route=location.hash.slice(1)||'/';
+function render(){stopLanding?.();stopLanding=null;try{renderRoute(location.hash.slice(1)||'/');}finally{authSwap=null;markEntrance();}}
+function renderRoute(route){
  document.title='Valus | '+({'/':'Your future, in practice.','/mission':'What is Valus?','/leaderboard':'Global rankings','/events':'Explore events','/start':'Step inside','/student':'Student','/teacher':'Teacher'}[route]||'Your study space');
  if(session.profile?.event&&session.profile.role==='student')document.body.dataset.event=session.profile.event;else delete document.body.dataset.event;
  if(['/','/about','/instructors'].includes(route)){document.body.classList.remove('in-workspace');app.innerHTML=landing();stopLanding=initLanding(app);if(route!=='/')requestAnimationFrame(()=>document.getElementById(route.slice(1))?.scrollIntoView({behavior:'smooth'}));return;}
@@ -245,13 +246,36 @@ function authBusy(trigger,label){const card=document.querySelector('.auth-card')
  return()=>{busy=false;if(!trigger?.isConnected)return;controls.forEach(c=>{c.disabled=false;});trigger.innerHTML=html;};}
 function welcome(){cache={};errors={};draft={};try{localStorage.setItem('valus-returning','1');}catch{}toast('Welcome to '+(me()?.community?.name||'your chapter')+'.');}
 
+// ---------- motion ----------
+// View transitions where the browser has them; every path still works, instantly, without.
+let lastRoute=location.hash.slice(1)||'/',enterStart=performance.now(),authSwap=null;
+const isAuthRoute=r=>r==='/student'||r==='/teacher';
+const stillMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function withTransition(kind,update,after){const root=document.documentElement;
+ if(!document.startViewTransition||stillMotion()){update();return;}
+ root.dataset.vt=kind;const t=document.startViewTransition(update);
+ t.ready.then(()=>after?.()).catch(()=>{});t.finished.finally(()=>{if(root.dataset.vt===kind)delete root.dataset.vt;});}
+// The new theme spreads out from the toggle in a circle; browsers without view transitions cross-fade the colours.
+function toggleTheme(btn){const root=document.documentElement,next=root.dataset.theme==='dark'?'light':'dark';
+ const apply=()=>{root.dataset.theme=next;try{localStorage.setItem('valus-theme',next);}catch{}document.querySelectorAll('.theme-toggle').forEach(b=>{b.outerHTML=themeButton();});document.querySelectorAll('.theme-toggle').forEach(b=>b.classList.add('spun'));};
+ if(!document.startViewTransition){if(!stillMotion()){root.classList.add('theme-fade');setTimeout(()=>root.classList.remove('theme-fade'),700);}apply();return;}
+ const r=btn.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,end=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+ withTransition('theme',apply,()=>root.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+end+'px at '+x+'px '+y+'px)']},{duration:700,easing:'cubic-bezier(.65,0,.35,1)',pseudoElement:'::view-transition-new(root)'}));}
+// Login pages rise in piece by piece. A re-render mid-way (the session arriving) picks up where it left off.
+function markEntrance(){const page=document.querySelector('.auth-student,.auth-teacher'),t=performance.now()-enterStart;if(!page||t>1400)return;
+ page.classList.add('auth-enter');page.style.setProperty('--enter-t',-Math.round(t)+'ms');}
+// A soft ripple from wherever a button is pressed.
+document.addEventListener('pointerdown',e=>{const b=e.target.closest('.button,.icon-button,.auth-tabs button,.filter-tabs button');if(!b||b.disabled||stillMotion())return;
+ const r=b.getBoundingClientRect(),s=document.createElement('span');s.className='ripple';s.setAttribute('aria-hidden','true');
+ s.style.cssText='left:'+(e.clientX-r.left)+'px;top:'+(e.clientY-r.top)+'px;--size:'+Math.round(Math.max(r.width,r.height)*2.2)+'px';b.append(s);s.addEventListener('animationend',()=>s.remove());});
+
 // ---------- actions ----------
 async function run(task){try{await task();}catch(err){toast(err.message);}}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const action=el.dataset.action;
- if(action==='theme'){document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('valus-theme',document.documentElement.dataset.theme);}catch{}document.querySelectorAll('.theme-toggle').forEach(b=>{b.outerHTML=themeButton();});return;}
+ if(action==='theme'){toggleTheme(el);return;}
  if(action==='close'){modal.close();return;}
  if(action==='menu'){document.querySelector('.sidebar').classList.toggle('open');return;}
- if(action==='auth-tab'){authTab=el.dataset.value;authError='';render();return;}
+ if(action==='auth-tab'){if(authTab===el.dataset.value)return;authSwap=authTab;authTab=el.dataset.value;authError='';render();return;}
  if(action==='google'){showAuthError('');const restore=authBusy(el,'Opening Google…');googleSignIn().catch(err=>showAuthError(err.message)).finally(restore);return;}
  if(action==='google-create'){const form=el.closest('form');if(![...form.querySelectorAll('[data-community]')].every(f=>f.reportValidity()))return;const d=formData(form);showAuthError('');const restore=authBusy(el,'Opening Google…');
   createAccount({method:'google',role:form.dataset.role,communityId:d.communityId,password:d.password,firstName:d.firstName,lastName:d.lastName}).then(ok=>{if(ok)welcome();}).catch(err=>showAuthError(err.message)).finally(restore);return;}
@@ -304,7 +328,10 @@ document.addEventListener('submit',e=>{const form=e.target;if(!['create-form','s
  }).finally(()=>{if(submit)submit.disabled=false;});});
 document.addEventListener('change',e=>{if(e.target.matches('[data-skill]')){const i=Number(e.target.dataset.skill),done=readLocal('skills',[]);writeLocal('skills',e.target.checked?[...new Set([...done,i])]:done.filter(x=>x!==i));}if(e.target.id==='event-category'){eventFilter=e.target.value;document.querySelector('#event-results').innerHTML=eventCards();}});
 document.addEventListener('input',e=>{if(e.target.id==='event-search'){eventSearch=e.target.value;document.querySelector('#event-results').innerHTML=eventCards();}if(e.target.id==='student-search'){studentSearch=e.target.value;document.querySelector('#roster-result').innerHTML=roster();}});
-window.addEventListener('hashchange',()=>{modal.close();assignmentFilter='All';authError='';render();if(!['#/about','#/instructors'].includes(location.hash))window.scrollTo({top:0,behavior:'instant'});});
+window.addEventListener('hashchange',()=>{const route=location.hash.slice(1)||'/',prev=lastRoute;lastRoute=route;
+ const update=()=>{modal.close();assignmentFilter='All';authError='';if(isAuthRoute(route)&&prev!==route)enterStart=performance.now();render();if(!['#/about','#/instructors'].includes(location.hash))window.scrollTo({top:0,behavior:'instant'});};
+ if(prev===route||!(isAuthRoute(route)||isAuthRoute(prev)))return update();
+ withTransition(prev==='/student'&&route==='/teacher'?'forward':prev==='/teacher'&&route==='/student'?'back':'page',update);});
 modal.addEventListener('click',e=>{if(e.target===modal){const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)modal.close();}});
 // A new account (or signing out) starts with an empty cache.
 let lastUid=null;

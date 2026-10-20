@@ -376,7 +376,7 @@
   background: var(--surface); border: 1px solid var(--line); border-radius: 24px;
 }
 .auth-card h2 { font-size: 1.7rem; letter-spacing: -.03em; line-height: 1.15; }
-.auth-card > p { color: var(--ink-2); font-size: 15px; }
+.auth-card > p, .auth-pane > p { color: var(--ink-2); font-size: 15px; }
 .auth-step { color: var(--red-ink); }
 .auth-fields { display: grid; gap: 14px; }
 .auth-fields .field { display: grid; gap: 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
