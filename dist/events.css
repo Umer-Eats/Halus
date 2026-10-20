@@ -5,6 +5,11 @@
 .focus-card>.micro{padding-right:32px;min-height:28px;font-size:10px}
 .event-pick{position:absolute;right:20px;top:20px;z-index:2;display:grid;place-items:center;width:32px;height:32px;cursor:pointer}
 .event-pick input{width:20px;height:20px;accent-color:var(--red);cursor:pointer}
+@media(hover:hover) and (pointer:fine){
+ .event-pick{opacity:0;pointer-events:none;transition:opacity .18s ease}
+ .focus-card:hover .event-pick,.focus-card:focus-within .event-pick{opacity:1;pointer-events:auto}
+}
+@media(prefers-reduced-motion:reduce){.event-pick{transition:none}}
 .event-card-link{display:flex;flex-direction:column;flex:1;color:var(--ink);text-decoration:none}
 .event-card-link::after{content:"";position:absolute;inset:0;border-radius:20px}
 .event-card-link h3{font:600 21px/1.3 var(--font-body);letter-spacing:-.025em;margin:0 0 12px}

@@ -245,11 +245,10 @@ body.in-workspace { background: var(--bg-deep); }
   overflow-y: auto;
 }
 .sidebar > .brand { padding: 0 8px; }
-.chapter-label { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: 14px; background: var(--surface-2); }
-.chapter-label div { display: grid; line-height: 1.25; }
+.chapter-label { padding: 12px; border-radius: 14px; background: var(--surface-2); }
+.chapter-label div { display: grid; width: 100%; line-height: 1.25; }
 .chapter-label strong { font-size: 14px; }
 .chapter-label small { color: var(--muted); font-size: 12px; }
-.chapter-avatar { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--red); color: #fff; font-family: var(--font-display); font-weight: 600; }
 .sidebar nav { display: grid; gap: 2px; }
 .sidebar nav a {
   display: flex; gap: 12px; align-items: center;
