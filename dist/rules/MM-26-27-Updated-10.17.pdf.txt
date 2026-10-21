@@ -1,0 +1,206 @@
+ 
+Medical Math ILC Guidelines (October 2026)         Page 1 of 4 
+The expectation is that competitors read and are aware of all the content within these guidelines and associated links. Successful competitors will study all 
+links for the detailed information.  
+Medical Math                                
+Event Category: Health Science…………………………………………………………………………………………………………………………  
+Eligible Divisions: Secondary & 
+Postsecondary/ Collegiate 
+Round One: 50 Q test (90 minutes) Digital Upload: NO 
+Solo Event: 1 competitor HOSA will provide a handheld calculator for this test.  
+ 
+New for 2026-2027 
+Math for Health Care Professionals has been retired.  Pharmacy Calculations: An Introduction for Pharmacy Technicians  
+has been added. The tiebreaker question has been updated to essay format. Editorial changes have been made. The test plan 
+has been updated. 
+ 
+Event Summary 
+Medical Math allows members to gain the knowledge and skills required to identify, solve, and apply m athematical principles. 
+This competitive event consists of a written test. In the event of a tie, the tie-breaker questions will be judged to break the 
+tie. It aims to inspire members to learn about the integration of mathematics in health care, including temperature, weights, 
+and measures used in the health community. 
+                                                            
+General Event Information 
+General Rules  Competitors must be familiar with and adhere to the General Rules and Regulations.  
+Dress Code Proper business attire or official HOSA uniform. Bonus points will be awarded for proper dress.  
+Competitors Must 
+Provide 
+●  Photo ID 
+●  Two #2 lead pencils (not mechanical) with an eraser 
+●  Neon colored foam earplugs, NOT earbuds, for noise control (optional) 
+HOSA Conference Staff will provide equipment and supplies listed in Appendix I.  
+Official References  The references below are used in developing the test questions:  
+●  Simmers, L., Simmers-Nartker, K., Simmers-Kobelak, S., Morris, L.   DHO: Health Science. 
+Cengage Learning, Latest edition 
+●  Craig, Gloria P., Dosage Calculations Made Easy. Wolters Kluwer, Latest edition.  
+●  Rewald,M. Lorang, B. and Schramm, G. Pharmacy Calculations: An Introduction for Pharmacy 
+Technicians. Latest edition.  (Use this HOSA student promo code at checkout for a 
+discount on this ASHP resource: ASHPxHOSA) 
+ 
+ROUND ONE- Test 
+Test Instructions All competitors will be given a test and test answer sheet. The written test will consist of 50 
+multiple choice questions in a maximum of 90 minutes. See test instructions here. 
+An essay tiebreaker question will be administered with the original test. Essay tiebreakers will 
+be completed in the space provided in the test booklet. 
+Time Remaining 
+Announcements 
+There will be NO verbal announcements for time remaining during ILC testing.  All ILC testing 
+will be completed in the Testing Center, and competitors are responsible for monitoring their 
+own time. 
+
+ 
+Medical Math ILC Guidelines (October 2026)         Page 2 of 4 
+The expectation is that competitors read and are aware of all the content within these guidelines and associated links. Successful competitors will study all 
+links for the detailed information.  
+Written Test Plan The test plan for the Medical Math Test is: 
+●  Mathematical essentials - 5% 
+●  Measurement and conversion problems - 30% 
+●  Drug dosages and intravenous solutions - 35% 
+●  Dilutions, solutions, and concentrations - 30% 
+ 
+At the International Leadership Conference, HOSA will provide basic handheld calculators (no 
+graphing calculators) for addition, subtraction, division, multiplication, and square root 
+calculations. Personal calculators are NOT allowed. 
+ 
+Abbreviations will be used in the written problems.  In addition, the test will use standard 
+medical abbreviations as designated in the Simmers DHO: Health Science reference.  
+ 
+At least half of the computation and calculation problems involve conversions.  
+ 
+The medical math “Reference Materials Summary” included in these guidelines (page 4) will be 
+used as the official reference for the test for uniformity. Competitors may NOT use this 
+summary page or any conversion chart or resource during the test. 
+Test Answer Sheet 
+ 
+ 
+The test answer sheet for this event will require competitors to grid 
+their responses with pencils. Numbers must be written with the last 
+number of the answer in the far right box. (See sample to the right.) 
+When a paper/pencil test is used or administered on a computer, the 
+competitor will write in or key in their response to each question.  A 
+forward slash (/) and period (.) are the only characters available as part 
+of the answer. 
+Rounding 1. Converting between measurement systems often yields a different answer depending on 
+which systems and conversions are used. However, the answer to a calculation problem 
+will ultimately be the same after appropriate rounding. When determining a solution, 
+round only the final answer after completing all calculation steps. 
+ 
+2. When rounding decimal numbers to the nearest tenths, hundredths, or thousandths 
+place, look to the immediate right of the digit located in the position to be rounded. If 
+the number to the direct right is 5 or larger, round up one number and drop everything 
+that follows. If the number to the direct right is 4 or smaller, leave the position being 
+rounded as is and drop everything that follows. 
+ 
+3. In specific situations, answers will be rounded per medical protocol. For example, 
+pediatric dosage is always rounded DOWN to avoid potential overdose. Unless otherwise 
+indicated, all answers should be rounded to the nearest whole number. (Examples: 
+31.249 (rounded down) = 31 and 23.75 (rounded up) = 24). 
+Use of Zero Decimal expressions of less than 1 should be preceded by a zero – “leading zero.”  A whole 
+number should never be followed by a decimal point and a zero – “trailing zero.” 
+ 
+ 
+ 
+ 
+
+ 
+Medical Math ILC Guidelines (October 2026)         Page 3 of 4 
+The expectation is that competitors read and are aware of all the content within these guidelines and associated links. Successful competitors will study all 
+links for the detailed information.  
+Sample Test Questions 
+ 
+*Competitors will grid-in and write-in their final answers to the test problems on the test 
+answer sheet. 
+1.     An IV bag of 500 mL solution is started at 1900.  The flow rate is 38 gtts per minute, and 
+the drop factor is 10 gtts per mL.  At what time (24-hour clock) will this infusion finish?  
+(Craig pp 174-178) 
+         Solution 38 gtts/1 min x 1 mL/10 gtts = 3.8 mL/min 
+    3.8 mL/1 min x 60 min/1 hr = 228 mL/hr 
+               500 mL x 1 hr/228 mL = 2.1929824 hr 
+               0.1929824 hr x 60 min/1 hr = 11.578944 minutes   
+               1900 hr + 2 hrs 11.578944 min (Rounded = 12 minutes) 
+                                                   1900 hours + 2hrs 12 min = 2112 hours                            
+2.     A patient with an eating disorder weighs 95½ lbs. What is the patient’s weight in kg?  
+        Round to the nearest tenth.    (Simmers pp 383) 
+          Solution 95.5 lb x 1 kg/2.2 lbs = 43.40909 kg   Rounded = 43.4 kg 
+3.     How many grams of sodium chloride are needed to prepare 500 mL of a 5% solution?     
+(Kennamer pp 235) 
+                  Solution  5% = 5 g/100 mL = 0.05 g/1 mL  
+                0.05 g/1 mL x 500 mL = 25 g  
+ 
+Final Scoring  
+In the event of a tie, the essay will be judged to break the tie.  
+ 
+Future Opportunities  
+The HOSA Scholarship program has funding available for HOSA members who have an interest in various health careers!  The 
+application process begins January 1, 2027, and can be found here: https://hosa.org/scholarships/. 
+ 
+Graduating from high school or completing your postsecondary/collegiate program does not mean your HOSA journey has to 
+end. As a HOSA member, you are eligible to become a HOSA Lifetime Alumni Member - a free and valuable opportunity to 
+remain connected, give back, and help to shape the future of the organization. Learn more and sign up at  hosa.org/alumni. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Medical Math ILC Guidelines (October 2026)         Page 4 of 4 
+The expectation is that competitors read and are aware of all the content within these guidelines and associated links. Successful competitors will study all 
+links for the detailed information.  
+ 
+Medical Math – SS/PSC 
+Reference Materials Summary  
+METRIC EQUIVALENTS 
+APPROXIMATE EQUIVALENTS AMONG SYSTEMS Formulas  
+ 
+NOTE: This reference may NOT be used during testing. 
+ 
+Length  Temperature 
+1 meter (m) = 100 centimeters (cm) = 1000 millimeters (mm) 
+1 centimeters (cm) = 10 millimeters (mm)  
+ oC (Degrees Celsius) = (oF - 32) 5/9    
+ oF (Degrees Fahrenheit) = (oC) 9/5 + 32 
+Weight  Weight Conversion  
+1 kilogram (kg) = 1000 grams (g) 1 kilogram (kg) = 2.2 pounds (lb) 
+1 gram (g) = 1000 milligrams (mg) 1 pound (lb) = 16 ounces (oz) 
+1 milligram (mg) = 1000 micrograms (mcg)   
+Volume for Solids Volume for Fluids 
+1000 cubic decimeters (dm) = 1 cubic meter (m3) 1 liter (L) = 1000 milliliters (mL) 
+1000 cubic centimeters (cm3) = 1 cubic decimeter (dm3) 10 centiliters (cL) = 1 deciliter (dL) 
+1000 cubic millimeters (mm3)= 1 cubic centimeter (cm3 or cc) 10 deciliters (dL) = 1 liter (L) 
+ 1 cubic centimeters (cm3 or cc) = 1 milliliter (mL) 
+ Units (U) = a measure for drugs such as insulin 
+Metric  Household/English  
+ 
+240 milliliters (mL)  1 cup = 8 ounces (oz) = 16 tablespoons (tbsp) 
+30 milliliters (mL) 1 ounce (oz) = 2 tablespoons (tbsp) = 6 teaspoons (tsp) 
+15 milliliters (mL) 1 tablespoon (tbsp) = 3 teaspoons (tsp) 
+5 milliliters (mL) 1 teaspoon (tsp) 
+1 milliliter (mL) 15 drops (gtts) 
+0.0667 milliliters (mL) 1 drop (gtt) 
+1 meter (m) 39.4 inches (in) 
+2.54 centimeters (cm) 1 inch (in) 
+ 1 foot (ft) = 12 inches (in)  
+Standard Deviation Formula    
+        for Sample Data 
+Body Surface Area  
+ 
+BSA (m2) = √([height (cm) x weight(kg)]/3,600) 
+ 
+BSA (m2) = √([height (in) x weight(lb)]/3,131) 
+ 

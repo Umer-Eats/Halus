@@ -1,5 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { EVENTS, LESSONS } from '../dist/model.js';
+import {findCourseLesson, assessLesson} from '../dist/courses.js';
+import {gradeCourseFRQ} from './course-grader.js';
 import { COMMUNITIES, equalSecret, findCommunity, passwordFor, publicCommunities } from './communities.js';
 import { ensureSchema, one, rows } from './db.js';
 import { allowHalMessage, askHal } from './hal.js';
@@ -7,7 +9,7 @@ import { AppError, failure, readBody, send, text } from './http.js';
 
 const EVENT_NAMES = new Set(EVENTS.map((e) => e.name));
 const LESSON_IDS = new Set(LESSONS.map((l) => l.id));
-const ASSIGNMENT_TYPES = ['Lesson', 'Quiz', 'Skill checklist', 'Reflection'];
+const ASSIGNMENT_TYPES = ['Lesson', 'Lesson checkpoint', 'Quiz', 'Skill checklist', 'Reflection'];
 const ENROLL_LIMIT = 10;
 const ENROLL_IP_LIMIT = 40;
 const ENROLL_WINDOW_MS = 15 * 60_000;
@@ -37,6 +39,13 @@ function assignmentFields(body, partial) {
   // A blank event sends the assignment to the whole community.
   if (!partial || 'event' in body) out.event = eventName(body.event, { allowEmpty: true });
   if (!partial || 'instructions' in body) out.instructions = text(body.instructions, 'instructions', { max: 4000, required: false });
+  // A checkpoint belongs to one course lesson, so its audience is that lesson's event.
+  if (out.type === 'Lesson checkpoint') {
+    const found = typeof body.lessonId === 'string' && findCourseLesson(body.lessonId);
+    if (!found) throw new AppError(400, 'Choose the lesson this checkpoint covers.');
+    out.lessonId = found.lesson.id;
+    out.event = found.name;
+  } else if (out.type) out.lessonId = null;
   return out;
 }
 
@@ -59,6 +68,7 @@ const assignment = (a) => ({
   event: a.event ?? null,
   due: a.due,
   instructions: a.instructions,
+  lessonId: a.lesson_id ?? null,
   createdAt: a.created_at,
   ...(a.submission_count !== undefined && { submissionCount: Number(a.submission_count) }),
   ...(a.submitted_at !== undefined && { submitted: Boolean(a.submitted_at), submittedAt: a.submitted_at ?? null, submission: a.submission_body ?? null }),
@@ -108,7 +118,7 @@ async function limitEnrollment(db, id, limit = ENROLL_LIMIT) {
 }
 
 async function assignmentInCommunity(ctx, user, id) {
-  const a = one(await ctx.db.execute({ sql: 'SELECT * FROM assignments WHERE id = ? AND community_id = ?', args: [id, user.community_id] }));
+  const a = one(await ctx.db.execute({ sql: 'SELECT a.*, al.lesson_id FROM assignments a LEFT JOIN assignment_lessons al ON al.assignment_id = a.id WHERE a.id = ? AND a.community_id = ?', args: [id, user.community_id] }));
   if (!a) throw new AppError(404, 'That assignment was not found.');
   return a;
 }
@@ -231,7 +241,9 @@ route('GET', '/students', async (ctx) => {
   const result = await ctx.db.execute({
     sql: `SELECT u.id, u.display_name, u.email, u.event, u.created_at,
         (SELECT COUNT(*) FROM lesson_progress lp WHERE lp.user_id = u.id) AS lessons_completed,
-        (SELECT q.score FROM quiz_attempts q WHERE q.user_id = u.id ORDER BY q.created_at DESC LIMIT 1) AS last_quiz_score
+        (SELECT q.score FROM quiz_attempts q WHERE q.user_id = u.id ORDER BY q.created_at DESC LIMIT 1) AS last_quiz_score,
+        (SELECT COUNT(*) FROM course_completions cc WHERE cc.user_id = u.id) AS course_lessons_completed,
+        (SELECT ROUND(AVG(ca.accuracy)) FROM checkpoint_attempts ca WHERE ca.user_id = u.id) AS checkpoint_accuracy
       FROM users u WHERE u.community_id = ? AND u.role = 'student' ORDER BY u.display_name COLLATE NOCASE`,
     args: [user.community_id],
   });
@@ -245,6 +257,8 @@ route('GET', '/students', async (ctx) => {
       lessonsCompleted: Number(s.lessons_completed),
       progress: Math.round((Number(s.lessons_completed) / LESSONS.length) * 100),
       lastQuizScore: s.last_quiz_score === null ? null : Number(s.last_quiz_score),
+      courseLessonsCompleted: Number(s.course_lessons_completed),
+      checkpointAccuracy: s.checkpoint_accuracy === null ? null : Number(s.checkpoint_accuracy),
     })),
   };
 });
@@ -277,14 +291,15 @@ route('GET', '/assignments', async (ctx) => {
   const user = await member(ctx);
   if (user.role === 'instructor') {
     const result = await ctx.db.execute({
-      sql: `SELECT a.*, (SELECT COUNT(*) FROM submissions s WHERE s.assignment_id = a.id) AS submission_count
-        FROM assignments a WHERE a.community_id = ? ORDER BY a.due, a.created_at`,
+      sql: `SELECT a.*, al.lesson_id, (SELECT COUNT(*) FROM submissions s WHERE s.assignment_id = a.id) AS submission_count
+        FROM assignments a LEFT JOIN assignment_lessons al ON al.assignment_id = a.id WHERE a.community_id = ? ORDER BY a.due, a.created_at`,
       args: [user.community_id],
     });
     return { assignments: rows(result).map(assignment) };
   }
   const result = await ctx.db.execute({
-    sql: `SELECT a.*, s.submitted_at, s.body AS submission_body FROM assignments a
+    sql: `SELECT a.*, al.lesson_id, s.submitted_at, s.body AS submission_body FROM assignments a
+      LEFT JOIN assignment_lessons al ON al.assignment_id = a.id
       LEFT JOIN submissions s ON s.assignment_id = a.id AND s.user_id = ?
       WHERE a.community_id = ? AND (a.event IS NULL OR a.event = ?) ORDER BY a.due, a.created_at`,
     args: [user.id, user.community_id, user.event],
@@ -296,24 +311,32 @@ route('POST', '/assignments', async (ctx) => {
   const user = await member(ctx, 'instructor');
   const fields = assignmentFields(ctx.body, false);
   const id = randomUUID();
-  await ctx.db.execute({
-    sql: 'INSERT INTO assignments (id, community_id, event, title, type, instructions, due, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    args: [id, user.community_id, fields.event, fields.title, fields.type, fields.instructions, fields.due, user.id],
-  });
+  await ctx.db.batch([
+    {
+      sql: 'INSERT INTO assignments (id, community_id, event, title, type, instructions, due, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [id, user.community_id, fields.event, fields.title, fields.type, fields.instructions, fields.due, user.id],
+    },
+    ...(fields.lessonId ? [{ sql: 'INSERT INTO assignment_lessons (assignment_id, lesson_id) VALUES (?, ?)', args: [id, fields.lessonId] }] : []),
+  ], 'write');
   return { status: 201, data: { assignment: assignment(await assignmentInCommunity(ctx, user, id)) } };
 });
 
 route('PATCH', '/assignments/:id', async (ctx) => {
   const user = await member(ctx, 'instructor');
-  await assignmentInCommunity(ctx, user, ctx.params.id);
-  const fields = assignmentFields(ctx.body, true);
+  const current = await assignmentInCommunity(ctx, user, ctx.params.id);
+  // Validate type and lesson together so a checkpoint can never lose its lesson.
+  const typeBody = ['type', 'lessonId', 'event'].some((k) => k in ctx.body) ? { type: current.type, lessonId: current.lesson_id, ...ctx.body } : ctx.body;
+  const { lessonId, ...fields } = assignmentFields(typeBody, true);
   const keys = Object.keys(fields);
-  if (keys.length) {
-    await ctx.db.execute({
-      sql: `UPDATE assignments SET ${keys.map((k) => `${k} = ?`).join(', ')} WHERE id = ? AND community_id = ?`,
-      args: [...keys.map((k) => fields[k]), ctx.params.id, user.community_id],
-    });
-  }
+  const statements = [];
+  if (keys.length) statements.push({
+    sql: `UPDATE assignments SET ${keys.map((k) => `${k} = ?`).join(', ')} WHERE id = ? AND community_id = ?`,
+    args: [...keys.map((k) => fields[k]), ctx.params.id, user.community_id],
+  });
+  if (lessonId !== undefined) statements.push(lessonId
+    ? { sql: 'INSERT INTO assignment_lessons (assignment_id, lesson_id) VALUES (?, ?) ON CONFLICT(assignment_id) DO UPDATE SET lesson_id = excluded.lesson_id', args: [ctx.params.id, lessonId] }
+    : { sql: 'DELETE FROM assignment_lessons WHERE assignment_id = ?', args: [ctx.params.id] });
+  if (statements.length) await ctx.db.batch(statements, 'write');
   return { assignment: assignment(await assignmentInCommunity(ctx, user, ctx.params.id)) };
 });
 
@@ -322,6 +345,7 @@ route('DELETE', '/assignments/:id', async (ctx) => {
   await assignmentInCommunity(ctx, user, ctx.params.id);
   await ctx.db.batch([
     { sql: 'DELETE FROM submissions WHERE assignment_id = ?', args: [ctx.params.id] },
+    { sql: 'DELETE FROM assignment_lessons WHERE assignment_id = ?', args: [ctx.params.id] },
     { sql: 'DELETE FROM assignments WHERE id = ? AND community_id = ?', args: [ctx.params.id, user.community_id] },
   ], 'write');
   return { status: 204 };
@@ -331,8 +355,12 @@ route('GET', '/assignments/:id/submissions', async (ctx) => {
   const user = await member(ctx, 'instructor');
   await assignmentInCommunity(ctx, user, ctx.params.id);
   const result = await ctx.db.execute({
-    sql: `SELECT s.user_id, s.body, s.submitted_at, u.display_name FROM submissions s
-      LEFT JOIN users u ON u.id = s.user_id WHERE s.assignment_id = ? ORDER BY s.submitted_at`,
+    sql: `SELECT s.user_id, s.body, s.submitted_at, u.display_name,
+        c.accuracy, c.mcq_correct, c.mcq_total, c.frq_score,
+        (SELECT COUNT(*) FROM checkpoint_attempts x WHERE x.assignment_id = s.assignment_id AND x.user_id = s.user_id) AS attempts
+      FROM submissions s LEFT JOIN users u ON u.id = s.user_id
+      LEFT JOIN checkpoint_attempts c ON c.id = (SELECT y.id FROM checkpoint_attempts y WHERE y.assignment_id = s.assignment_id AND y.user_id = s.user_id ORDER BY y.created_at DESC LIMIT 1)
+      WHERE s.assignment_id = ? ORDER BY s.submitted_at`,
     args: [ctx.params.id],
   });
   return {
@@ -341,6 +369,9 @@ route('GET', '/assignments/:id/submissions', async (ctx) => {
       displayName: s.display_name ?? 'Former member',
       body: s.body,
       submittedAt: s.submitted_at,
+      ...(s.accuracy !== null && {
+        checkpoint: { accuracy: Number(s.accuracy), mcqCorrect: Number(s.mcq_correct), mcqTotal: Number(s.mcq_total), frqScore: s.frq_score === null ? null : Number(s.frq_score), attempts: Number(s.attempts) },
+      }),
     })),
   };
 });
@@ -349,6 +380,7 @@ route('PUT', '/assignments/:id/submission', async (ctx) => {
   const user = await member(ctx, 'student');
   const a = await assignmentInCommunity(ctx, user, ctx.params.id);
   if (a.event && a.event !== user.event) throw new AppError(404, 'That assignment was not found.');
+  if (a.type === 'Lesson checkpoint') throw new AppError(400, 'Submit this assignment from its lesson checkpoint.');
   const body = text(ctx.body.body, 'your response', { max: 10000, required: false });
   await ctx.db.execute({
     sql: `INSERT INTO submissions (assignment_id, user_id, body) VALUES (?, ?, ?)
@@ -411,6 +443,73 @@ route('GET', '/progress', async (ctx) => {
   };
 });
 
+// Course lessons are open: students mark them complete and move on. The MCQ + FRQ
+// checkpoint only runs when a teacher assigns it, and every attempt's accuracy is stored.
+route('GET', '/courses/progress', async (ctx) => {
+  const user = await member(ctx);
+  const [done, attempts] = await ctx.db.batch([
+    { sql: 'SELECT lesson_id FROM course_completions WHERE user_id = ? ORDER BY completed_at', args: [user.id] },
+    { sql: 'SELECT lesson_id, accuracy, created_at FROM checkpoint_attempts WHERE user_id = ? ORDER BY created_at', args: [user.id] },
+  ], 'read');
+  const accuracy = {};
+  for (const a of rows(attempts)) accuracy[a.lesson_id] = { latest: Number(a.accuracy), attempts: (accuracy[a.lesson_id]?.attempts || 0) + 1 };
+  return { completed: rows(done).map((r) => r.lesson_id), accuracy };
+});
+
+route('POST', '/courses/lessons/:lessonId/complete', async (ctx) => {
+  const user = await member(ctx, 'student');
+  const found = findCourseLesson(ctx.params.lessonId);
+  if (!found) throw new AppError(404, 'That lesson was not found.');
+  await ctx.db.execute({
+    sql: 'INSERT INTO course_completions (user_id, lesson_id) VALUES (?, ?) ON CONFLICT DO NOTHING',
+    args: [user.id, found.lesson.id],
+  });
+  return { completed: true, lessonId: found.lesson.id };
+});
+
+const checkpointLog = new Map();
+const accuracyOf = (mcqCorrect, mcqTotal, frqScore) => {
+  const mcq = mcqTotal ? (mcqCorrect / mcqTotal) * 100 : 0;
+  return Math.round(frqScore === null ? mcq : (mcq + frqScore) / 2);
+};
+
+route('POST', '/assignments/:id/checkpoint', async (ctx) => {
+  const user = await member(ctx, 'student');
+  const a = await assignmentInCommunity(ctx, user, ctx.params.id);
+  if (a.event && a.event !== user.event) throw new AppError(404, 'That assignment was not found.');
+  const found = a.lesson_id && findCourseLesson(a.lesson_id);
+  if (a.type !== 'Lesson checkpoint' || !found) throw new AppError(400, 'This assignment does not have a lesson checkpoint.');
+  const check = assessLesson(found.lesson, ctx.body);
+  if (!check.responseReady) throw new AppError(400, 'Write a response between 80 and 10,000 characters.');
+  if (!Array.isArray(ctx.body.answers) || ctx.body.answers.length !== found.lesson.mcqs.length || ctx.body.answers.some((x) => !Number.isInteger(x) || x < 0))
+    throw new AppError(400, 'Answer every multiple-choice question.');
+  if (!allowHalMessage(checkpointLog, user.id, Date.now(), 12, 10 * 60_000))
+    throw new AppError(429, 'You have submitted several checkpoints. Please wait a few minutes before trying again.');
+  const response = ctx.body.response.trim();
+  const mcqCorrect = check.mcqs.filter((q) => q.correct).length, mcqTotal = check.mcqs.length;
+  // If Gemini is down the MCQ accuracy is still recorded; the written response stays ungraded.
+  let grade = null, gradingError = null;
+  try {
+    grade = await ctx.gradeFRQ(found.lesson, response, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_GRADING_MODEL || ctx.env.GEMINI_MODEL });
+  } catch (error) {
+    gradingError = error instanceof AppError ? error.message : 'The written response could not be graded right now.';
+  }
+  const frqScore = grade ? grade.score : null, accuracy = accuracyOf(mcqCorrect, mcqTotal, frqScore);
+  await ctx.db.batch([
+    {
+      sql: `INSERT INTO checkpoint_attempts (id, user_id, lesson_id, assignment_id, mcq_correct, mcq_total, frq_score, accuracy, response, grade)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [randomUUID(), user.id, found.lesson.id, a.id, mcqCorrect, mcqTotal, frqScore, accuracy, response, grade && JSON.stringify(grade)],
+    },
+    {
+      sql: `INSERT INTO submissions (assignment_id, user_id, body) VALUES (?, ?, ?)
+        ON CONFLICT(assignment_id, user_id) DO UPDATE SET body = excluded.body, submitted_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')`,
+      args: [a.id, user.id, response],
+    },
+  ], 'write');
+  return { accuracy, mcqCorrect, mcqTotal, frqScore, grade, gradingError, mcqs: check.mcqs };
+});
+
 route('PUT', '/progress/lessons/:lessonId', async (ctx) => {
   const user = await member(ctx);
   if (!LESSON_IDS.has(ctx.params.lessonId)) throw new AppError(404, 'That lesson was not found.');
@@ -436,7 +535,7 @@ route('POST', '/progress/quizzes', async (ctx) => {
 
 // One Vercel function serves every /api route (vercel.json rewrites to it), which keeps
 // the project far below the Hobby plan's function limit and shares one warm DB client.
-export function createApp({ db, verifyToken, env = process.env, communities = COMMUNITIES }) {
+export function createApp({ db, verifyToken, env = process.env, communities = COMMUNITIES, gradeFRQ = gradeCourseFRQ }) {
   return async function handler(req, res) {
     try {
       const url = new URL(req.url, 'http://localhost');
@@ -453,7 +552,7 @@ export function createApp({ db, verifyToken, env = process.env, communities = CO
         const body = ['POST', 'PUT', 'PATCH'].includes(req.method) ? await readBody(req) : {};
         if (body === null || typeof body !== 'object' || Array.isArray(body)) throw new AppError(400, 'The request could not be read.');
         if (!['/health', '/config', '/communities', '/hal'].includes(path)) await ensureSchema(db);
-        const out = await r.handler({ req, db, env, communities, verifyToken, params, query: url.searchParams, body });
+        const out = await r.handler({ req, db, env, communities, verifyToken, gradeFRQ, params, query: url.searchParams, body });
         if (out && typeof out.status === 'number' && Object.keys(out).every((k) => k === 'status' || k === 'data'))
           return send(res, out.status, out.data);
         return send(res, 200, out);

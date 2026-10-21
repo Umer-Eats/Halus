@@ -5,6 +5,23 @@ import { AppError } from './http.js';
 // is validated in code. Removing a community from the file locks its members out
 // without deleting their data.
 export const SCHEMA = [
+  // Finishing a course lesson marks it complete; checkpoints are optional and teacher-assigned.
+  `CREATE TABLE IF NOT EXISTS course_completions (
+    user_id TEXT NOT NULL, lesson_id TEXT NOT NULL,
+    completed_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    PRIMARY KEY (user_id, lesson_id))`,
+  // Every checkpoint attempt is kept so lesson accuracy can be analyzed later.
+  `CREATE TABLE IF NOT EXISTS checkpoint_attempts (
+    id TEXT PRIMARY KEY, user_id TEXT NOT NULL, lesson_id TEXT NOT NULL, assignment_id TEXT,
+    mcq_correct INTEGER NOT NULL, mcq_total INTEGER NOT NULL, frq_score INTEGER,
+    accuracy INTEGER NOT NULL CHECK (accuracy BETWEEN 0 AND 100),
+    response TEXT NOT NULL, grade TEXT,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))`,
+  'CREATE INDEX IF NOT EXISTS idx_checkpoint_attempts_user ON checkpoint_attempts(user_id, lesson_id)',
+  'CREATE INDEX IF NOT EXISTS idx_checkpoint_attempts_assignment ON checkpoint_attempts(assignment_id, user_id)',
+  // Links a "Lesson checkpoint" assignment to its course lesson (a side table avoids an ALTER migration).
+  `CREATE TABLE IF NOT EXISTS assignment_lessons (
+    assignment_id TEXT PRIMARY KEY, lesson_id TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT NOT NULL,

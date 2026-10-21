@@ -1,5 +1,6 @@
 import {EVENTS, GROUPS} from './model.js';
 import {EVENT_DETAILS, TOOL_LABELS} from './event-details.js';
+import {coursePage,rulesPage} from './course-workspace.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const eventHref = (name, tool='rules') => '#/event/'+encodeURIComponent(name)+'/'+tool;
@@ -26,16 +27,16 @@ export function catalogToolbar(search='', category='All', type='All') {
   return `<div class="catalog-toolbar"><label class="search-field"><input id="event-search" type="search" placeholder="Search HOSA events" aria-label="Search HOSA events" value="${escape(search)}"></label>${select('event-category','Category',['All',...Object.keys(GROUPS)],category)}${select('event-type','Event type',['All','Testing','Skills','Speech & presentation','Online submission'],type)}</div>`;
 }
 export function parseEventRoute(route) {
-  const match=route.match(/^\/event\/([^/]+)(?:\/([^/]+))?$/);
+  const match=route.match(/^\/event\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/);
   if(!match)return null;
   try {
     const event=EVENTS.find(e=>e.name===decodeURIComponent(match[1]));
     if(!event)return null;
     const detail=EVENT_DETAILS[event.name], tool=match[2]||'rules';
-    return {event,detail,tool,valid:detail.tools.includes(tool)};
+    return {event,detail,tool,lessonId:match[3]?decodeURIComponent(match[3]):null,valid:detail.tools.includes(tool)&&(!match[3]||tool==='lessons')};
   } catch {return null;}
 }
-export function eventWorkspace({event,detail,tool,valid}, {brand,theme,teacher,selected}) {
+export function eventWorkspace({event,detail,tool,valid,lessonId}, {brand,theme,teacher,selected,courseProgress={}}) {
   const label=valid?TOOL_LABELS[tool]:'Section unavailable';
   return `<div class="event-focus">
     <header class="event-focus-header">${brand}<a class="text-button" href="${teacher?'#/students':'#/my-event'}">← ${teacher?'Back to students':'All my events'}</a>${theme}</header>
@@ -44,7 +45,7 @@ export function eventWorkspace({event,detail,tool,valid}, {brand,theme,teacher,s
         <div class="event-focus-intro"><span class="eyebrow">${escape(event.category)} / 2026–27</span><h1>${escape(event.name)}</h1>
           <p>${escape(detail.summary)}</p><div class="event-type-tags">${detail.types.map(t=>`<span>${escape(t)}</span>`).join('')}${selected===event.name?'<span class="selected-label">My selected event</span>':''}${teacher?'<span>Teacher preview</span>':''}</div>
         </div>
-        <section class="event-coming-soon" aria-labelledby="tool-title"><span class="eyebrow">YOUR EVENT TOOLKIT</span><h2 id="tool-title">${escape(label)}</h2><div class="coming-soon-mark" aria-hidden="true">↗</div><h3>${valid?'Coming soon.':'Choose an available tool.'}</h3><p>${valid?'A little room for what comes next. This section is being prepared.':'Use the event navigation to continue.'}</p></section>
+        ${valid&&tool==='rules'?rulesPage(event.name):valid&&tool==='lessons'?coursePage(event.name,lessonId,courseProgress,teacher):`<section class="event-coming-soon" aria-labelledby="tool-title"><span class="eyebrow">YOUR EVENT TOOLKIT</span><h2 id="tool-title">${escape(label)}</h2><div class="coming-soon-mark" aria-hidden="true">↗</div><h3>${valid?'Coming soon.':'Choose an available tool.'}</h3><p>${valid?'A little room for what comes next. This section is being prepared.':'Use the event navigation to continue.'}</p></section>`}
         <p class="event-source">Tool selection is based on the <a href="${escape(detail.source)}" target="_blank" rel="noreferrer">official HOSA guidelines ↗</a>. State requirements may vary. ${escape(detail.note||'')}</p>
       </main>
       <aside class="event-tools"><span class="eyebrow">EVENT SPACE</span><nav aria-label="Event tools">${detail.tools.map((key,i)=>`<a href="${eventHref(event.name,key)}" ${key===tool?'aria-current="page"':''}><span class="tool-number">${String(i+1).padStart(2,'0')}</span><span>${TOOL_LABELS[key]}</span><span aria-hidden="true">↗</span></a>`).join('')}</nav><p>One focus.<br><span>Every possibility.</span></p></aside>
