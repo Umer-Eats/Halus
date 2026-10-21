@@ -231,7 +231,11 @@ function renderRoute(route){
    if(errors.courseProgress){app.innerHTML=failed('courseProgress');return;}
   }
   app.innerHTML=eventWorkspace(detail,{brand:logo(),theme:themeButton(),teacher:isInstructor(),selected:me().event,courseProgress:cache.courseProgress||{}});
-  mountCourse(app,{api,onComplete:id=>{
+  mountCourse(app,{api,userId:session.user?.uid,onCheckpoint:r=>{
+   if(!r.recorded)return;
+   if(cache.courseProgress){const acc=cache.courseProgress.accuracy||(cache.courseProgress.accuracy={});acc[detail.lessonId]={latest:r.accuracy,attempts:(acc[detail.lessonId]?.attempts||0)+1};}
+   if(r.assignmentId)delete cache.assignments;
+  },onComplete:id=>{
    if(cache.courseProgress&&!cache.courseProgress.completed.includes(id))cache.courseProgress.completed.push(id);
    toast('Lesson complete.');
   }});return;
@@ -246,7 +250,7 @@ function renderRoute(route){
 // ---------- modals ----------
 function lessonModal(id){const l=LESSONS.find(x=>x.id===id);if(!l)return;const done=cache.progress?.completed.includes(id);showModal(l.title,'<span class="eyebrow">STARTER LESSON · '+l.time+'</span><p class="lesson-body">'+l.body+'</p><a class="resource-link" href="https://hosa.org/guidelines" target="_blank" rel="noreferrer">'+icon('book')+' Open official HOSA guidelines ↗</a><div class="callout"><strong>A small step to try</strong><p>Write one thing you want to prepare this week in your event notebook.</p></div><div class="modal-actions">'+(isInstructor()?'':button(done?'Completed':'Mark as complete','complete-lesson','data-id="'+id+'"'+(done?' disabled':'')))+button('Ask Mr. DNA about this','ask-hal','data-id="'+id+'"',true)+'</div>');}
 async function assignmentModal(id){const a=cache.assignments?.find(x=>x.id===id);if(!a)return;const head='<span class="eyebrow">'+esc(a.type)+' · '+esc(a.event||'Whole chapter')+' · DUE '+date(a.due)+'</span><p class="lesson-body">'+esc(a.instructions||'Review this assignment with your instructor.')+'</p>';
- if(!isInstructor()&&a.type==='Lesson checkpoint'){showModal(esc(a.title),head+(a.submitted?'<div class="callout"><strong>Submitted '+stamp(a.submittedAt)+'.</strong><p>You can retake this checkpoint. Every attempt is saved.</p></div>':'')+checkpointForm(a.lessonId,id));mountCheckpoint(modal,{api,userId:session.user?.uid,onSubmitted:()=>{delete cache.courseProgress;refresh('assignments');}});return;}
+ if(!isInstructor()&&a.type==='Lesson checkpoint'){showModal(esc(a.title),head+(a.submitted?'<div class="callout"><strong>Submitted '+stamp(a.submittedAt)+'.</strong><p>You can retake this checkpoint. Every attempt is saved.</p></div>':'')+checkpointForm(a.lessonId,{url:'/assignments/'+encodeURIComponent(id)+'/checkpoint'}));mountCheckpoint(modal,{api,userId:session.user?.uid,onSubmitted:()=>{delete cache.courseProgress;refresh('assignments');}});return;}
  if(!isInstructor()){showModal(esc(a.title),head+(a.submitted?'<div class="callout"><strong>Submitted '+stamp(a.submittedAt)+'.</strong><p>You can update your response until your instructor reviews it.</p></div>':'')+'<form id="submit-assignment" data-id="'+esc(id)+'"><label class="field">Your response<textarea name="response" rows="5" required maxlength="10000" placeholder="Share your reflection or practice notes…">'+esc(a.submission||'')+'</textarea></label><button class="button" type="submit">'+(a.submitted?'Update response':'Submit assignment')+'</button></form>');return;}
  const actions='<div class="modal-actions">'+button('Delete assignment','delete-assignment','data-id="'+esc(id)+'"',true)+'</div>';
  showModal(esc(a.title),head+'<div class="callout"><strong>Responses</strong><p>Loading…</p></div>'+actions);

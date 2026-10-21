@@ -473,16 +473,13 @@ const accuracyOf = (mcqCorrect, mcqTotal, frqScore) => {
   return Math.round(frqScore === null ? mcq : (mcq + frqScore) / 2);
 };
 
-route('POST', '/assignments/:id/checkpoint', async (ctx) => {
-  const user = await member(ctx, 'student');
-  const a = await assignmentInCommunity(ctx, user, ctx.params.id);
-  if (a.event && a.event !== user.event) throw new AppError(404, 'That assignment was not found.');
-  const found = a.lesson_id && findCourseLesson(a.lesson_id);
-  if (a.type !== 'Lesson checkpoint' || !found) throw new AppError(400, 'This assignment does not have a lesson checkpoint.');
-  const check = assessLesson(found.lesson, ctx.body);
-  if (!check.responseReady) throw new AppError(400, 'Write a response between 80 and 10,000 characters.');
-  if (!Array.isArray(ctx.body.answers) || ctx.body.answers.length !== found.lesson.mcqs.length || ctx.body.answers.some((x) => !Number.isInteger(x) || x < 0))
+// Grades one checkpoint attempt. Students' attempts are saved (and count toward the
+// assignment, when there is one); teacher previews are graded but never recorded.
+async function runCheckpoint(ctx, user, lesson, assignmentId) {
+  const check = assessLesson(lesson, ctx.body);
+  if (!Array.isArray(ctx.body.answers) || ctx.body.answers.length !== lesson.mcqs.length || ctx.body.answers.some((x) => !Number.isInteger(x) || x < 0))
     throw new AppError(400, 'Answer every multiple-choice question.');
+  if (!check.responseReady) throw new AppError(400, 'Write a response between 80 and 10,000 characters.');
   if (!allowHalMessage(checkpointLog, user.id, Date.now(), 12, 10 * 60_000))
     throw new AppError(429, 'You have submitted several checkpoints. Please wait a few minutes before trying again.');
   const response = ctx.body.response.trim();
@@ -490,24 +487,50 @@ route('POST', '/assignments/:id/checkpoint', async (ctx) => {
   // If Gemini is down the MCQ accuracy is still recorded; the written response stays ungraded.
   let grade = null, gradingError = null;
   try {
-    grade = await ctx.gradeFRQ(found.lesson, response, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_GRADING_MODEL || ctx.env.GEMINI_MODEL });
+    grade = await ctx.gradeFRQ(lesson, response, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_GRADING_MODEL || ctx.env.GEMINI_MODEL });
   } catch (error) {
     gradingError = error instanceof AppError ? error.message : 'The written response could not be graded right now.';
   }
   const frqScore = grade ? grade.score : null, accuracy = accuracyOf(mcqCorrect, mcqTotal, frqScore);
+  const result = { accuracy, mcqCorrect, mcqTotal, frqScore, grade, gradingError, mcqs: check.mcqs, recorded: user.role === 'student' };
+  if (user.role !== 'student') return result;
   await ctx.db.batch([
     {
       sql: `INSERT INTO checkpoint_attempts (id, user_id, lesson_id, assignment_id, mcq_correct, mcq_total, frq_score, accuracy, response, grade)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [randomUUID(), user.id, found.lesson.id, a.id, mcqCorrect, mcqTotal, frqScore, accuracy, response, grade && JSON.stringify(grade)],
+      args: [randomUUID(), user.id, lesson.id, assignmentId, mcqCorrect, mcqTotal, frqScore, accuracy, response, grade && JSON.stringify(grade)],
     },
-    {
+    ...(assignmentId ? [{
       sql: `INSERT INTO submissions (assignment_id, user_id, body) VALUES (?, ?, ?)
         ON CONFLICT(assignment_id, user_id) DO UPDATE SET body = excluded.body, submitted_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')`,
-      args: [a.id, user.id, response],
-    },
+      args: [assignmentId, user.id, response],
+    }] : []),
   ], 'write');
-  return { accuracy, mcqCorrect, mcqTotal, frqScore, grade, gradingError, mcqs: check.mcqs };
+  return { ...result, assignmentId };
+}
+
+// The checkpoint at the end of every lesson. It is optional: completing a lesson never needs it.
+route('POST', '/courses/lessons/:lessonId/checkpoint', async (ctx) => {
+  const user = await member(ctx);
+  const found = findCourseLesson(ctx.params.lessonId);
+  if (!found) throw new AppError(404, 'That lesson was not found.');
+  // A student's attempt also counts for a teacher-assigned checkpoint on this lesson, if there is one.
+  const assigned = user.role === 'student' && one(await ctx.db.execute({
+    sql: `SELECT a.id FROM assignments a JOIN assignment_lessons al ON al.assignment_id = a.id
+      WHERE al.lesson_id = ? AND a.community_id = ? AND a.type = 'Lesson checkpoint' AND (a.event IS NULL OR a.event = ?)
+      ORDER BY a.due LIMIT 1`,
+    args: [found.lesson.id, user.community_id, user.event],
+  }));
+  return runCheckpoint(ctx, user, found.lesson, assigned ? assigned.id : null);
+});
+
+route('POST', '/assignments/:id/checkpoint', async (ctx) => {
+  const user = await member(ctx, 'student');
+  const a = await assignmentInCommunity(ctx, user, ctx.params.id);
+  if (a.event && a.event !== user.event) throw new AppError(404, 'That assignment was not found.');
+  const found = a.lesson_id && findCourseLesson(a.lesson_id);
+  if (a.type !== 'Lesson checkpoint' || !found) throw new AppError(400, 'This assignment does not have a lesson checkpoint.');
+  return runCheckpoint(ctx, user, found.lesson, a.id);
 });
 
 route('PUT', '/progress/lessons/:lessonId', async (ctx) => {

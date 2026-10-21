@@ -39,12 +39,9 @@ export function parseEventRoute(route) {
 export function eventWorkspace({event,detail,tool,valid,lessonId}, {brand,theme,teacher,selected,courseProgress={}}) {
   const label=valid?TOOL_LABELS[tool]:'Section unavailable';
   return `<div class="event-focus">
-    <header class="event-focus-header">${brand}<a class="text-button" href="${teacher?'#/students':'#/my-event'}">← ${teacher?'Back to students':'All my events'}</a>${theme}</header>
+    <header class="event-focus-header">${brand}<h1 class="event-focus-title">${escape(event.name)}</h1><div class="event-focus-actions"><a class="text-button" href="${teacher?'#/students':'#/my-event'}">← ${teacher?'Back to students':'All my events'}</a>${theme}</div></header>
     <div class="event-focus-layout">
       <main id="main" class="event-focus-main" tabindex="-1">
-        <div class="event-focus-intro"><span class="eyebrow">${escape(event.category)} / 2026–27</span><h1>${escape(event.name)}</h1>
-          <p>${escape(detail.summary)}</p><div class="event-type-tags">${detail.types.map(t=>`<span>${escape(t)}</span>`).join('')}${selected===event.name?'<span class="selected-label">My selected event</span>':''}${teacher?'<span>Teacher preview</span>':''}</div>
-        </div>
         ${valid&&tool==='rules'?rulesPage(event.name):valid&&tool==='lessons'?coursePage(event.name,lessonId,courseProgress,teacher):`<section class="event-coming-soon" aria-labelledby="tool-title"><span class="eyebrow">YOUR EVENT TOOLKIT</span><h2 id="tool-title">${escape(label)}</h2><div class="coming-soon-mark" aria-hidden="true">↗</div><h3>${valid?'Coming soon.':'Choose an available tool.'}</h3><p>${valid?'A little room for what comes next. This section is being prepared.':'Use the event navigation to continue.'}</p></section>`}
         <p class="event-source">Tool selection is based on the <a href="${escape(detail.source)}" target="_blank" rel="noreferrer">official HOSA guidelines ↗</a>. State requirements may vary. ${escape(detail.note||'')}</p>
       </main>

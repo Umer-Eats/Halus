@@ -51,15 +51,40 @@ test('students move on to any lesson without a checkpoint', async () => {
   assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.completed.sort(), [first.id, second.id].sort());
 });
 
-test('course pages have no checkpoint for students and an assign button for teachers', () => {
+test('every lesson shows an optional checkpoint; teachers also get the answer key and assign button', () => {
   const student = coursePage('Pharmacology', first.id, { completed: [] }, false);
-  assert.doesNotMatch(student, /data-checkpoint|name="mcq0"/);
-  assert.match(student, /data-course-complete/);
+  assert.match(student, new RegExp(`data-checkpoint="/courses/lessons/${first.id}/checkpoint"`));
+  assert.match(student, /name="mcq0"/);
+  assert.match(student, /data-course-complete/, 'moving on never needs the checkpoint');
+  assert.doesNotMatch(student, /Show answer key|assign-checkpoint/);
   assert.doesNotMatch(coursePage('Pharmacology', '', { completed: [] }, false), /Locked/);
-  assert.match(coursePage('Pharmacology', first.id, {}, true), /data-action="assign-checkpoint"/);
+  const teacher = coursePage('Pharmacology', first.id, {}, true);
+  assert.match(teacher, /data-action="assign-checkpoint"/);
+  assert.match(teacher, /Show answer key/);
+});
+
+test('the in-lesson checkpoint records student accuracy and grades teacher previews without saving', async () => {
+  grader = async () => ({ score: 100, points: 6, maximum: 6, passed: true, feedback: 'Strong.', safetyConcern: false, criteria: [] });
+  const url = `/courses/lessons/${second.id}/checkpoint`;
+  const preview = await call('POST', url, { as: 'teach', body: { answers: answers(second), response } });
+  assert.equal(preview.status, 200);
+  assert.equal(preview.data.recorded, false);
+  assert.equal(preview.data.accuracy, 100);
+  const free = await call('POST', url, { as: 'ana', body: { answers: answers(second, 1), response } });
+  assert.deepEqual([free.data.recorded, free.data.accuracy, free.data.assignmentId], [true, 75, null]);
+  assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.accuracy[second.id], { latest: 75, attempts: 1 });
+  assert.equal((await call('POST', '/courses/lessons/nope/checkpoint', { as: 'ana', body: { answers: [0, 0], response } })).status, 404);
+
+  // When the teacher has assigned this lesson's checkpoint, the in-lesson attempt counts as the submission.
+  const a = (await call('POST', '/assignments', { as: 'teach', body: { title: 'L2', type: 'Lesson checkpoint', due: '2026-12-05', lessonId: second.id } })).data.assignment;
+  const linked = await call('POST', url, { as: 'ana', body: { answers: answers(second), response } });
+  assert.equal(linked.data.assignmentId, a.id);
+  const subs = (await call('GET', `/assignments/${a.id}/submissions`, { as: 'teach' })).data.submissions;
+  assert.equal(subs[0].checkpoint.accuracy, 100);
 });
 
 test('teachers assign a lesson checkpoint and every attempt records accuracy', async () => {
+  grader = async () => ({ score: 50, points: 3, maximum: 6, passed: false, feedback: 'Add reasoning.', safetyConcern: false, criteria: [] });
   const bad = await call('POST', '/assignments', { as: 'teach', body: { title: 'Check', type: 'Lesson checkpoint', due: '2026-12-01' } });
   assert.equal(bad.status, 400, 'a checkpoint needs a lesson');
   const made = await call('POST', '/assignments', { as: 'teach', body: { title: 'Check', type: 'Lesson checkpoint', due: '2026-12-01', event: null, lessonId: first.id } });
@@ -91,7 +116,8 @@ test('teachers assign a lesson checkpoint and every attempt records accuracy', a
   assert.equal((await call('GET', '/assignments', { as: 'ana' })).data.assignments.find((x) => x.id === a.id).submitted, true);
   assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.accuracy[first.id], { latest: 100, attempts: 2 });
   const ana = (await call('GET', '/students', { as: 'teach' })).data.students.find((s) => s.uid === 'ana');
-  assert.equal(ana.checkpointAccuracy, 75);
+  // Average of every attempt: 50 and 100 here, plus 75 and 100 from the in-lesson test.
+  assert.equal(ana.checkpointAccuracy, 81);
   assert.equal(ana.courseLessonsCompleted, 2);
 
   // Changing the type away from a checkpoint drops its lesson link.
