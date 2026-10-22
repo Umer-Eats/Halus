@@ -3,6 +3,8 @@ import {course} from './build.js';
 import {D1, D2, D3, D4, D5} from './dt-a.js';
 import {D6, D7, D8, D9, D10, D11} from './dt-b.js';
 
+D3.sections[1][1].push({t:'w',kind:'termlab',title:'Decode terms in the dental record',words:[{word:'gingivitis',parts:['','gingiv','-itis'],meanings:['no prefix','gingiva / gums','inflammation'],meaning:'Inflammation of the gingiva. The word does not by itself establish periodontal attachment loss.'},{word:'periodontitis',parts:['peri-','odont','-itis'],meanings:['around','tooth','inflammation'],meaning:'Inflammatory disease affecting supporting tissues around teeth. Its accepted clinical meaning includes attachment loss; literal word-part translation is not enough.'},{word:'glossitis',parts:['','gloss','-itis'],meanings:['no prefix','tongue','inflammation'],meaning:'Inflammation of the tongue. The term describes a finding rather than specifying a single cause.'}]});
+
 export default course('Dental Terminology', {
   intro: 'Eleven in-depth lessons following the HOSA Dental Terminology test plan, with labeled skull, tooth, cavity and radiograph models, an interactive tooth chart, a nerve-block simulator, emergency cases and spelling drills for the tiebreaker.',
   units: [

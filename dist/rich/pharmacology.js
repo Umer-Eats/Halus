@@ -4,6 +4,8 @@ import {L1, L2, L3, L4} from './pharm-a.js';
 import {L5, L6, L7, L8, L9} from './pharm-b.js';
 import {L10, L11, L12} from './pharm-c.js';
 
+L12.sections[0][1].push({t:'w',kind:'lifespan',title:'Why age changes the context of medication care',prompt:'Compare developmental contexts. This model describes people and support needs, not age-based dose recommendations.'});
+
 export default course('Pharmacology', {
   intro: 'Twelve in-depth lessons mapped to the HOSA Pharmacology test plan, with simulations, practice calculations and HOSA-style checkpoints.',
   units: [

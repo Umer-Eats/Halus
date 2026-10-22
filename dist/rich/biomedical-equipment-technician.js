@@ -3,6 +3,8 @@ import {course} from './build.js';
 import {T1, T2, T3, T4, T5} from './bet-a.js';
 import {T6, T7, T8, T9, T10} from './bet-b.js';
 
+T10.sections[2][1].push({t:'w',kind:'informaticsflow',title:'Trace an observation from device to record',prompt:'A connected device must preserve identity, structure, meaning and authorization—not just transmit a number.'});
+
 export default course('Biomedical Equipment Technician', {
   intro: 'Ten in-depth lessons following the HOSA Biomedical Equipment Technician test plan, with circuit, ECG, resistor and shock simulators and troubleshooting cases.',
   units: [

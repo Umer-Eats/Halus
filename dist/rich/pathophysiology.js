@@ -4,6 +4,8 @@ import {P1, P2, P3} from './patho-a.js';
 import {P4, P5, P6, P7, P8} from './patho-b.js';
 import {P9, P10, P11, P12, P13} from './patho-c.js';
 
+P1.sections[0][1].push({t:'w',kind:'termlab',title:'Decode the language of disease',prompt:'Separate what a word means from what it can establish about a person’s diagnosis.'});
+
 export default course('Pathophysiology', {
   intro: 'Thirteen in-depth lessons following the HOSA Pathophysiology test plan: the disease process and cancer, then every body system and mental disorders.',
   units: [

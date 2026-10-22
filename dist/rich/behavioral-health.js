@@ -4,6 +4,8 @@ import {B1, B2, B3, B4, B5} from './bh-a.js';
 import {B6, B7, B8, B9, B10} from './bh-b.js';
 import {B11, B12, B13, B14} from './bh-c.js';
 
+B13.sections[0][1].push({t:'w',kind:'lifespan',title:'Understand stress in a developmental context',prompt:'Explore changing demands and support needs. A life period does not determine someone’s coping ability or mental health.'});
+
 export default course('Behavioral Health', {
   intro: 'Fourteen in-depth lessons following the HOSA Behavioral Health test plan: the mind, disorders and treatments, substance use and mental illness, wellness, and careers, laws and history.',
   units: [

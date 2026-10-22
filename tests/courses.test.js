@@ -10,6 +10,8 @@ import { loadCommunities } from '../server/communities.js';
 import { createDb } from '../server/db.js';
 import { COURSES, courseLessons, loadAllCourses } from '../dist/courses.js';
 import { RICH_COURSES } from '../dist/rich/index.js';
+import { FIGURES } from '../dist/rich/figures.js';
+import { FIGURE_PLACES } from '../dist/rich/figure-places.js';
 import { widgetKinds } from '../dist/lesson-widgets.js';
 import { DIAGRAMS } from '../dist/lesson-diagrams.js';
 
@@ -108,7 +110,7 @@ test('teachers assign a lesson checkpoint and every attempt records accuracy', a
   assert.deepEqual([one.data.mcqCorrect, one.data.mcqTotal, one.data.frqScore, one.data.accuracy], [1, 2, 50, 50]);
 
   // Grader outage still records MCQ accuracy.
-  grader = async () => { throw new AppError(503, 'Gemini could not grade this response right now.'); };
+  grader = async () => { throw new AppError(503, 'Valus AI could not grade this response right now.'); };
   const two = await call('POST', `/assignments/${a.id}/checkpoint`, { as: 'ana', body: { answers: answers(first), response } });
   assert.equal(two.status, 200);
   assert.equal(two.data.frqScore, null);
@@ -162,6 +164,17 @@ test('in-depth courses are complete, well-formed and only use known activities a
         if (b.kind === 'case') for (const n of Object.values(b.nodes)) for (const c of n.choices || []) assert.ok(b.nodes[c[1]], l.id + ' case link ' + c[1]);
       }
       for (const b of blocks.filter(b => b.t === 'check')) assert.ok(b.options[b.answer] && b.why, l.id + ' quick check');
+      for (const b of blocks.filter(b => b.t === 'fig')) { const f = FIGURES[b.file]; assert.ok(f && f.url.startsWith('https://') && /^CC BY/.test(f.license) && f.source, l.id + ' figure ' + b.file); assert.ok(b.caption && b.alt, l.id + ' figure text ' + b.file); }
     }
   }
+});
+
+test('every placed textbook figure lands in a real lesson section', () => {
+  for (const [name, lessons] of Object.entries(FIGURE_PLACES)) for (const [n, list] of Object.entries(lessons)) {
+    const lesson = courseLessons(name)[Number(n) - 1];
+    assert.ok(lesson, name + ' lesson ' + n);
+    for (const [section] of list) assert.ok(lesson.sections[section - 1], name + ' lesson ' + n + ' section ' + section);
+  }
+  const figs = Object.keys(RICH_COURSES).flatMap(courseLessons).flatMap(l => l.sections.flatMap(s => s.blocks)).filter(b => b.t === 'fig');
+  assert.ok(figs.length >= 100, 'figures are placed: ' + figs.length);
 });

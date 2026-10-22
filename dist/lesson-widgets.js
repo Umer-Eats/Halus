@@ -2,6 +2,8 @@
 // renderWidget(); mountWidgets() wires up behaviour after the HTML is on the page.
 import {DIAGRAMS} from './lesson-diagrams.js';
 import {SIMS} from './lesson-sims.js';
+import {SUBJECT_LABS} from './lesson-labs.js';
+import {dragify, snapshot, glide, under} from './lesson-drag.js';
 
 export const e = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const inline = s => e(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -15,7 +17,7 @@ const label = {
   mount(node, w) {
     const parts = new Map(w.parts.map(([id, name, detail]) => [id, {name, detail}]));
     const detail = node.querySelector('.lw-detail');
-    let quiz = null;
+    let quiz = null, advancing = false, quizTimer;
     const light = id => { node.querySelectorAll('[data-part]').forEach(p => p.classList.toggle('hl', p.dataset.part === id)); node.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('on', b.dataset.pick === id)); };
     const show = id => { const p = parts.get(id); if (!p) return; light(id); detail.innerHTML = `<h5>${e(p.name)}</h5><p>${inline(p.detail)}</p>`; };
     const ask = () => {
@@ -24,15 +26,15 @@ const label = {
       detail.innerHTML = `<h5>Find: ${e(parts.get(quiz.target).name)}</h5><p class="subtle">Select it on the model. ${parts.size - quiz.order.length} of ${parts.size} done · ${quiz.score} correct first try.</p><p class="lw-msg" aria-live="polite"></p>`;
     };
     const choose = id => {
-      if (!parts.has(id)) return;
+      if (!parts.has(id) || advancing) return;
       if (!quiz) return show(id);
       const msg = detail.querySelector('.lw-msg');
-      if (id === quiz.target) { light(id); if (quiz.first) quiz.score++; quiz.order.shift(); say(msg, 'Correct.', true); setTimeout(ask, 650); }
+      if (id === quiz.target) { advancing=true; light(id); if (quiz.first) quiz.score++; quiz.order.shift(); say(msg, 'Correct.', true); quizTimer=setTimeout(()=>{advancing=false;if(node.isConnected&&quiz)ask();},650); }
       else { quiz.first = false; say(msg, `That is the ${parts.get(id).name}. Try again.`, false); }
     };
     node.addEventListener('click', ev => {
       const mode = ev.target.closest('[data-mode]');
-      if (mode) {
+      if (mode) { clearTimeout(quizTimer); advancing=false;
         node.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b === mode));
         node.querySelector('.lw-parts').hidden = mode.dataset.mode === 'quiz';
         quiz = mode.dataset.mode === 'quiz' ? {order: shuffle([...parts.keys()]), score: 0} : null;
@@ -40,7 +42,7 @@ const label = {
         if (quiz) ask(); else detail.innerHTML = '<p class="subtle">Select any part of the model or a label to learn what it does.</p>';
         return;
       }
-      if (ev.target.closest('[data-restart]')) { quiz = {order: shuffle([...parts.keys()]), score: 0}; return ask(); }
+      if (ev.target.closest('[data-restart]')) { clearTimeout(quizTimer); advancing=false; quiz = {order: shuffle([...parts.keys()]), score: 0}; return ask(); }
       const pick = ev.target.closest('[data-pick]') || ev.target.closest('[data-part]');
       if (pick) choose(pick.dataset.pick || pick.dataset.part);
     });
@@ -48,70 +50,139 @@ const label = {
   },
 };
 
+// Mouse and touch users drag; keyboard users select an item, then a destination.
+// Keyboard activation sends a click with detail 0, which is how the two are told apart.
+// Drag completion suppresses its following click; ordinary clicks/taps remain an accessible alternative.
+const keyboardClick = () => true;
+const hoverZones = node => t => node.querySelectorAll('[data-zone]').forEach(z => z.classList.toggle('over', z === t));
+
 /* ---------- sort items into categories ---------- */
 const sort = {
   label: 'Sort it out',
-  render: w => `<div class="lw-sort"><p class="subtle">Select an item, then select the category it belongs in. Select a placed item to move it back.</p><div class="lw-pool" data-pool></div><div class="lw-buckets" style="--cols:${Math.min(w.buckets.length, 4)}">${w.buckets.map((b, i) => `<div class="lw-bucket" data-bucket="${i}" role="button" tabindex="0"><strong>${e(b)}</strong><div data-slot></div></div>`).join('')}</div><div class="lw-actions"><button type="button" class="button" data-check>Check</button><button type="button" class="text-button" data-reset>Reset</button><span class="lw-msg" aria-live="polite"></span></div></div>`,
+  render: w => `<div class="lw-sort"><p class="subtle">Drag each item into a category, or select an item and then select its destination. Keyboard: Tab to an item, press Enter, then Tab to a category and press Enter.</p><div class="lw-pool" data-pool data-zone="pool" tabindex="0" role="button" aria-label="Return selected item to the answer bank"></div><div class="lw-buckets" style="--cols:${Math.min(w.buckets.length, 4)}">${w.buckets.map((b, i) => `<div class="lw-bucket" data-bucket="${i}" data-zone="${i}" role="button" tabindex="0" aria-label="${e(b)}"><strong>${e(b)}</strong><div data-slot></div></div>`).join('')}</div><div class="lw-actions"><button type="button" class="button" data-check>Check</button><button type="button" class="text-button" data-reset>Reset</button><span class="lw-msg" aria-live="polite"></span></div></div>`,
   mount(node, w) {
     const pool = node.querySelector('[data-pool]'), msg = node.querySelector('.lw-msg');
     let picked = null;
-    const reset = () => { pool.innerHTML = shuffle(w.items.map((it, i) => i)).map(i => `<button type="button" class="chip" data-item="${i}">${inline(w.items[i][0])}</button>`).join(''); node.querySelectorAll('[data-slot]').forEach(s => s.innerHTML = ''); say(msg, ''); picked = null; };
+    const reset = () => { pool.innerHTML = shuffle(w.items.map((it, i) => i)).map(i => `<button type="button" class="chip lw-drag" data-item="${i}">${inline(w.items[i][0])}</button>`).join(''); node.querySelectorAll('[data-slot]').forEach(s => s.innerHTML = ''); say(msg, ''); picked = null; };
+    const moveTo = (item, zone) => {
+      const before = snapshot(node.querySelectorAll('[data-item]'));
+      (zone.querySelector('[data-slot]') || zone).append(item);
+      item.classList.remove('on', 'good', 'bad'); item.setAttribute('aria-pressed','false');
+      glide(before); say(msg, '');
+    };
     reset();
-    const place = bucket => { if (!picked) return; bucket.querySelector('[data-slot]').append(picked); picked.classList.remove('on', 'good', 'bad'); picked = null; };
+    dragify(node, {items: '[data-item]', target: (x, y) => under(x, y, '[data-zone]', node), hover: hoverZones(node), drop: moveTo});
     node.addEventListener('click', ev => {
-      const item = ev.target.closest('[data-item]');
-      if (item) {
-        if (item.closest('[data-slot]')) { pool.append(item); item.classList.remove('good', 'bad'); return; }
-        if (picked) picked.classList.remove('on');
-        picked = picked === item ? null : item; if (picked) picked.classList.add('on'); return;
-      }
-      const bucket = ev.target.closest('[data-bucket]'); if (bucket) return place(bucket);
       if (ev.target.closest('[data-reset]')) return reset();
       if (ev.target.closest('[data-check]')) {
         let right = 0;
         node.querySelectorAll('[data-slot] [data-item]').forEach(b => { const ok = w.items[b.dataset.item][1] === Number(b.closest('[data-bucket]').dataset.bucket); b.classList.toggle('good', ok); b.classList.toggle('bad', !ok); if (ok) right++; });
-        const left = pool.children.length;
-        say(msg, left ? `${right} correct so far · ${left} still to place.` : right === w.items.length ? `All ${right} correct.` : `${right} of ${w.items.length} correct. Move the red ones and check again.`, !left && right === w.items.length);
+        const left = pool.querySelectorAll('[data-item]').length;
+        return say(msg, left ? `${right} correct so far · ${left} still to place.` : right === w.items.length ? `All ${right} correct.` : `${right} of ${w.items.length} correct. Move the red ones and check again.`, !left && right === w.items.length);
       }
+      if (!keyboardClick(ev)) return;
+      const item = ev.target.closest('[data-item]');
+      if (item) { if (picked) { picked.classList.remove('on'); picked.setAttribute('aria-pressed','false'); } picked = picked === item ? null : item; picked?.classList.add('on'); picked?.setAttribute('aria-pressed','true'); say(msg,picked?'Selected. Choose a destination, or select this item again to cancel.':'Selection cleared.'); return; }
+      const zone = ev.target.closest('[data-zone]');
+      if (zone && picked) { const p = picked; picked = null; moveTo(p, zone); p.focus(); }
     });
-    node.querySelectorAll('[data-bucket]').forEach(b => b.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); place(b); } }));
+    node.querySelectorAll('[data-zone]').forEach(b => b.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && picked && ev.target === b) { ev.preventDefault(); const p = picked; picked = null; moveTo(p, b); p.focus(); } }));
   },
 };
 
 /* ---------- match each term to its partner ---------- */
 const match = {
   label: 'Match up',
-  render: w => { const right = shuffle(w.pairs.map(p => p[1])); return `<div class="lw-match">${w.pairs.map(([l], i) => `<label class="lw-match-row"><span>${inline(l)}</span><select data-row="${i}"><option value="">Choose…</option>${right.map(r => `<option>${e(r)}</option>`).join('')}</select></label>`).join('')}<div class="lw-actions"><button type="button" class="button" data-check>Check matches</button><span class="lw-msg" aria-live="polite"></span></div></div>`; },
+  render: w => `<div class="lw-match"><p class="subtle">Drag each answer onto its matching term, or select an answer and then its destination. Keyboard: use Tab and Enter. A filled destination swaps the answers.</p><div class="lw-pool" data-pool data-zone="pool" tabindex="0" role="button" aria-label="Return selected item to the answer bank"></div><div class="lw-match-rows">${w.pairs.map(([l], i) => `<div class="lw-match-row" data-row="${i}"><span class="lw-match-term">${inline(l)}</span><div class="lw-drop" data-zone="${i}" role="button" tabindex="0" aria-label="Answer for: ${e(l.replace(/\*/g, ''))}"><span class="lw-drop-hint">Drop the answer here</span></div></div>`).join('')}</div><div class="lw-actions"><button type="button" class="button" data-check>Check matches</button><button type="button" class="text-button" data-reset>Reset</button><span class="lw-msg" aria-live="polite"></span></div></div>`,
   mount(node, w) {
-    const msg = node.querySelector('.lw-msg');
-    node.querySelector('[data-check]').addEventListener('click', () => {
-      let right = 0;
-      node.querySelectorAll('[data-row]').forEach(s => { const ok = s.value === w.pairs[s.dataset.row][1]; s.closest('label').dataset.state = s.value ? ok ? 'good' : 'bad' : ''; if (ok) right++; });
-      say(msg, right === w.pairs.length ? 'Every match is correct.' : `${right} of ${w.pairs.length} correct.`, right === w.pairs.length);
+    const pool = node.querySelector('[data-pool]'), msg = node.querySelector('.lw-msg');
+    let picked = null;
+    const filled = () => node.querySelectorAll('.lw-drop').forEach(d => d.classList.toggle('filled', Boolean(d.querySelector('[data-item]'))));
+    const reset = () => {
+      pool.innerHTML = shuffle(w.pairs.map((p, i) => i)).map(i => `<button type="button" class="chip lw-drag" data-item="${i}">${inline(w.pairs[i][1])}</button>`).join('');
+      node.querySelectorAll('.lw-drop [data-item]').forEach(c => c.remove());
+      node.querySelectorAll('[data-row]').forEach(r => r.dataset.state = '');
+      filled(); say(msg, ''); picked = null;
+    };
+    const moveTo = (item, zone) => {
+      const before = snapshot(node.querySelectorAll('[data-item]')), from = item.parentElement;
+      if (zone !== pool) {
+        const occupant = zone.querySelector('[data-item]');
+        if (occupant && occupant !== item) (from.classList.contains('lw-drop') ? from : pool).append(occupant);
+      }
+      zone.append(item);
+      node.querySelectorAll('[data-item]').forEach(c => {c.classList.remove('on','good','bad');c.setAttribute('aria-pressed','false');});
+      node.querySelectorAll('[data-row]').forEach(r => r.dataset.state = '');
+      filled(); glide(before); say(msg, '');
+    };
+    reset();
+    dragify(node, {items: '[data-item]', target: (x, y) => under(x, y, '[data-zone]', node), hover: hoverZones(node), drop: moveTo});
+    node.addEventListener('click', ev => {
+      if (ev.target.closest('[data-reset]')) return reset();
+      if (ev.target.closest('[data-check]')) {
+        let right = 0, empty = 0;
+        node.querySelectorAll('[data-row]').forEach(row => {
+          const chip = row.querySelector('[data-item]'), i = Number(row.dataset.row);
+          if (!chip) { empty++; row.dataset.state = ''; return; }
+          const ok = w.pairs[chip.dataset.item][1] === w.pairs[i][1];
+          row.dataset.state = ok ? 'good' : 'bad'; chip.classList.toggle('good', ok); chip.classList.toggle('bad', !ok);
+          if (ok) right++;
+        });
+        return say(msg, right === w.pairs.length ? 'Every match is correct.' : `${right} of ${w.pairs.length} correct${empty ? ` · ${empty} still empty` : ''}.`, right === w.pairs.length);
+      }
+      if (!keyboardClick(ev)) return;
+      const item = ev.target.closest('[data-item]');
+      if (item && !(picked && item.closest('.lw-drop'))) { if (picked) picked.classList.remove('on'); picked = picked === item ? null : item; picked?.classList.add('on'); return; }
+      const zone = ev.target.closest('[data-zone]');
+      if (zone && picked) { const p = picked; picked = null; moveTo(p, zone); p.focus(); }
     });
+    node.querySelectorAll('[data-zone]').forEach(d => d.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && picked && ev.target === d) { ev.preventDefault(); const p = picked; picked = null; moveTo(p, d); p.focus(); } }));
   },
 };
 
 /* ---------- put steps in the right order ---------- */
+const GRIP = '<svg viewBox="0 0 10 16" width="10" height="16"><circle cx="2" cy="2" r="1.5"/><circle cx="8" cy="2" r="1.5"/><circle cx="2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="2" cy="14" r="1.5"/><circle cx="8" cy="14" r="1.5"/></svg>';
 const order = {
   label: 'Put it in order',
-  render: () => `<div class="lw-order"><ol data-list></ol><div class="lw-actions"><button type="button" class="button" data-check>Check order</button><button type="button" class="text-button" data-reset>Shuffle</button><span class="lw-msg" aria-live="polite"></span></div></div>`,
+  render: () => `<div class="lw-order"><p class="subtle">Drag the steps into the correct order. Keyboard: focus a step and press the up or down arrow.</p><ol data-list></ol><div class="lw-actions"><button type="button" class="button" data-check>Check order</button><button type="button" class="text-button" data-reset>Shuffle</button><span class="lw-msg" aria-live="polite"></span></div></div>`,
   mount(node, w) {
     const list = node.querySelector('[data-list]'), msg = node.querySelector('.lw-msg');
-    const draw = idx => { list.innerHTML = idx.map(i => `<li data-step="${i}"><span>${inline(w.steps[i])}</span><span class="lw-move"><button type="button" class="icon-button" data-up aria-label="Move up">↑</button><button type="button" class="icon-button" data-down aria-label="Move down">↓</button></span></li>`).join(''); say(msg, ''); };
+    const steps = () => [...list.querySelectorAll('[data-step]')];
+    const draw = idx => { list.innerHTML = idx.map(i => `<li data-step="${i}" tabindex="0" aria-label="${e(w.steps[i].replace(/\*/g, ''))}. Use the arrow keys to move."><span class="lw-grip" aria-hidden="true">${GRIP}</span><span class="lw-step-num" aria-hidden="true"></span><span class="lw-step-text">${inline(w.steps[i])}</span></li>`).join(''); say(msg, ''); };
     const fresh = () => { let idx; do idx = shuffle(w.steps.map((_, i) => i)); while (idx.every((v, i) => v === i) && w.steps.length > 1); draw(idx); };
+    const clear = () => { steps().forEach(li => li.dataset.state = ''); say(msg, ''); };
     fresh();
+    dragify(list, {
+      items: '[data-step]', handle: '.lw-grip',
+      move(item, x, y) {
+        const others = steps().filter(li => li !== item);
+        const next = others.find(li => { const r = li.getBoundingClientRect(); return y < r.top + r.height / 2; }) || null;
+        const at = steps().indexOf(item), want = next ? others.indexOf(next) : others.length;
+        if (at === want) return;
+        const before = snapshot(others);
+        list.insertBefore(item, next);
+        clear(); glide(before, 200);
+      },
+      drop() {},
+    });
+    list.addEventListener('keydown', ev => {
+      const li = ev.target.closest('[data-step]');
+      if (!li || (ev.key !== 'ArrowUp' && ev.key !== 'ArrowDown')) return;
+      ev.preventDefault();
+      const all = steps(), i = all.indexOf(li), j = ev.key === 'ArrowUp' ? i - 1 : i + 1;
+      if (j < 0 || j >= all.length) return;
+      const before = snapshot(all);
+      if (ev.key === 'ArrowUp') all[j].before(li); else all[j].after(li);
+      glide(before, 200); li.focus(); clear();
+      say(msg, `Moved to position ${j + 1} of ${all.length}.`);
+    });
     node.addEventListener('click', ev => {
-      const li = ev.target.closest('li');
-      if (ev.target.closest('[data-up]') && li.previousElementSibling) li.previousElementSibling.before(li);
-      else if (ev.target.closest('[data-down]') && li.nextElementSibling) li.nextElementSibling.after(li);
-      else if (ev.target.closest('[data-reset]')) return fresh();
-      else if (ev.target.closest('[data-check]')) {
-        const items = [...list.children]; let right = 0;
+      if (ev.target.closest('[data-reset]')) return fresh();
+      if (ev.target.closest('[data-check]')) {
+        const items = steps(); let right = 0;
         items.forEach((li, i) => { const ok = Number(li.dataset.step) === i; li.dataset.state = ok ? 'good' : 'bad'; if (ok) right++; });
-        return say(msg, right === items.length ? 'Perfect sequence.' : `${right} of ${items.length} in the right place.`, right === items.length);
+        say(msg, right === items.length ? 'Perfect sequence.' : `${right} of ${items.length} in the right place.`, right === items.length);
       }
-      list.querySelectorAll('li').forEach(li => li.dataset.state = '');
     });
   },
 };
@@ -125,7 +196,7 @@ const flip = {
     node.addEventListener('click', ev => {
       const card = ev.target.closest('[data-card]');
       if (card) { const on = card.getAttribute('aria-pressed') !== 'true'; card.setAttribute('aria-pressed', String(on)); seen.add(card.dataset.card); msg.textContent = `${seen.size} of ${box.children.length} cards reviewed.`; }
-      if (ev.target.closest('[data-reset]')) { shuffle([...box.children]).forEach(c => { c.setAttribute('aria-pressed', 'false'); box.append(c); }); }
+      if (ev.target.closest('[data-reset]')) { seen.clear();msg.textContent='Cards shuffled. Select a card to flip it.'; shuffle([...box.children]).forEach(c => { c.setAttribute('aria-pressed', 'false'); box.append(c); }); }
     });
   },
 };
@@ -204,7 +275,7 @@ const wordbuild = {
   },
 };
 
-const W = {label, sort, match, order, flip, stepper, case: scenario, wordbuild, ...SIMS};
+const W = {label, sort, match, order, flip, stepper, case: scenario, wordbuild, ...SIMS, ...SUBJECT_LABS};
 
 let seq = 0;
 const CONFIG = new Map();

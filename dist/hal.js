@@ -1,4 +1,4 @@
-// Mr. DNA, the one global study buddy: roams the screen, reacts, eats apples and chats through Gemini.
+// Mr. DNA, the one global study buddy: roams the screen, reacts, eats apples and chats through Valus AI.
 import {HAL_ACTIONS, HAL_SIZE, boundHal, stepHal} from './hal-motion.js';
 import {halSVG} from './hal-character.js';
 import {LESSONS} from './model.js';

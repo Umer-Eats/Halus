@@ -15,7 +15,7 @@ Valus is an independent project and is not affiliated with or endorsed by HOSA. 
 - Three shared orientation lessons, a practice check, account-specific notes, and a preparation checklist.
 - Assignments for an entire chapter or a particular event, plus student responses.
 - Chapter posts, instructor roster management, and progress analytics.
-- Mr. DNA, an animated study companion with optional Gemini-powered chat.
+- Mr. DNA, an animated study companion with optional Valus AI chat.
 - Light/dark appearance, reduced-motion support, a live bloodstream hero, and a cellular atlas.
 
 The rankings pages display students and selected events to signed-in members. There are nine displayed tiers, but no live ranked assessments, ranking points, or competitive scores. Event tools are Coming soon. Existing orientation progress is preserved. Assignment types are labels; selecting “Quiz” or “Skill checklist” does not generate a separate assessment engine. See HOSA_EVENT_RESEARCH.md for the source and tool mapping for every event.
@@ -38,7 +38,7 @@ The server serves `dist/` directly and routes `/api/*` to the backend. Despite i
 
 Without a Turso URL, local development creates a file database in `.data/`. The local database filename is `valus.db`. Existing local data is retained during the branding change. The startup command reads `.env`; it does not automatically load `.env.local`.
 
-Public pages can render without account configuration. Sign-in requires Firebase settings, enrollment requires community passwords, and Mr. DNA chat requires a Gemini key.
+Public pages can render without account configuration. Sign-in requires Firebase settings, enrollment requires community passwords, and Mr. DNA chat and written-response grading require an AI provider key (`GEMINI_API_KEY`).
 
 ## Configuration
 
@@ -55,14 +55,14 @@ Use `.env.example` as the template. Never commit real credentials or community p
 | `FIREBASE_WEB_API_KEY` | Public Firebase web configuration |
 | `FIREBASE_AUTH_DOMAIN` | Public Firebase Authentication domain |
 | `FIREBASE_APP_ID` | Public Firebase web application ID |
-| `GEMINI_API_KEY` | Server-only credential for Mr. DNA chat |
+| `GEMINI_API_KEY` | Server-only AI provider credential for Valus AI (Mr. DNA chat and grading) |
 | `GEMINI_MODEL` | Chat model; the code default is `gemini-3.5-flash-lite` |
 | `PPCHS_STUDENT_PASSWORD` | Current community's shared student enrollment password |
 | `PPCHS_INSTRUCTOR_PASSWORD` | Current community's shared instructor enrollment password |
 
-The Gemini model identifier is the application's configured default, not a guarantee of provider availability. Change it to a model available to your project if necessary.
+The AI model identifier is the application's configured default, not a guarantee of provider availability. Change it to a model available to your project if necessary.
 
-In Firebase, enable Google and Email/Password authentication, register the site's authorized domains, and supply the service-account settings. Public Firebase web settings are returned by `/api/config`; the private key, database token, Gemini key, and enrollment passwords remain on the server.
+In Firebase, enable Google and Email/Password authentication, register the site's authorized domains, and supply the service-account settings. Public Firebase web settings are returned by `/api/config`; the private key, database token, AI provider key, and enrollment passwords remain on the server.
 
 ### School communities
 
@@ -100,7 +100,7 @@ Students enter a shared student password that identifies their school. Instructo
 | `server/auth.js` | Firebase Admin token verification |
 | `server/db.js` | libSQL client, schema, and schema initialization |
 | `server/communities.js` | Community configuration, password validation, and comparisons |
-| `server/hal.js` | Gemini request/response validation and study-chat behavior |
+| `server/hal.js` | Valus AI request/response validation and study-chat behavior |
 | `server/http.js` | JSON request/response helpers and safe error handling |
 | `api/index.js` | Vercel serverless entry point with a reused application instance |
 | `vercel.json` | Static output directory, API rewrites, and response headers |
@@ -169,7 +169,7 @@ Theme and returning-visitor flags use `valus-` storage keys. Existing keys from 
 
 Mr. DNA roams, reacts, can be dragged/anchored, accepts apples, and can mute pep talks. Movement respects reduced-motion preferences. Companion preferences/position are stored locally under the existing `hal-` keys; internal file and function names retain `hal` to match this subsystem.
 
-Chat posts to `/api/hal`. The server validates message/history size, resolves known event/lesson context, and sends a Gemini request without adding account identifiers. User-entered text and recent conversation still go to the provider. Requests include at most 12 history turns, a 1,000-character new message, and a 25-second timeout.
+Chat posts to `/api/hal`. The server validates message/history size, resolves known event/lesson context, and sends the AI request without adding account identifiers. User-entered text and recent conversation still go to the provider. Requests include at most 12 history turns, a 1,000-character new message, and a 25-second timeout.
 
 The reply is structured as text, mood, verdict, and whether the student should explain their reasoning. The server normalizes the mood and “why” state: correct reasoning gets positive feedback; incorrect explanations get another hint, and after three misses the intended routine explains the reasoning and moves on. The browser also reacts when the student leaves a reasoning prompt unanswered for a minute.
 
@@ -232,7 +232,7 @@ Requests/responses use JSON except successful `204` deletions. Errors use `{ "er
 1. Connect the Valus GitHub repository to a Vercel project.
 2. Keep the supplied `vercel.json`: `dist` is the static output, and `/api/*` rewrites to the single `api/index.js` function.
 3. Configure a persistent hosted Turso database and set its URL/token in Vercel.
-4. Add Firebase, Gemini, and community-password variables in Vercel's environment settings.
+4. Add Firebase, AI provider (`GEMINI_*`), and community-password variables in Vercel's environment settings.
 5. Add the deployed domain to Firebase Authentication's authorized domains.
 6. Deploy, then verify the public pages, `/api/config`, sign-in/enrollment, assignments, and chat.
 

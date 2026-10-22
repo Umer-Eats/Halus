@@ -137,7 +137,7 @@ const route = (method, path, handler) => {
 
 route('GET', '/health', () => ({ ok: true }));
 
-// Hal's study chat (Gemini). Open to visitors too, so it is rate limited per address.
+// Hal's study chat (Valus AI). Open to visitors too, so it is rate limited per address.
 const halLog = new Map();
 route('POST', '/hal', async (ctx) => {
   if (!allowHalMessage(halLog, clientAddress(ctx.req), Date.now())) throw new AppError(429, 'Hal needs a short break. Try again in a few minutes.');
@@ -487,7 +487,7 @@ async function runCheckpoint(ctx, user, lesson, assignmentId) {
     throw new AppError(429, 'You have submitted several checkpoints. Please wait a few minutes before trying again.');
   const response = ctx.body.response.trim();
   const mcqCorrect = check.mcqs.filter((q) => q.correct).length, mcqTotal = check.mcqs.length;
-  // If Gemini is down the MCQ accuracy is still recorded; the written response stays ungraded.
+  // If Valus AI grading is down the MCQ accuracy is still recorded; the written response stays ungraded.
   let grade = null, gradingError = null;
   try {
     grade = await ctx.gradeFRQ(lesson, response, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_GRADING_MODEL || ctx.env.GEMINI_MODEL });

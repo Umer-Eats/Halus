@@ -1,4 +1,4 @@
-// Server-only: the Gemini key and lesson answers never reach the browser.
+// Server-only: the AI provider key and lesson answers never reach the browser.
 import {EVENTS, LESSONS} from '../dist/model.js';
 import {AppError} from './http.js';
 
@@ -72,7 +72,7 @@ export function settleHalReply(raw, state) {
   return {reply: raw.reply, mood, verdict, awaitingWhy, missedWhys: awaitingWhy ? missedWhys : 0};
 }
 
-/** One chat turn with Mr. DNA. No student identifiers are sent to Gemini. */
+/** One chat turn with Mr. DNA. No student identifiers are sent to the AI provider. */
 export async function askHal(input, config = {}) {
   const turn = readHalInput(input);
   const unavailable = () => new AppError(503, 'Mr. DNA is taking a nap and cannot chat right now. Try again in a moment.');
@@ -108,7 +108,7 @@ export async function askHal(input, config = {}) {
         generationConfig: {temperature: 0.6, maxOutputTokens: 2048, responseMimeType: 'application/json', responseJsonSchema: schema},
       }),
     });
-    if (!response.ok) throw new Error(`Gemini ${response.status}`);
+    if (!response.ok) throw new Error(`AI provider ${response.status}`);
     const body = await response.text();
     if (body.length > 100_000) throw new Error('Invalid response');
     const candidate = JSON.parse(body).candidates?.[0];
@@ -117,7 +117,7 @@ export async function askHal(input, config = {}) {
     if (!raw || typeof raw.reply !== 'string' || !raw.reply.trim() || raw.reply.length > HAL_LIMITS.turn || !HAL_MOODS.includes(raw.mood) || !HAL_VERDICTS.includes(raw.verdict) || typeof raw.askedWhy !== 'boolean') throw new Error('Invalid response');
   } catch (error) {
     // Log the reason only: never provider payloads, credentials or student messages.
-    console.warn('Mr. DNA: Gemini request failed:', error.message);
+    console.warn('Mr. DNA: Valus AI request failed:', error.message);
     throw unavailable();
   }
   return settleHalReply({...raw, reply: raw.reply.trim()}, turn);

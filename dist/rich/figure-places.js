@@ -1,0 +1,241 @@
+// Where each OpenStax figure appears in the in-depth lessons, so figures sit inside the section
+// they illustrate. scripts/import-openstax-figures.mjs reads this file to fetch the images.
+// course → lesson number (1-based) → [section number (1-based), 'book/page', figure number, caption, alt, 'end'?]
+// A figure goes after the section's first block, or at the end of the section with 'end'.
+const AP = 'anatomy-and-physiology/', PS = 'psychology/', CP = 'college-physics/';
+
+const HEMOSTASIS = [AP + '18-5-hemostasis', '18.14', 'Hemostasis has three steps: vascular spasm, a platelet plug and coagulation. Antiplatelet drugs act on the plug, anticoagulants on the clotting cascade, and thrombolytics dissolve a finished clot.', 'Three steps of hemostasis: vessel spasm, platelet plug and clot formation'];
+const ASTHMA = [AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.12', 'In asthma, the bronchiole wall becomes inflamed and thickened, mucus collects and smooth muscle tightens, narrowing the airway.', 'Normal bronchiole compared with an asthmatic bronchiole'];
+const GLUCOSE = [AP + '17-9-the-endocrine-pancreas', '17.19', 'Insulin and glucagon keep blood glucose in range: insulin moves glucose into cells, and glucagon releases stored glucose from the liver.', 'Feedback loop of insulin and glucagon regulating blood glucose'];
+const SKIN = [AP + '5-1-layers-of-the-skin', '5.2', 'The skin has three layers: epidermis, dermis and hypodermis (subcutaneous tissue).', 'Cross section of skin showing epidermis, dermis and hypodermis'];
+const STOMACH = [AP + '23-4-the-stomach', '23.15', 'Regions and layers of the stomach.', 'Anatomy of the stomach'];
+const NEPHRON = [AP + '25-3-gross-anatomy-of-the-kidney', '25.10', 'Blood flow through the nephron, where blood is filtered and urine forms.', 'Blood vessels surrounding a nephron'];
+const RAAS = [AP + '25-4-microscopic-anatomy-of-the-kidney', '25.14', 'The renin-angiotensin-aldosterone system. Angiotensin-converting enzyme turns angiotensin I into angiotensin II, which constricts vessels and triggers aldosterone release.', 'Conversion of angiotensin I to angiotensin II and its effects'];
+
+export const FIGURE_PLACES = {
+  'Pharmacology': {
+    2: [
+      [2, AP + '3-1-the-cell-membrane', '3.5', 'Small, lipid-soluble molecules cross cell membranes by simple diffusion, from high to low concentration. This is why lipid solubility speeds drug absorption.', 'Molecules diffusing across a cell membrane from high to low concentration'],
+      [3, AP + '20-1-structure-and-function-of-blood-vessels', '20.5', 'Capillary types shape drug distribution. Leaky fenestrated and sinusoid capillaries let drugs out easily, while the tight continuous capillaries of the brain form the blood-brain barrier.', 'Continuous, fenestrated and sinusoid capillaries'],
+      [4, AP + '23-6-accessory-organs-in-digestion-the-liver-pancreas-and-gallbladder', '23.24', 'The liver receives blood from the gut through the portal vein, so oral drugs pass through it before reaching the body. It is the main site of drug metabolism and the first-pass effect.', 'Liver, gallbladder and pancreas beside the stomach and duodenum'],
+      [5, ...NEPHRON.slice(0, 2), 'Blood flow through the nephron. Drugs leave the blood by glomerular filtration and tubular secretion, and some are reabsorbed.', NEPHRON[3]],
+    ],
+    3: [
+      [1, AP + '17-2-hormones', '17.5', 'A water-soluble messenger binds a receptor on the cell surface and starts a second-messenger cascade inside the cell. Many drugs act on this same kind of receptor.', 'A hormone binding a membrane receptor and activating cAMP inside the cell'],
+      [2, AP + '12-5-communication-between-neurons', '12.28', 'Two main receptor types: ion channels that open when a ligand binds, and G protein-coupled receptors that work through second messengers. Agonists activate these receptors; antagonists block them.', 'Ligand-gated ion channel receptor and G protein-coupled receptor'],
+    ],
+    5: [
+      [1, AP + '15-1-divisions-of-the-autonomic-nervous-system', '15.2', 'The sympathetic division leaves the thoracic and lumbar spinal cord. Most of its target organs respond to norepinephrine.', 'Sympathetic nerve connections from the spinal cord to organs'],
+      [3, AP + '15-1-divisions-of-the-autonomic-nervous-system', '15.4', 'The parasympathetic division leaves the brainstem and sacral spinal cord and releases acetylcholine at its targets. Cholinergic drugs mimic it; anticholinergic drugs block it.', 'Parasympathetic nerve connections from the brainstem and sacral cord to organs'],
+    ],
+    6: [
+      [1, AP + '12-5-communication-between-neurons', '12.27', 'At a chemical synapse, neurotransmitter crosses the cleft and binds receptors, then is cleared by reuptake. SSRIs and SNRIs block that reuptake.', 'Chemical synapse with vesicles, synaptic cleft and receptors'],
+      [5, AP + '13-2-the-central-nervous-system', '13.9', 'The basal nuclei depend on dopamine from the substantia nigra. Losing those neurons causes Parkinson disease, which levodopa treats.', 'Frontal section of the brain showing the basal nuclei'],
+    ],
+    7: [
+      [1, ...RAAS.slice(0, 2), 'The renin-angiotensin-aldosterone system. ACE inhibitors block the conversion of angiotensin I to angiotensin II, and ARBs block angiotensin II at its receptor.', RAAS[3]],
+      [2, AP + '19-1-heart-anatomy', '19.15', 'The coronary arteries supply the heart muscle. When they narrow, oxygen demand outstrips supply and angina results.', 'Coronary arteries and veins on the surface of the heart'],
+      [3, ...HEMOSTASIS],
+    ],
+    8: [
+      [4, AP + '21-4-the-adaptive-immune-response-b-lymphocytes-and-antibodies', '21.24', 'A vaccine produces the primary response. On later exposure, memory cells mount a faster and larger secondary response.', 'Graph of primary and secondary antibody responses over time'],
+    ],
+    9: [
+      [1, ...GLUCOSE],
+      [3, AP + '17-4-the-thyroid-gland', '17.13', 'The thyroid feedback loop: TRH triggers TSH, TSH triggers T3 and T4, and the thyroid hormones feed back to slow both. Levothyroxine doses are adjusted by TSH for this reason.', 'Negative feedback loop of TRH, TSH and thyroid hormones'],
+      [4, ...ASTHMA.slice(0, 2), 'In asthma, the bronchiole wall is inflamed, mucus collects and smooth muscle tightens. Bronchodilators relax the muscle; inhaled corticosteroids treat the inflammation.', ASTHMA[3]],
+      [5, ...STOMACH.slice(0, 2), 'The stomach. Proton pump inhibitors and H2 blockers reduce the acid made by its parietal cells.', STOMACH[3]],
+    ],
+    10: [
+      [2, ...SKIN.slice(0, 2), 'The layers of the skin. Intradermal injections go into the dermis, subcutaneous injections into the hypodermis, and intramuscular injections pass through both into muscle.', SKIN[3]],
+    ],
+  },
+
+  'Pathophysiology': {
+    1: [
+      [1, AP + '1-5-homeostasis', '1.10', 'Health depends on homeostasis. In a negative feedback loop, a change is detected and reversed; many diseases begin when this regulation fails.', 'Diagram of a negative feedback loop'],
+      [3, AP + '3-5-cell-growth-and-division', '3.30', 'The cell cycle. Hyperplasia adds cells by driving them through this cycle, while hypertrophy enlarges existing cells without dividing.', 'Cell cycle with interphase and mitotic phase'],
+    ],
+    2: [
+      [1, AP + '18-4-leukocytes-and-platelets', '18.10', 'Emigration (diapedesis): white blood cells squeeze out of a capillary toward injured tissue during acute inflammation.', 'White blood cell squeezing through a capillary wall'],
+      [2, AP + '4-6-tissue-injury-and-aging', '4.21', 'Tissue healing: a clot forms, inflammation clears debris, and granulation tissue fills the wound before it is remodeled into a scar.', 'Stages of wound healing in skin'],
+      [3, AP + '21-2-barrier-defenses-and-the-innate-immune-response', '21.12', 'Innate and adaptive immunity work together. Innate defenses act within minutes; adaptive responses take days but are specific and leave memory.', 'Timeline of innate and adaptive immune responses'],
+    ],
+    3: [
+      [3, AP + '4-6-tissue-injury-and-aging', '4.22', 'Cancer develops as mutations accumulate and cells escape normal growth controls, invade nearby tissue and spread.', 'Abnormal cells multiplying and invading tissue'],
+      [3, AP + '3-5-cell-growth-and-division', '3.33', 'Checkpoints control the cell cycle. Mutations in proto-oncogenes and tumor suppressor genes disable these controls and let damaged cells divide.', 'Cell cycle checkpoints', 'end'],
+    ],
+    4: [
+      [1, ...SKIN.slice(0, 2), 'The skin has three layers: epidermis, dermis and hypodermis. Burn depth and many skin disorders are described by which layers they reach.', SKIN[3]],
+      [3, AP + '5-4-diseases-disorders-and-injuries-of-the-integumentary-system', '5.23', 'The rule of nines estimates the percentage of body surface burned. Children have proportionally larger heads, so their chart differs.', 'Rule of nines body surface area chart'],
+      [4, AP + '5-4-diseases-disorders-and-injuries-of-the-integumentary-system', '5.20', 'Melanoma, the most dangerous skin cancer. Look for the ABCDEs: asymmetry, irregular border, uneven color, diameter over 6 mm and evolving appearance.', 'Photograph of a melanoma on the skin'],
+      [4, AP + '5-4-diseases-disorders-and-injuries-of-the-integumentary-system', '5.18', 'Basal cell carcinoma, the most common skin cancer.', 'Photograph of a basal cell carcinoma', 'end'],
+    ],
+    5: [
+      [1, AP + '9-4-synovial-joints', '9.8', 'A synovial joint: articular cartilage covers the bone ends, and a capsule lined by synovial membrane holds lubricating synovial fluid.', 'Structure of a synovial joint'],
+      [2, AP + '6-5-fractures-bone-repair', '6.20', 'Types of fractures, including transverse, oblique, spiral, comminuted, greenstick and open (compound).', 'Illustrations of fracture types'],
+      [2, AP + '6-5-fractures-bone-repair', '6.21', 'Fracture repair: a hematoma forms, then a soft callus, a bony callus and finally remodeling.', 'Stages of bone fracture repair', 'end'],
+      [3, AP + '9-4-synovial-joints', '9.11', 'Osteoarthritis wears away articular cartilage until bone rubs on bone.', 'Joint damaged by osteoarthritis'],
+      [4, AP + '6-6-exercise-nutrition-hormones-and-bone-tissue', '6.23', 'Bone mass peaks in early adulthood and then declines, faster in women after menopause. This is why osteoporosis is most common in older women.', 'Graph of bone mass against age for men and women'],
+    ],
+    6: [
+      [1, AP + '19-1-heart-anatomy', '19.9', 'Internal structures of the heart: four chambers, the septum and the valves that keep blood flowing one way.', 'Interior of the heart showing chambers and valves'],
+      [2, AP + '19-1-heart-anatomy', '19.16', 'Plaque narrows a coronary artery. When a plaque ruptures, the clot that forms can block the artery and cause a myocardial infarction.', 'Coronary arteries narrowed by atherosclerotic plaque'],
+      [4, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.25', 'Common ECG abnormalities compared with a normal tracing.', 'Several abnormal ECG tracings'],
+      [5, AP + '20-1-structure-and-function-of-blood-vessels', '20.8', 'Varicose veins form when the valves in superficial leg veins fail and blood pools.', 'Photograph of varicose veins in a leg'],
+    ],
+    7: [
+      [1, AP + '18-1-an-overview-of-blood', '18.2', 'Spun in a centrifuge, blood separates into plasma, a thin buffy coat of white cells and platelets, and red cells. The red cell fraction is the hematocrit.', 'Centrifuged blood sample separated into layers'],
+      [2, AP + '18-3-erythrocytes', '18.9', 'In sickle cell disease, abnormal hemoglobin makes red cells stiff and crescent-shaped, so they block small vessels and break down early.', 'Normal and sickled red blood cells'],
+      [3, ...HEMOSTASIS],
+      [3, AP + '21-1-anatomy-of-the-lymphatic-and-immune-systems', '21.2', 'The lymphatic system returns fluid to the blood and filters it through lymph nodes, where lymphomas begin.', 'Lymphatic vessels and lymph nodes throughout the body', 'end'],
+      [4, AP + '20-4-homeostatic-regulation-of-the-vascular-system', '20.21', 'After blood loss the body raises heart rate, constricts vessels and holds on to water. Shock develops when these responses can no longer keep up.', 'Homeostatic responses to loss of blood volume'],
+    ],
+    8: [
+      [1, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.2', 'The respiratory tract from the nasal cavity to the alveoli.', 'Major structures of the respiratory system'],
+      [1, AP + '22-4-gas-exchange', '22.22', 'External respiration: oxygen diffuses from the alveoli into the blood and carbon dioxide diffuses out.', 'Gas exchange between an alveolus and a capillary', 'end'],
+      [2, ...ASTHMA],
+      [4, AP + '22-3-the-process-of-breathing', '22.16', 'Pressure in the pleural space stays below lung pressure, which keeps the lungs expanded. When air enters this space (pneumothorax), the lung collapses.', 'Pressure relationships between the lungs and pleural space'],
+    ],
+    9: [
+      [1, AP + '23-1-overview-of-the-digestive-system', '23.2', 'The organs of the digestive tract and the accessory organs.', 'Components of the digestive system'],
+      [2, ...STOMACH.slice(0, 2), 'The stomach. Peptic ulcers form in its lining or in the duodenum.', STOMACH[3]],
+      [3, AP + '23-5-the-small-and-large-intestines', '23.21', 'The large intestine. Diverticula, polyps and colorectal cancer form in its wall.', 'Regions of the large intestine'],
+      [4, AP + '23-6-accessory-organs-in-digestion-the-liver-pancreas-and-gallbladder', '23.24', 'The liver, gallbladder and pancreas drain into the duodenum through shared ducts, so a gallstone can block bile flow or trigger pancreatitis.', 'Liver, gallbladder and pancreas with their ducts'],
+    ],
+    10: [
+      [1, AP + '17-3-the-pituitary-gland-and-hypothalamus', '17.7', 'The hypothalamus controls the pituitary gland, which directs many other endocrine glands.', 'Hypothalamus and pituitary gland'],
+      [2, ...GLUCOSE],
+      [3, AP + '17-4-the-thyroid-gland', '17.14', 'A goiter is an enlarged thyroid gland, classically caused by iodine deficiency.', 'Photograph of a goiter'],
+      [4, AP + '17-6-the-adrenal-glands', '17.17', 'The adrenal glands sit on top of the kidneys. The cortex makes cortisol and aldosterone; the medulla makes epinephrine.', 'Adrenal gland showing cortex and medulla'],
+    ],
+    11: [
+      [1, AP + '13-2-the-central-nervous-system', '13.7', 'The lobes of the cerebral cortex.', 'Lobes of the cerebrum'],
+      [1, AP + '13-2-the-central-nervous-system', '13.12', 'The brainstem (midbrain, pons and medulla) controls breathing, heart rate and consciousness.', 'Midbrain, pons and medulla of the brainstem', 'end'],
+      [4, AP + '13-2-the-central-nervous-system', '13.14', 'Cross section of the spinal cord. The level of an injury determines which parts of the body lose function.', 'Cross section of the spinal cord'],
+      [5, AP + '14-1-sensory-perception', '14.15', 'Structure of the eye: cornea, lens, retina and optic nerve.', 'Structure of the eye'],
+      [5, AP + '14-1-sensory-perception', '14.5', 'The outer, middle and inner ear.', 'Structures of the ear', 'end'],
+    ],
+    12: [
+      [1, AP + '25-3-gross-anatomy-of-the-kidney', '25.7', 'The kidneys sit behind the abdominal organs and drain through the ureters into the bladder.', 'Kidneys and their position in the body'],
+      [1, ...NEPHRON, 'end'],
+      [3, ...RAAS.slice(0, 2), 'Damaged kidneys activate the renin-angiotensin-aldosterone system, which raises blood pressure and harms the kidneys further.', RAAS[3]],
+    ],
+    13: [
+      [5, PS + '16-2-types-of-treatment', '16.13', 'Cognitive therapy targets the thoughts between an event and the feelings that follow it.', 'Two flowcharts showing different thoughts and feelings after failing a test'],
+    ],
+  },
+
+  'Behavioral Health': {
+    1: [
+      [1, PS + '3-2-cells-of-the-nervous-system', '3.8', 'Parts of a neuron: dendrites receive signals, the cell body integrates them and the axon carries the impulse to the terminal buttons.', 'Neuron with labeled dendrites, cell body, axon and terminals'],
+      [2, PS + '3-2-cells-of-the-nervous-system', '3.9', 'Neurotransmitters released into the synaptic cleft bind receptors on the next neuron.', 'Synapse between two neurons with neurotransmitters'],
+      [3, PS + '3-4-the-brain-and-spinal-cord', '3.18', 'The four lobes of the cerebral cortex.', 'Frontal, parietal, temporal and occipital lobes'],
+      [3, PS + '3-4-the-brain-and-spinal-cord', '3.23', 'The limbic system, which handles emotion and memory.', 'Hypothalamus, amygdala and hippocampus in the limbic system', 'end'],
+    ],
+    2: [
+      [1, AP + '14-1-sensory-perception', '14.15', 'Structure of the eye. Light is focused on the retina, where receptors turn it into neural signals (transduction).', 'Structure of the eye'],
+      [3, PS + '4-3-stages-of-sleep', '4.13', 'A hypnogram. A night cycles through NREM stages and REM about every 90 minutes, with more REM toward morning.', 'Hypnogram showing sleep stages across a night'],
+    ],
+    3: [
+      [2, PS + '10-2-hunger-and-eating', '10.9', 'Hunger signals come from the stomach and from hormones acting on the hypothalamus.', 'Brain and stomach exchanging hunger and fullness signals'],
+      [3, PS + '10-4-emotion', '10.22', 'The amygdala, hippocampus and hypothalamus are central to emotion.', 'Brain with the hypothalamus, amygdala and hippocampus labeled'],
+    ],
+    4: [
+      [1, PS + '6-2-classical-conditioning', '6.4', 'Classical conditioning: after a neutral stimulus is paired with food, it triggers salivation on its own.', 'Dog before, during and after classical conditioning'],
+      [2, PS + '6-3-operant-conditioning', '6.10', 'A Skinner box, in which an animal learns to press a lever for food.', 'Rat in a Skinner box'],
+      [2, PS + '6-3-operant-conditioning', '6.13', 'Schedules of reinforcement. Variable-ratio schedules produce the highest and most persistent response rates.', 'Cumulative responses under different reinforcement schedules', 'end'],
+    ],
+    5: [
+      [1, PS + '8-1-how-memory-functions', '8.4', 'The Atkinson-Shiffrin model: sensory memory, short-term memory and long-term memory.', 'Flow diagram from sensory input to long-term memory'],
+      [3, PS + '8-3-problems-with-memory', '8.15', 'Ebbinghaus’s forgetting curve: most forgetting happens soon after learning.', 'Graph of memory retention falling over time'],
+      [3, PS + '8-3-problems-with-memory', '8.18', 'Proactive interference (old learning disrupts new) and retroactive interference (new learning disrupts old).', 'Diagram of proactive and retroactive interference', 'end'],
+      [4, PS + '8-3-problems-with-memory', '8.11', 'Anterograde amnesia blocks new memories after an event; retrograde amnesia erases memories from before it.', 'Diagram comparing anterograde and retrograde amnesia'],
+    ],
+    7: [
+      [5, PS + '3-2-cells-of-the-nervous-system', '3.12', 'Neurotransmitter that does not bind is taken back into the sending neuron (reuptake). SSRIs block reuptake of serotonin so more stays in the synapse.', 'Synapse showing neurotransmitter reuptake'],
+    ],
+    8: [
+      [1, PS + '14-1-what-is-stress', '14.8', 'The fight-or-flight response: heart rate, breathing and muscle tension rise while digestion slows.', 'Body outline showing fight-or-flight responses'],
+    ],
+    11: [
+      [2, PS + '3-4-the-brain-and-spinal-cord', '3.24', 'The ventral tegmental area (VTA) and substantia nigra release dopamine. The VTA pathway is the core of the brain’s reward system.', 'Location of the substantia nigra and ventral tegmental area'],
+    ],
+    13: [
+      [1, PS + '14-1-what-is-stress', '14.3', 'Stress begins with appraisal: whether an event seems threatening and whether we believe we can cope.', 'Concept map from stressor to appraisal and stress response'],
+      [1, PS + '14-1-what-is-stress', '14.4', 'The Yerkes-Dodson law: performance is best at a moderate level of arousal.', 'Bell curve of performance against arousal', 'end'],
+      [2, PS + '14-1-what-is-stress', '14.11', 'The HPA axis: the hypothalamus signals the pituitary, which signals the adrenal glands to release cortisol.', 'Body outline showing the hypothalamus, pituitary and adrenal glands'],
+      [3, PS + '14-1-what-is-stress', '14.10', 'Selye’s general adaptation syndrome: alarm, resistance and exhaustion.', 'Graph of the three stages of the general adaptation syndrome'],
+    ],
+  },
+
+  'Biomedical Equipment Technician': {
+    1: [
+      [1, AP + '1-6-anatomical-terminology', '1.13', 'Directional terms applied to the human body.', 'Body with directional terms such as superior, inferior, anterior and posterior'],
+      [1, AP + '1-6-anatomical-terminology', '1.14', 'The sagittal, frontal and transverse planes, the views used by CT and MRI.', 'Body divided by sagittal, frontal and transverse planes', 'end'],
+      [3, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.18', 'The heart’s conduction system produces the electrical signal an ECG records.', 'Conduction system of the heart'],
+      [4, AP + '20-2-blood-flow-blood-pressure-and-resistance', '20.11', 'Common pulse sites.', 'Body outline with pulse sites marked'],
+    ],
+    2: [
+      [1, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.22', 'Standard placement of ECG leads.', 'ECG electrode positions on the chest and limbs'],
+      [1, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.24', 'Each part of the ECG tracing matches an event in the cardiac cycle.', 'ECG tracing lined up with the cardiac cycle', 'end'],
+      [2, AP + '20-2-blood-flow-blood-pressure-and-resistance', '20.12', 'Measuring blood pressure with a cuff: sounds begin at systolic pressure and stop at diastolic pressure.', 'Blood pressure cuff measurement with pressure graph'],
+      [4, AP + '22-3-the-process-of-breathing', '22.18', 'Respiratory volumes and capacities, the quantities spirometers and ventilators measure.', 'Graph of lung volumes and capacities'],
+    ],
+    3: [
+      [2, AP + '22-3-the-process-of-breathing', '22.17', 'Normal breathing uses negative pressure: the diaphragm drops and air is drawn in. A mechanical ventilator instead pushes air in with positive pressure.', 'Inspiration and expiration with diaphragm movement'],
+      [3, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.26', 'An automated external defibrillator and a manual defibrillator.', 'Photographs of defibrillators'],
+    ],
+    5: [
+      [1, CP + '20-6-electric-hazards-and-the-human-body', '20.24', 'A shock happens when a person becomes part of a path to ground. Grounding and insulation keep current from taking that path.', 'Person touching a live wire with a tool, completing a path to ground'],
+      [1, CP + '20-6-electric-hazards-and-the-human-body', '20.25', 'Thresholds of sensation and of “can’t let go” current by frequency. Currents near 50–60 Hz are the most dangerous.', 'Graph of current thresholds against frequency', 'end'],
+      [2, CP + '20-6-electric-hazards-and-the-human-body', '20.23', 'In a three-wire system, the ground wire gives fault current a safe path so the breaker trips.', 'Circuit with a fuse or breaker and a ground wire'],
+    ],
+    6: [
+      [2, CP + '20-2-ohms-law-resistance-and-simple-circuits', '20.8', 'A simple circuit: a voltage source drives current through a resistance.', 'Battery connected to a resistor with current direction shown'],
+      [3, CP + '21-1-resistors-in-series-and-parallel', '21.2', 'Resistors connected in series share one current path.', 'Resistors in series'],
+      [4, CP + '20-5-alternating-current-versus-direct-current', '20.16', 'Direct current flows one way at a steady value; alternating current reverses direction many times per second.', 'Graphs of DC and AC voltage and current over time'],
+    ],
+  },
+
+  'Dental Terminology': {
+    1: [
+      [1, AP + '7-2-the-skull', '7.5', 'Lateral view of the skull.', 'Side view of the skull with bones labeled'],
+      [1, AP + '7-2-the-skull', '7.15', 'The mandible: body, ramus, angle, condyle and coronoid process.', 'The mandible with its parts labeled', 'end'],
+      [2, AP + '9-6-anatomy-of-selected-synovial-joints', '9.15', 'The temporomandibular joint, where the mandibular condyle meets the temporal bone.', 'Temporomandibular joint'],
+      [2, AP + '11-3-axial-muscles-of-the-head-neck-and-back', '11.10', 'Muscles that move the lower jaw: temporalis, masseter and the pterygoids.', 'Muscles of mastication', 'end'],
+      [3, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.9', 'The salivary glands: parotid, submandibular and sublingual.', 'Parotid, submandibular and sublingual glands'],
+      [3, AP + '13-4-the-peripheral-nervous-system', '13.23', 'The cranial nerves. The trigeminal nerve (V) supplies sensation to the teeth and jaws.', 'Underside of the brain with the cranial nerves', 'end'],
+      [4, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.7', 'The oral cavity.', 'Open mouth showing the palate, uvula and tongue'],
+    ],
+    2: [
+      [1, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.11', 'Structure of a tooth.', 'Cross section of a tooth showing enamel, dentin, pulp and root'],
+      [2, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.10', 'The permanent and primary (deciduous) teeth with typical eruption ages.', 'Permanent and deciduous teeth with eruption ages'],
+    ],
+    10: [
+      [1, AP + '12-4-the-action-potential', '12.20', 'Voltage-gated sodium channels open to start an action potential. Local anesthetics block these channels.', 'Voltage-gated channel closed and open'],
+    ],
+    11: [
+      [3, AP + '19-1-heart-anatomy', '19.3', 'Hand position for chest compressions during CPR.', 'Hands placed on the lower sternum for CPR'],
+    ],
+  },
+};
+
+/** Key used in figures.js for a book page and figure number. */
+export const figureKey = (ref, number) => ref.split('/')[0] + ':' + number;
+
+/** Insert the figure blocks into a course's lessons (called by course()). */
+export function placeFigures(name, lessons) {
+  const places = FIGURE_PLACES[name] || {};
+  for (const [n, list] of Object.entries(places)) {
+    const lesson = lessons[Number(n) - 1];
+    if (!lesson) continue;
+    for (const [s, ref, number, caption, alt, where] of list) {
+      const section = lesson.sections[s - 1];
+      if (!section) continue;
+      const block = {t: 'fig', file: figureKey(ref, number), caption, alt};
+      if (where === 'end') section.blocks.push(block);
+      else section.blocks.splice(Math.min(1, section.blocks.length), 0, block);
+    }
+  }
+}

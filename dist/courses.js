@@ -32,7 +32,7 @@ export function loadCourse(name, {view = true} = {}) {
 }
 export const loadAllCourses = options => Promise.all(Object.keys(RICH_COURSES).map(name => loadCourse(name, options)));
 
-// MCQs are deterministic; the server separately grades the FRQ with Gemini.
+// MCQs are deterministic; the server separately grades the FRQ with Valus AI.
 export function assessLesson(lesson, input = {}) {
   const answers = Array.isArray(input.answers) ? input.answers : [];
   const mcqs = lesson.mcqs.map((q, i) => ({correct: answers[i] === q.answer, explanation: q.explanation}));

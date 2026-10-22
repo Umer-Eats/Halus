@@ -46,7 +46,7 @@ All routes except `health`, `config`, `communities` and `hal` need `Authorizatio
 | Route | Who | Purpose |
 | --- | --- | --- |
 | `GET /api/health` | anyone | Service health check |
-| `POST /api/hal` | anyone, rate limited | Mr. DNA study chat through Gemini |
+| `POST /api/hal` | anyone, rate limited | Mr. DNA study chat through Valus AI |
 | `GET /api/config` | anyone | Firebase web config and the public community list |
 | `GET /api/communities` | anyone | `[{ id, name }]` |
 | `POST /api/auth/register` | signed in | Join a community as a student or instructor |

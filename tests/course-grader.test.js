@@ -4,7 +4,7 @@ import {gradeCourseFRQ} from '../server/course-grader.js';
 const lesson={title:'Simulation',sections:[{title:'Reasoning',paragraphs:['An educational example.']}],frq:{prompt:'Explain the calculation',rubric:[{label:'Units'},{label:'Reasoning'},{label:'Result'}],modelAnswer:'Use units and show the calculation.'}};
 const response='This response shows the calculation and explains the units and reasoning behind the result.';
 const provider=(scores,extra={})=>async()=>new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({criteria:scores.map(score=>({score,feedback:'Specific feedback.'})),feedback:'Review your reasoning.',safetyConcern:false,...extra})}]}}]}));
-test('Gemini grades each rubric criterion and server computes pass threshold',async()=>{
+test('Valus AI grades each rubric criterion and server computes pass threshold',async()=>{
  let request;
  const fetcher=async(url,init)=>{request={url,init};return provider([2,2,1])();};
  const grade=await gradeCourseFRQ(lesson,response,{apiKey:'private-key',model:'gemini-test',fetcher});

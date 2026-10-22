@@ -43,36 +43,70 @@ function lab(lesson,name){
 function lessonCheckpoint(l,teacher){
  const intro=teacher
   ?'Teacher preview: try the checkpoint below. It is graded but not saved. Students can take it any time, and you can assign it to collect everyone’s accuracy.'
-  :'Optional. Check your understanding with '+l.mcqs.length+' multiple-choice questions and a written response graded by Gemini. You can move on without it; if you submit, your accuracy is saved for your teacher. If your teacher assigned this checkpoint, submitting here counts.';
+  :'Optional. Check your understanding with '+l.mcqs.length+' multiple-choice questions and a written response graded by Valus AI. You can move on without it; if you submit, your accuracy is saved for your teacher. If your teacher assigned this checkpoint, submitting here counts.';
  const key=teacher?`<details class="checkpoint-key"><summary>Show answer key</summary><ol>${l.mcqs.map(q=>`<li>${e(q.prompt)} <strong>${e(q.options[q.answer])}</strong></li>`).join('')}</ol><p><strong>Model written answer:</strong> ${e(l.frq.modelAnswer)}</p></details><button class="button secondary" type="button" data-action="assign-checkpoint" data-lesson="${e(l.id)}">Assign this checkpoint to students →</button>`:'';
  return `<section class="course-card checkpoint" id="lesson-checkpoint"><span class="eyebrow">LESSON CHECKPOINT · MCQ + WRITTEN RESPONSE</span><h3>Put your understanding to work.</h3>${checkpointForm(l.id,{url:'/courses/lessons/'+encodeURIComponent(l.id)+'/checkpoint',intro,teacher})}${key}</section>`;
 }
 
-/** The MCQ + FRQ form, used at the end of each lesson and in checkpoint assignments. */
+/** The MCQ + FRQ checkpoint as a slideshow: one question per slide, the written response last.
+ * Used at the end of each lesson and in checkpoint assignments. */
 export function checkpointForm(lessonId, {url,intro,teacher=false}={}) {
  const found=findCourseLesson(lessonId);
  if(!found)return '<p class="lesson-body">This checkpoint’s lesson is no longer available.</p>';
- const l=found.lesson;
- return `<div class="checkpoint"><p class="lesson-body">${intro?e(intro):`Review <a href="#/event/${encodeURIComponent(found.name)}/lessons/${encodeURIComponent(l.id)}">${e(l.title)}</a> first if you need to. Answer each question, then write your response. Your accuracy is recorded for your teacher.`} AI feedback can make mistakes; discuss disputed feedback with your instructor.</p><form data-checkpoint="${e(url)}" data-lesson="${e(l.id)}" data-teacher="${teacher?'1':''}">${l.mcqs.map((q,i)=>`<fieldset><legend>${i+1}. ${e(q.prompt)}</legend>${q.options.map((o,j)=>`<label class="mcq-option"><input type="radio" name="mcq${i}" value="${j}" required><span>${e(o)}</span></label>`).join('')}<p class="question-feedback" data-feedback="${i}"></p></fieldset>`).join('')}<label class="field"><strong>Written response</strong><span>${e(l.frq.prompt)}</span><textarea name="response" minlength="80" maxlength="10000" rows="7" required placeholder="Explain your reasoning using the concepts from this lesson…"></textarea></label><div class="frq-rubric"><h4>Your response is assessed on</h4><ul>${l.frq.rubric.map(r=>`<li>${e(r.label)}</li>`).join('')}</ul><p class="subtle">Your response and the lesson rubric are sent to Google Gemini for grading. Do not include personal or patient information.</p></div><p role="status" class="assessment-result" aria-live="polite"></p><button class="button" type="submit">Submit checkpoint →</button><small class="draft-status" aria-live="polite"></small></form></div>`;
+ const l=found.lesson, n=l.mcqs.length;
+ const dots=l.mcqs.map((_,i)=>`<button type="button" class="cp-dot" data-go="${i}" aria-label="Question ${i+1}">${i+1}</button>`).join('')+`<button type="button" class="cp-dot cp-dot-frq" data-go="${n}" aria-label="Written response">Written</button>`;
+ const slides=l.mcqs.map((q,i)=>`<fieldset class="cp-slide" data-slide="${i}" tabindex="-1"${i?' hidden':''}><legend><span class="cp-qnum">Question ${i+1} of ${n}</span>${e(q.prompt)}</legend>${q.options.map((o,j)=>`<label class="mcq-option"><input type="radio" name="mcq${i}" value="${j}"><span>${e(o)}</span></label>`).join('')}<p class="question-feedback" data-feedback="${i}"></p></fieldset>`).join('');
+ const frq=`<div class="cp-slide cp-frq" data-slide="${n}" tabindex="-1" hidden><label class="field"><span class="cp-qnum">Written response</span><strong>${e(l.frq.prompt)}</strong><textarea name="response" minlength="80" maxlength="10000" rows="8" placeholder="Explain your reasoning using the concepts from this lesson…"></textarea></label><div class="frq-rubric"><h4>Your response is assessed on</h4><ul>${l.frq.rubric.map(r=>`<li>${e(r.label)}</li>`).join('')}</ul><p class="subtle">Your response is graded by Valus AI using the lesson rubric. Do not include personal or patient information.</p></div><p role="status" class="assessment-result" aria-live="polite"></p><button class="button" type="submit">Submit checkpoint →</button><small class="draft-status" aria-live="polite"></small></div>`;
+ return `<div class="checkpoint"><p class="lesson-body">${intro?e(intro):`Review <a href="#/event/${encodeURIComponent(found.name)}/lessons/${encodeURIComponent(l.id)}">${e(l.title)}</a> first if you need to. Answer each question, then write your response. Your accuracy is recorded for your teacher.`} AI feedback can make mistakes; discuss disputed feedback with your instructor.</p><form class="cp" data-checkpoint="${e(url)}" data-lesson="${e(l.id)}" data-teacher="${teacher?'1':''}" novalidate><div class="cp-top"><div class="cp-progress"><span class="cp-count" aria-live="polite">Question 1 of ${n}</span><span class="cp-answered"></span></div><div class="cp-bar" aria-hidden="true"><span></span></div><nav class="cp-dots" aria-label="Checkpoint questions">${dots}</nav></div><div class="cp-stage">${slides}${frq}</div><div class="cp-nav"><button type="button" class="button secondary" data-cp-prev>← Previous</button><button type="button" class="button" data-cp-next>Next →</button></div></form></div>`;
 }
 
 export function mountCheckpoint(root,{api,userId,onSubmitted}) {
  const form=root.querySelector('[data-checkpoint]');
  if(!form)return;
- const lesson=findCourseLesson(form.dataset.lesson).lesson, draftKey='valus-checkpoint-draft:'+userId+':'+form.dataset.checkpoint;
+ const lesson=findCourseLesson(form.dataset.lesson).lesson, n=lesson.mcqs.length, draftKey='valus-checkpoint-draft:'+userId+':'+form.dataset.checkpoint;
+ const slides=[...form.querySelectorAll('.cp-slide')], dots=[...form.querySelectorAll('[data-go]')];
+ const prev=form.querySelector('[data-cp-prev]'), next=form.querySelector('[data-cp-next]'), result=form.querySelector('.assessment-result');
  try {const draft=JSON.parse(localStorage.getItem(draftKey));if(draft){form.elements.response.value=draft.response||'';draft.answers?.forEach((v,i)=>{const input=form.querySelector(`[name="mcq${i}"][value="${v}"]`);if(input)input.checked=true;});}}catch{}
  const answers=()=>lesson.mcqs.map((_,i)=>form.querySelector(`[name="mcq${i}"]:checked`)?.value??null);
- form.addEventListener('input',()=>{try{localStorage.setItem(draftKey,JSON.stringify({response:form.elements.response.value,answers:answers()}));form.querySelector('.draft-status').textContent='Draft saved on this device.';}catch{form.querySelector('.draft-status').textContent='Draft could not be saved on this device.';}});
+ let at=0;
+ const update=()=>{
+  const picked=answers(), done=picked.filter(v=>v!==null).length+(form.elements.response.value.trim().length>=80?1:0);
+  form.querySelector('.cp-count').textContent=at<n?`Question ${at+1} of ${n}`:'Written response';
+  form.querySelector('.cp-answered').textContent=`${done} of ${n+1} answered`;
+  form.querySelector('.cp-bar span').style.width=(100*done/(n+1))+'%';
+  dots.forEach((d,i)=>{d.classList.toggle('on',i===at);d.toggleAttribute('aria-current',i===at);d.classList.toggle('answered',i<n?picked[i]!==null:form.elements.response.value.trim().length>=80);});
+  prev.disabled=at===0;
+  next.hidden=at===n;
+  next.textContent=at===n-1?'Written response →':'Next →';
+ };
+ const show=(i,focus=true)=>{
+  if(i<0||i>n||i===at)return;
+  const dir=i>at?1:-1;
+  slides[at].hidden=true;at=i;slides[at].hidden=false;
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)slides[at].animate([{opacity:0,transform:`translateX(${dir*32}px)`},{opacity:1,transform:'none'}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'});
+  update();
+  if(focus)(at===n?form.elements.response:slides[at]).focus({preventScroll:true});
+  const top=form.getBoundingClientRect().top;
+  if(top<0)form.scrollIntoView({behavior:'smooth',block:'start'});
+ };
+ prev.addEventListener('click',()=>show(at-1));
+ next.addEventListener('click',()=>show(at+1));
+ dots.forEach(d=>d.addEventListener('click',()=>show(Number(d.dataset.go))));
+ update();
+ form.addEventListener('input',()=>{update();try{localStorage.setItem(draftKey,JSON.stringify({response:form.elements.response.value,answers:answers()}));form.querySelector('.draft-status').textContent='Draft saved on this device.';}catch{form.querySelector('.draft-status').textContent='Draft could not be saved on this device.';}});
  form.addEventListener('submit',async ev=>{
   ev.preventDefault();ev.stopPropagation();
-  const result=form.querySelector('.assessment-result'), button=form.querySelector('[type="submit"]');
+  const button=form.querySelector('[type="submit"]');
   const input={answers:answers().map(v=>v===null?-1:Number(v)),response:form.elements.response.value};
-  if(input.answers.includes(-1)||input.response.trim().length<80){result.textContent='Answer every question and write at least 80 characters before submitting.';return;}
+  const blank=input.answers.map((v,i)=>v===-1?i+1:0).filter(Boolean);
+  dots.forEach((d,i)=>d.classList.toggle('missing',i<n&&input.answers[i]===-1));
+  if(blank.length){result.textContent=`Answer every question before submitting. Still blank: ${blank.join(', ')}. Select a number above to jump to it.`;return;}
+  if(input.response.trim().length<80){result.textContent='Write at least 80 characters before submitting.';form.elements.response.focus();return;}
   button.disabled=true;result.textContent='Checking your answers and grading your response…';
   try{
    const r=await api('POST',form.dataset.checkpoint,input);
-   r.mcqs.forEach((q,i)=>{form.querySelector(`[data-feedback="${i}"]`).textContent=(q.correct?'Correct. ':'Not quite. ')+q.explanation;});
-   result.innerHTML='<strong>Checkpoint accuracy: '+r.accuracy+'%</strong><p>Multiple choice: '+r.mcqCorrect+' of '+r.mcqTotal+' correct.'+(r.grade?' Written response: '+r.grade.score+'%.':'')+'</p>'+(r.grade?'<p>'+e(r.grade.feedback)+'</p><ul>'+r.grade.criteria.map(c=>'<li><strong>'+e(c.label)+' ('+c.score+'/2)</strong><br>'+e(c.feedback)+'</li>').join('')+'</ul>'+(r.grade.safetyConcern?'<p>Review the safety concern with your instructor.</p>':''):'<p>'+e(r.gradingError||'Your written response was saved but could not be graded yet.')+'</p>')+'<p class="subtle">'+(r.recorded?'Saved. You can revise and resubmit; every attempt is recorded.':'Teacher preview: this attempt was graded but not saved.')+'</p>';
+   r.mcqs.forEach((q,i)=>{form.querySelector(`[data-feedback="${i}"]`).textContent=(q.correct?'Correct. ':'Not quite. ')+q.explanation;form.querySelector(`[data-feedback="${i}"]`).dataset.state=q.correct?'good':'bad';dots[i].dataset.state=q.correct?'good':'bad';});
+   result.innerHTML='<strong>Checkpoint accuracy: '+r.accuracy+'%</strong><p>Multiple choice: '+r.mcqCorrect+' of '+r.mcqTotal+' correct. Select any question number above to review its explanation.'+(r.grade?' Written response: '+r.grade.score+'%.':'')+'</p>'+(r.grade?'<p>'+e(r.grade.feedback)+'</p><ul>'+r.grade.criteria.map(c=>'<li><strong>'+e(c.label)+' ('+c.score+'/2)</strong><br>'+e(c.feedback)+'</li>').join('')+'</ul>'+(r.grade.safetyConcern?'<p>Review the safety concern with your instructor.</p>':''):'<p>'+e(r.gradingError||'Your written response was saved but could not be graded yet.')+'</p>')+'<p class="subtle">'+(r.recorded?'Saved. You can revise and resubmit; every attempt is recorded.':'Teacher preview: this attempt was graded but not saved.')+'</p>';
    try{localStorage.removeItem(draftKey);}catch{}
    button.textContent='Resubmit checkpoint →';
    onSubmitted?.(r);

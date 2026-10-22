@@ -43,7 +43,7 @@ test('input is validated and lesson context is resolved on the server', () => {
   assert.equal(turn.lesson.id, 'guidelines');
 });
 
-test('askHal sends the lesson to Gemini with the key in a header, and fails closed', async () => {
+test('askHal sends the lesson to the AI provider with the key in a header, and fails closed', async () => {
   let sent;
   const fetcher = async (url, init) => {
     sent = {url, init, body: JSON.parse(init.body)};
@@ -68,7 +68,7 @@ test('the rate limiter blocks after the limit within the window', () => {
   assert.ok(allowHalMessage(log, 'a', 1000 + 11 * 60_000, 3));
 });
 
-test('Mr. DNA has distinct excited frames and Gemini can celebrate a breakthrough', () => {
+test('Mr. DNA has distinct excited frames and Valus AI can celebrate a breakthrough', () => {
   assert.ok(HAL_ACTIONS.includes('excited'));
   assert.notEqual(halSVG({action: 'excited', seconds: 0}), halSVG({action: 'excited', seconds: 0.5}));
   assert.equal(settleHalReply({reply: 'Great!', mood: 'excited', verdict: 'correct', askedWhy: false}, {pendingWhy: true, missedWhys: 0}).mood, 'excited');

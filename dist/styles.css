@@ -2,11 +2,21 @@
    Soft Gen X club: porcelain + graphite neutrals, one signal red, frosted materials,
    transit-signage labels, hairline structure, generous negative space. */
 
+@font-face {
+  font-family: Manrope;
+  src: url('assets/fonts/Manrope-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
 :root {
-  --font-display: 'Geist', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-body: 'Geist', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-  --font-button: var(--font-mono);
+  --font-display: Manrope, 'Segoe UI', sans-serif;
+  --font-body: Manrope, 'Segoe UI', sans-serif;
+  --font-editorial: Georgia, 'Times New Roman', serif;
+  --font-accent: 'Valus Rounded', Manrope, sans-serif;
+  --font-mono: Consolas, 'SFMono-Regular', ui-monospace, monospace;
+  --font-button: var(--font-body);
   --font-tech: var(--font-display);
 
   --bg: #f3f3f1;

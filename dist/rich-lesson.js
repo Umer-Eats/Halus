@@ -13,7 +13,7 @@ function block(b) {
     case 'callout': return `<aside class="lesson-callout ${e(b.kind || 'remember')}"><strong>${e(b.title || CALLOUT[b.kind] || 'Note')}</strong><p>${inline(b.text)}</p></aside>`;
     case 'check': return `<form class="quick-check" data-quick="${b.answer}"><span class="eyebrow">Quick check</span><p class="qc-q">${inline(b.q)}</p>${b.options.map((o, i) => `<label class="mcq-option"><input type="radio" name="qc" value="${i}"><span>${inline(o)}</span></label>`).join('')}<div class="qc-foot"><button type="submit" class="button secondary">Check</button><p class="qc-why" aria-live="polite" data-why="${e(b.why)}"></p></div></form>`;
     case 'example': return `<section class="worked" data-worked><span class="eyebrow">Worked example</span><h4>${inline(b.title || 'Try it')}</h4><p>${inline(b.prompt)}</p><ol class="worked-steps">${b.steps.map(s => `<li hidden>${inline(s)}</li>`).join('')}</ol>${b.answer ? `<p class="worked-answer" hidden><strong>Answer:</strong> ${inline(b.answer)}</p>` : ''}<button type="button" class="button secondary" data-next-step>Show the first step</button></section>`;
-    case 'fig': { const f = FIGURES[b.file]; if (!f) return ''; return `<figure class="lesson-media"><img src="${e(f.url)}" alt="${e(b.alt)}" loading="lazy" referrerpolicy="no-referrer"${f.width ? ` width="${f.width}" height="${f.height}"` : ''}><figcaption>${inline(b.caption)} <span class="credit">Image: ${e(f.credit)} · <a href="${e(f.source)}" target="_blank" rel="noreferrer">${e(f.license)} ↗</a></span></figcaption></figure>`; }
+    case 'fig': { const f = FIGURES[b.file]; if (!f) return ''; return `<figure class="lesson-media lesson-fig"><button type="button" class="fig-zoom" data-zoom aria-label="Enlarge figure: ${e(b.alt)}"><img src="${e(f.url)}" alt="${e(b.alt)}" loading="lazy" referrerpolicy="no-referrer"${f.width ? ` style="aspect-ratio:${f.width}/${f.height}"` : ''}></button><figcaption>${inline(b.caption)}<span class="credit">Image: ${e(f.credit)} · <a href="${e(f.source)}" target="_blank" rel="noreferrer">Source ↗</a> · <a href="${e(f.licenseUrl || f.source)}" target="_blank" rel="noreferrer">${e(f.license)}</a></span></figcaption></figure>`; }
     case 'w': return renderWidget(b);
     default: return '';
   }
@@ -32,6 +32,16 @@ export function richLessonBody(lesson) {
 /** Wire up quick checks, worked examples, the table of contents and activities. */
 export function mountRichLesson(root) {
   mountWidgets(root);
+  root.querySelectorAll('.lesson-fig img').forEach(img => img.addEventListener('error', () => { img.closest('.lesson-fig').hidden = true; }, {once: true}));
+  root.querySelectorAll('[data-zoom]').forEach(button => button.addEventListener('click', () => {
+    const img = button.querySelector('img'), dialog = document.createElement('dialog');
+    dialog.className = 'fig-viewer';
+    dialog.innerHTML = `<img src="${e(img.src)}" alt="${e(img.alt)}" referrerpolicy="no-referrer"><button type="button" class="icon-button" aria-label="Close">✕</button>`;
+    document.body.append(dialog);
+    dialog.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => dialog.remove());
+    dialog.showModal();
+  }));
   root.querySelectorAll('[data-quick]').forEach(form => form.addEventListener('submit', ev => {
     ev.preventDefault(); ev.stopPropagation();
     const pickd = form.querySelector('input:checked'), why = form.querySelector('.qc-why');

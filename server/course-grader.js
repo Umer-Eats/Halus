@@ -5,8 +5,8 @@ const instruction = `You grade educational HOSA lesson free-response answers aga
 
 export async function gradeCourseFRQ(lesson, response, config={}) {
  const apiKey=config.apiKey, model=config.model;
- if(!apiKey?.trim())throw new AppError(503,'Written-response grading is not connected yet. Your draft is saved; ask your instructor to configure Gemini.');
- if(!model||!/^gemini-[a-zA-Z0-9.-]+$/.test(model))throw new AppError(503,'Written-response grading needs a valid Gemini model configured by your instructor.');
+ if(!apiKey?.trim())throw new AppError(503,'Written-response grading is not connected yet. Your draft is saved; ask your instructor to finish setting up Valus AI grading.');
+ if(!model||!/^gemini-[a-zA-Z0-9.-]+$/.test(model))throw new AppError(503,'Written-response grading needs a valid AI model configured by your instructor.');
  const schema={type:'object',properties:{criteria:{type:'array',items:{type:'object',properties:{score:{type:'integer',minimum:0,maximum:2},feedback:{type:'string'}},required:['score','feedback'],additionalProperties:false}},feedback:{type:'string'},safetyConcern:{type:'boolean'}},required:['criteria','feedback','safetyConcern'],additionalProperties:false};
  try{
   const res=await (config.fetcher||fetch)(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},signal:AbortSignal.timeout(25000),body:JSON.stringify({systemInstruction:{parts:[{text:instruction}]},contents:[{role:'user',parts:[{text:JSON.stringify({lesson:{title:lesson.title,notes:lessonText(lesson)},question:lesson.frq.prompt,rubric:lesson.frq.rubric.map(r=>r.label),modelAnswer:lesson.frq.modelAnswer,studentResponse:response})}]}],generationConfig:{temperature:0,maxOutputTokens:4096,responseMimeType:'application/json',responseJsonSchema:schema}})});
@@ -17,5 +17,5 @@ export async function gradeCourseFRQ(lesson, response, config={}) {
   if(!raw||typeof raw.feedback!=='string'||!raw.feedback.trim()||raw.feedback.length>2000||typeof raw.safetyConcern!=='boolean'||!Array.isArray(raw.criteria)||raw.criteria.length!==lesson.frq.rubric.length||raw.criteria.some(c=>!Number.isInteger(c.score)||c.score<0||c.score>2||typeof c.feedback!=='string'||!c.feedback.trim()||c.feedback.length>1200))throw Error('Invalid grade');
   const points=raw.criteria.reduce((sum,c)=>sum+c.score,0),maximum=raw.criteria.length*2,score=Math.round(points/maximum*100);
   return {score,points,maximum,passed:score>=80&&!raw.safetyConcern,feedback:raw.feedback,safetyConcern:raw.safetyConcern,criteria:raw.criteria.map((c,i)=>({...c,label:lesson.frq.rubric[i].label})),model};
- }catch{throw new AppError(503,'Gemini could not grade this response right now. Your lesson remains incomplete and your draft is saved. Please retry later.');}
+ }catch{throw new AppError(503,'Valus AI could not grade this response right now. Your lesson remains incomplete and your draft is saved. Please retry later.');}
 }
