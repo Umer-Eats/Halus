@@ -1,11 +1,14 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { EVENTS, LESSONS } from '../dist/model.js';
-import {findCourseLesson, assessLesson} from '../dist/courses.js';
+import {findCourseLesson, assessLesson, loadAllCourses} from '../dist/courses.js';
 import {gradeCourseFRQ} from './course-grader.js';
 import { COMMUNITIES, equalSecret, findCommunity, passwordFor, publicCommunities } from './communities.js';
 import { ensureSchema, one, rows } from './db.js';
 import { allowHalMessage, askHal } from './hal.js';
 import { AppError, failure, readBody, send, text } from './http.js';
+
+// The server grades and assigns every course, so it loads the in-depth ones up front.
+await loadAllCourses({view: false});
 
 const EVENT_NAMES = new Set(EVENTS.map((e) => e.name));
 const LESSON_IDS = new Set(LESSONS.map((l) => l.id));

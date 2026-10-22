@@ -8,7 +8,12 @@ import { createApp } from '../server/app.js';
 import { AppError } from '../server/http.js';
 import { loadCommunities } from '../server/communities.js';
 import { createDb } from '../server/db.js';
-import { COURSES, courseLessons } from '../dist/courses.js';
+import { COURSES, courseLessons, loadAllCourses } from '../dist/courses.js';
+import { RICH_COURSES } from '../dist/rich/index.js';
+import { widgetKinds } from '../dist/lesson-widgets.js';
+import { DIAGRAMS } from '../dist/lesson-diagrams.js';
+
+await loadAllCourses({ view: false });
 import { coursePage } from '../dist/course-workspace.js';
 
 const communities = loadCommunities([{ id: 'ppchs', name: 'Pines', studentPassword: { env: 'S' }, instructorPassword: { env: 'T' } }]);
@@ -20,7 +25,7 @@ const verifyToken = async (token) => {
 // The grader is swapped per test: a fixed score, or an outage.
 let grader = async () => ({ score: 50, points: 3, maximum: 6, passed: false, feedback: 'Add reasoning.', safetyConcern: false, criteria: [] });
 
-const lessons = courseLessons('Pharmacology'), [first, second] = lessons;
+const lessons = courseLessons('Nutrition'), [first, second] = lessons;
 let dir, server, base;
 before(async () => {
   dir = mkdtempSync(path.join(tmpdir(), 'valus-course-'));
@@ -30,8 +35,8 @@ before(async () => {
   base = `http://127.0.0.1:${server.address().port}/api`;
   for (const [as, role, password] of [['ana', 'student', 'student-pass'], ['ben', 'student', 'student-pass'], ['teach', 'instructor', 'teacher-pass']])
     await call('POST', '/auth/register', { as, body: { role, communityId: 'ppchs', password } });
-  await call('PUT', '/me/event', { as: 'ana', body: { event: 'Pharmacology' } });
-  await call('PUT', '/me/event', { as: 'ben', body: { event: 'Nutrition' } });
+  await call('PUT', '/me/event', { as: 'ana', body: { event: 'Nutrition' } });
+  await call('PUT', '/me/event', { as: 'ben', body: { event: 'Medical Terminology' } });
 });
 after(() => { server.close(); try { rmSync(dir, { recursive: true, force: true }); } catch {} });
 
@@ -52,13 +57,13 @@ test('students move on to any lesson without a checkpoint', async () => {
 });
 
 test('every lesson shows an optional checkpoint; teachers also get the answer key and assign button', () => {
-  const student = coursePage('Pharmacology', first.id, { completed: [] }, false);
+  const student = coursePage('Nutrition', first.id, { completed: [] }, false);
   assert.match(student, new RegExp(`data-checkpoint="/courses/lessons/${first.id}/checkpoint"`));
   assert.match(student, /name="mcq0"/);
   assert.match(student, /data-course-complete/, 'moving on never needs the checkpoint');
   assert.doesNotMatch(student, /Show answer key|assign-checkpoint/);
-  assert.doesNotMatch(coursePage('Pharmacology', '', { completed: [] }, false), /Locked/);
-  const teacher = coursePage('Pharmacology', first.id, {}, true);
+  assert.doesNotMatch(coursePage('Nutrition', '', { completed: [] }, false), /Locked/);
+  const teacher = coursePage('Nutrition', first.id, {}, true);
   assert.match(teacher, /data-action="assign-checkpoint"/);
   assert.match(teacher, /Show answer key/);
 });
@@ -91,7 +96,7 @@ test('teachers assign a lesson checkpoint and every attempt records accuracy', a
   assert.equal(made.status, 201);
   const a = made.data.assignment;
   assert.equal(a.lessonId, first.id);
-  assert.equal(a.event, 'Pharmacology', 'audience follows the lesson');
+  assert.equal(a.event, 'Nutrition', 'audience follows the lesson');
   assert.ok(!(await call('GET', '/assignments', { as: 'ben' })).data.assignments.some((x) => x.id === a.id));
   assert.equal((await call('POST', `/assignments/${a.id}/checkpoint`, { as: 'ben', body: { answers: answers(first), response } })).status, 404);
   assert.equal((await call('PUT', `/assignments/${a.id}/submission`, { as: 'ana', body: { body: 'text only' } })).status, 400);
@@ -134,4 +139,29 @@ test('every course lesson has a gradable checkpoint for teachers to assign', () 
   }
   const ids = Object.keys(COURSES).flatMap(courseLessons).map((l) => l.id);
   assert.equal(new Set(ids).size, ids.length, 'lesson ids are unique');
+});
+
+test('in-depth courses are complete, well-formed and only use known activities and diagrams', () => {
+  const kinds = new Set(widgetKinds());
+  for (const name of Object.keys(RICH_COURSES)) {
+    const course = COURSES[name];
+    assert.ok(course?.rich, name + ' loaded');
+    for (const l of courseLessons(name)) {
+      assert.ok(l.sections.length >= 4, l.id + ' has depth');
+      assert.ok(l.mcqs.length >= 8, l.id + ' has a full checkpoint');
+      assert.equal(new Set(l.mcqs.map(q => q.prompt)).size, l.mcqs.length, l.id + ' has no duplicate questions');
+      for (const q of l.mcqs) assert.equal(new Set(q.options).size, q.options.length, l.id + ' options are distinct: ' + q.prompt);
+      assert.ok(l.frq.rubric.length >= 3 && l.frq.modelAnswer.length > 200, l.id + ' FRQ');
+      assert.ok(l.sources.length >= 2 && l.sources.every(s => s.url.startsWith('https://')), l.id + ' sources');
+      const blocks = l.sections.flatMap(s => s.blocks);
+      assert.ok(blocks.some(b => b.t === 'w'), l.id + ' is interactive');
+      for (const b of blocks.filter(b => b.t === 'w')) {
+        assert.ok(kinds.has(b.kind), l.id + ' unknown activity ' + b.kind);
+        if (b.diagram) { assert.ok(DIAGRAMS[b.diagram], l.id + ' unknown diagram ' + b.diagram); for (const [id] of b.parts || []) assert.match(DIAGRAMS[b.diagram], new RegExp('data-part="' + id + '"'), l.id + ' part ' + id); }
+        if (b.kind === 'sort') for (const [, i] of b.items) assert.ok(i < b.buckets.length, l.id + ' sort bucket');
+        if (b.kind === 'case') for (const n of Object.values(b.nodes)) for (const c of n.choices || []) assert.ok(b.nodes[c[1]], l.id + ' case link ' + c[1]);
+      }
+      for (const b of blocks.filter(b => b.t === 'check')) assert.ok(b.options[b.answer] && b.why, l.id + ' quick check');
+    }
+  }
 });

@@ -1,7 +1,7 @@
 import {EVENTS,GROUPS,RANKS,LESSONS} from './model.js';
 import {catalogCards,catalogToolbar,eventHref,parseEventRoute,eventWorkspace} from './event-workspace.js';
 import {mountCourse,checkpointForm,mountCheckpoint} from './course-workspace.js';
-import {COURSES,courseLessons,findCourseLesson} from './courses.js';
+import {COURSES,courseLessons,findCourseLesson,courseReady,contentReady,loadCourse,loadAllCourses} from './courses.js';
 import {initLanding} from './landing.js';
 import {cellularAtlas} from './cellular.js';
 import {mountHal} from './hal.js';
@@ -49,7 +49,7 @@ const loaders={
  courseProgress:()=>api('GET','/courses/progress'),
  rankings:()=>api('GET','/rankings').then(d=>d.students),
  progress:()=>api('GET','/progress'),
- assignments:()=>api('GET','/assignments').then(d=>d.assignments),
+ assignments:()=>api('GET','/assignments').then(async d=>{if(d.assignments.some(a=>a.lessonId))await loadAllCourses({view:false});return d.assignments;}),
  posts:()=>api('GET','/posts').then(d=>d.posts),
  students:()=>api('GET','/students').then(d=>d.students),
 };
@@ -179,7 +179,7 @@ function assignmentRows(limit=99){if(cache.assignments===null)return failed('ass
  return list.length?'<div class="assignment-list">'+list.map(a=>'<button class="assignment-row" data-action="assignment" data-id="'+esc(a.id)+'"><span class="row-icon '+(a.submitted?'done':'')+'">'+icon(a.submitted?'check':'list')+'</span><span><strong>'+esc(a.title)+'</strong><small>'+esc(a.type)+' · '+esc(a.lessonId&&findCourseLesson(a.lessonId)?.lesson.title||a.event||'Whole chapter')+'</small></span><span class="row-end">'+(teacher?'<span class="status">'+a.submissionCount+' submitted</span>':'<span class="'+(a.submitted?'status':'due')+'">'+(a.submitted?'Submitted':'Due '+date(a.due))+'</span>')+icon('chevron')+'</span></button>').join('')+'</div>':'<div class="empty">'+icon('check')+'<h3>All clear for now.</h3><p>'+(teacher?'Create an assignment to give your chapter a next step.':'No assignments in this view.')+'</p></div>';}
 function sparkChart(history){if(!history.length)return '<div class="chart-empty"><div class="ghost-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p>Your progress starts with your first practice.</p>'+(isInstructor()?'':'<a class="editorial-link" href="#/my-event">Try a practice check '+icon('arrow')+'</a>')+'</div>';return '<div class="history-bars">'+history.slice(-7).map((q,i)=>'<div><span>'+q.score+'%</span><i style="height:'+Math.max(6,q.score)+'px"></i><small>Try '+(i+1)+'</small></div>').join('')+'</div>';}
 const firstName=()=>esc(String(me().displayName).split(/\s+/)[0]);
-function overview(){if(!need('progress','assignments','posts','courseProgress'))return loading();const p=cache.progress||{completed:[],progress:0,quizHistory:[]};const next=LESSONS.find(l=>!p.completed.includes(l.id))||LESSONS[0];const latest=cache.posts?.[0]; const eventLessons=courseLessons(me().event), courseDone=eventLessons.filter(l=>cache.courseProgress?.completed.includes(l.id)).length, coursePercent=eventLessons.length?Math.round(courseDone/eventLessons.length*100):0, courseNext=eventLessons.find(l=>!cache.courseProgress?.completed.includes(l.id))||eventLessons[0];
+function overview(){if(!need('progress','assignments','posts','courseProgress'))return loading();if(!contentReady(me().event)){loadCourse(me().event,{view:false}).then(render,()=>{});return loading();}const p=cache.progress||{completed:[],progress:0,quizHistory:[]};const next=LESSONS.find(l=>!p.completed.includes(l.id))||LESSONS[0];const latest=cache.posts?.[0]; const eventLessons=courseLessons(me().event), courseDone=eventLessons.filter(l=>cache.courseProgress?.completed.includes(l.id)).length, coursePercent=eventLessons.length?Math.round(courseDone/eventLessons.length*100):0, courseNext=eventLessons.find(l=>!cache.courseProgress?.completed.includes(l.id))||eventLessons[0];
  const eventPanel=me().event?'<div class="event-heading"><div><span class="eyebrow">'+esc(event()?.category||'YOUR ANNUAL EVENT')+'</span><h2>'+esc(me().event)+'</h2><span class="subtle">'+icon('lock')+' Your event for 2026–27</span></div><a class="round-link" href="#/my-event" aria-label="Open my event">'+icon('arrow')+'</a></div>':'<div class="event-heading"><div><span class="eyebrow">YOUR ANNUAL EVENT</span><h2>Choose your event</h2><span class="subtle">Pick the one event you will compete in this year.</span></div><a class="round-link" href="#/my-event" aria-label="Choose your event">'+icon('arrow')+'</a></div>';
  return heading('YOUR DAILY DOSE OF PROGRESS','Good to see you, '+firstName()+'.','A little focus today. A little more confidence tomorrow.')+
  '<div class="dashboard-grid"><section class="panel event-hero">'+eventPanel+(eventLessons.length?'<div class="event-progress"><div><span class="micro">YOUR EVENT LEARNING PATH</span><p>'+courseDone+' of '+eventLessons.length+' lessons completed</p>'+progressBar(coursePercent)+'</div>'+ring(coursePercent)+'</div><div class="continue-strip"><div>'+icon('book')+'<span><small>YOUR NEXT LESSON</small><strong>'+esc(courseNext.title)+'</strong></span></div><a class="button" href="'+eventHref(me().event,'lessons')+'/'+encodeURIComponent(courseNext.id)+'">Continue</a></div>':'<div class="event-progress"><div><span class="micro">ORIENTATION PATH</span><p>'+p.completed.length+' of '+LESSONS.length+' starter lessons completed</p>'+progressBar(p.progress)+'</div>'+ring(p.progress)+'</div><div class="continue-strip"><div>'+icon('book')+'<span><small>YOUR NEXT STEP</small><strong>'+next.title+'</strong></span></div>'+button('Continue','lesson','data-id="'+next.id+'"')+'</div>')+'</section>'+
@@ -226,6 +226,8 @@ function renderRoute(route){
   document.body.classList.add('in-workspace');
   if(!detail){app.innerHTML=shell(heading('EVENT NOT FOUND','Let’s find your event.','This event link is unavailable.',linkButton('Browse events',isInstructor()?'#/events':'#/my-event')),'event');return;}
   document.title='Valus | '+detail.event.name;
+  // In-depth courses load on first visit; show a loading state until the lesson content arrives.
+  if(detail.tool==='lessons'&&!courseReady(detail.event.name)){app.innerHTML=loading();loadCourse(detail.event.name).then(render,()=>{app.innerHTML='<main id="main" class="auth-page"><div class="empty"><h3>This course could not load.</h3><p>Check your connection and reload the page.</p></div></main>';});return;}
   if(detail.tool==='lessons'&&!isInstructor()){
    if(!need('courseProgress')){app.innerHTML=loading();return;}
    if(errors.courseProgress){app.innerHTML=failed('courseProgress');return;}
@@ -316,8 +318,8 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-action]')
  if(action==='ask-hal'){modal.close();window.dispatchEvent(new CustomEvent('hal:ask',{detail:{lessonId:el.dataset.id}}));return;}
  if(action==='complete-lesson'){el.disabled=true;run(async()=>{await api('PUT','/progress/lessons/'+encodeURIComponent(el.dataset.id));modal.close();refresh('progress');toast('Lesson complete. One small step forward.');});return;}
  if(action==='assignment'){assignmentModal(el.dataset.id);return;}
- if(action==='create-assignment'){createAssignmentModal();return;}
- if(action==='assign-checkpoint'){createAssignmentModal(el.dataset.lesson);return;}
+ if(action==='create-assignment'||action==='assign-checkpoint'){const lesson=action==='assign-checkpoint'?el.dataset.lesson:undefined;loadAllCourses({view:false}).then(()=>createAssignmentModal(lesson),()=>toast('Courses could not load. Check your connection.'));return;}
+
  if(action==='delete-assignment'){confirmModal('Delete this assignment?','Students will no longer see it, and every response to it is removed.','confirm-delete-assignment','data-id="'+esc(el.dataset.id)+'"','Delete');return;}
  if(action==='confirm-delete-assignment'){el.disabled=true;run(async()=>{await api('DELETE','/assignments/'+encodeURIComponent(el.dataset.id));modal.close();refresh('assignments');toast('Assignment deleted.');});return;}
  if(action==='filter-assignment'){assignmentFilter=el.dataset.value;render();return;}

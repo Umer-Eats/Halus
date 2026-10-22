@@ -4,19 +4,6 @@ import { LESSON_MEDIA } from './lesson-media.js';
 // cycle through an event's gallery: a clinical image is not decorative filler.
 // Each rule pairs a taught concept with figure metadata reviewed for that concept.
 const RULES = {
-  'Behavioral Health': [
-    [/neuron|perception|synap|neural|nervous system/i, /prototypical neuron|synapse|resting potential/i],
-    [/memory|encoding|retrieval|learning/i, /encoding involves|atkinson|encode information/i]
-  ],
-  'Biomedical Equipment Technician': [
-    [/patient monitor|cardiac|electrocardio|\bECG\b/i, /conduction system|cardiac conduction/i],
-    [/respirat|ventilat|breathing/i, /boyle|intrapulmonary|inspiration and expiration/i]
-  ],
-  'Dental Terminology': [
-    [/oral anatomy|oral structures|mouth|dentition|tooth anatomy|dental anatomy/i, /mouth|tongue|salivary glands/i],
-    [/saliva|salivary/i, /salivary glands/i],
-    [/tongue|lingual/i, /tongue/i]
-  ],
   'Health Informatics': [
     [/sampling|sample selection|selection bias/i, /data sampling/i],
     [/histogram|distribution|visualiz|frequency|time series|data display/i, /histograms frequency/i]
@@ -50,15 +37,6 @@ const RULES = {
   'Nutrition': [
     [/metaboli|energy|\bATP\b|macronutrient/i, /structure of ATP|sources of ATP/i],
     [/digesti|absorption|peristalsis/i, /peristalsis|digestive processes/i]
-  ],
-  'Pathophysiology': [
-    [/innate|adaptive|immun|inflamm|infection/i, /innate|complement cascade|barrier defenses/i],
-    [/homeostasis|feedback|compensation/i, /negative feedback/i],
-    [/positive feedback|childbirth/i, /positive feedback/i]
-  ],
-  'Pharmacology': [
-    [/absorption|membrane|pharmacokinetics|lipid.solub/i, /phospholipid|cell membrane/i],
-    [/hormone|endocrine|receptor|pharmacodynamics/i, /binding of.*hormones/i]
   ],
   'World Health & Disparities': [
     [/sampling|sample selection|representative sample|selection bias/i, /data sampling/i],
