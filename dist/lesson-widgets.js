@@ -3,6 +3,7 @@
 import {DIAGRAMS} from './lesson-diagrams.js';
 import {SIMS} from './lesson-sims.js';
 import {SUBJECT_LABS} from './lesson-labs.js';
+import {SCIENCE_LABS} from './lesson-science-labs.js';
 import {dragify, snapshot, glide, under} from './lesson-drag.js';
 
 export const e = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -284,7 +285,7 @@ const wordbuild = {
   },
 };
 
-const W = {label, sort, match, order, flip, stepper, case: scenario, wordbuild, ...SIMS, ...SUBJECT_LABS};
+const W = {label, sort, match, order, flip, stepper, case: scenario, wordbuild, ...SIMS, ...SUBJECT_LABS, ...SCIENCE_LABS};
 
 let seq = 0;
 const CONFIG = new Map();

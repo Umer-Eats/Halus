@@ -487,15 +487,10 @@ async function runCheckpoint(ctx, user, lesson, assignmentId) {
     throw new AppError(429, 'You have submitted several checkpoints. Please wait a few minutes before trying again.');
   const response = ctx.body.response.trim();
   const mcqCorrect = check.mcqs.filter((q) => q.correct).length, mcqTotal = check.mcqs.length;
-  // If Valus AI grading is down the MCQ accuracy is still recorded; the written response stays ungraded.
-  let grade = null, gradingError = null;
-  try {
-    grade = await ctx.gradeFRQ(lesson, response, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_GRADING_MODEL || ctx.env.GEMINI_MODEL });
-  } catch (error) {
-    gradingError = error instanceof AppError ? error.message : 'The written response could not be graded right now.';
-  }
-  const frqScore = grade ? grade.score : null, accuracy = accuracyOf(mcqCorrect, mcqTotal, frqScore);
-  const result = { accuracy, mcqCorrect, mcqTotal, frqScore, grade, gradingError, mcqs: check.mcqs, recorded: user.role === 'student' };
+  // A checkpoint is only submitted after its written response has a rubric grade.
+  const grade = await ctx.gradeFRQ(lesson, response, { apiKey: ctx.env.GEMINI_API_KEY, model: ctx.env.GEMINI_GRADING_MODEL || ctx.env.GEMINI_MODEL || 'gemini-3.5-flash-lite' });
+  const frqScore = grade.score, accuracy = accuracyOf(mcqCorrect, mcqTotal, frqScore);
+  const result = { accuracy, mcqCorrect, mcqTotal, frqScore, grade, mcqs: check.mcqs, recorded: user.role === 'student' };
   if (user.role !== 'student') return result;
   await ctx.db.batch([
     {

@@ -10,4 +10,9 @@ export const RICH_COURSES = {
   'Health Informatics': () => import('./health-informatics.js'),
   'Nutrition': () => import('./nutrition.js'),
   'Healthcare Administration': () => import('./healthcare-administration.js'),
+  'Medical Law & Ethics': () => import('./medical-law-ethics.js'),
+  'Medical Math': () => import('./medical-math.js'),
+  'Medical Reading': () => import('./medical-reading.js'),
+  'Medical Spelling': () => import('./medical-spelling.js'),
+  'World Health & Disparities': () => import('./world-health-disparities.js'),
 };

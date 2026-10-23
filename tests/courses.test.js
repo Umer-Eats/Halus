@@ -109,22 +109,20 @@ test('teachers assign a lesson checkpoint and every attempt records accuracy', a
   assert.equal(one.status, 200);
   assert.deepEqual([one.data.mcqCorrect, one.data.mcqTotal, one.data.frqScore, one.data.accuracy], [first.mcqs.length / 2, first.mcqs.length, 50, 50]);
 
-  // Grader outage still records MCQ accuracy.
+  // A grader outage must not record a checkpoint as submitted or inflate accuracy.
   grader = async () => { throw new AppError(503, 'Valus AI could not grade this response right now.'); };
   const two = await call('POST', `/assignments/${a.id}/checkpoint`, { as: 'ana', body: { answers: answers(first), response } });
-  assert.equal(two.status, 200);
-  assert.equal(two.data.frqScore, null);
-  assert.equal(two.data.accuracy, 100);
-  assert.match(two.data.gradingError, /could not grade/);
+  assert.equal(two.status, 503);
+  assert.match(two.data.error, /could not grade/);
 
   const subs = (await call('GET', `/assignments/${a.id}/submissions`, { as: 'teach' })).data.submissions;
   assert.equal(subs.length, 1);
-  assert.deepEqual(subs[0].checkpoint, { accuracy: 100, mcqCorrect: first.mcqs.length, mcqTotal: first.mcqs.length, frqScore: null, attempts: 2 });
+  assert.deepEqual(subs[0].checkpoint, { accuracy: 50, mcqCorrect: first.mcqs.length / 2, mcqTotal: first.mcqs.length, frqScore: 50, attempts: 1 });
   assert.equal((await call('GET', '/assignments', { as: 'ana' })).data.assignments.find((x) => x.id === a.id).submitted, true);
-  assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.accuracy[first.id], { latest: 100, attempts: 2 });
+  assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.accuracy[first.id], { latest: 50, attempts: 1 });
   const ana = (await call('GET', '/students', { as: 'teach' })).data.students.find((s) => s.uid === 'ana');
-  // Average of every attempt: 50 and 100 here, plus 75 and 100 from the in-lesson test.
-  assert.equal(ana.checkpointAccuracy, 81);
+  // Average of graded attempts: 50 here, plus 75 and 100 from the in-lesson test.
+  assert.equal(ana.checkpointAccuracy, 75);
   assert.equal(ana.courseLessonsCompleted, 2);
 
   // Changing the type away from a checkpoint drops its lesson link.
