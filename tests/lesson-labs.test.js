@@ -84,3 +84,60 @@ test('the five Health Science courses completed after Codex keep the same lesson
   assert.ok(first.some(b => b.t === 'callout' && /fictional, not an excerpt/.test(b.text)), lesson.title + ' labels its practice passage');
  }
 });
+
+test('skill labs calculate crosses, chi-square, typing, efficiency, gels, vitals, I&O, codons and Hardy-Weinberg', async () => {
+ const L = await import('../dist/lesson-skill-labs.js');
+ const mono = L.punnettCross('Pp', 'Pp', 'mono');
+ assert.equal(mono.total, 4);
+ assert.equal(mono.geno.PP, 1); assert.equal(mono.geno.Pp, 2); assert.equal(mono.geno.pp, 1);
+ const di = L.punnettCross('YyRr', 'YyRr', 'dihybrid');
+ assert.equal(di.total, 16);
+ assert.deepEqual(Object.values(di.pheno).sort((a, b) => b - a), [9, 3, 3, 1]);
+ const chi = L.chiSquare([290, 110], [3, 1]);
+ assert.deepEqual(chi.expected, [300, 100]);
+ assert.ok(Math.abs(chi.chi - 1.333) < 0.01);
+ assert.equal(chi.df, 1); assert.equal(chi.critical, 3.84); assert.equal(chi.reject, false);
+ assert.equal(L.aboType(true, true, true), 'AB+');
+ assert.equal(L.aboType(false, false, false), 'O−');
+ assert.equal(L.aboType(true, false, true), 'A+');
+ const eff = L.transformationEfficiency(100, 0.8, 100, 250);
+ assert.ok(Math.abs(eff.spreadDna - 0.32) < 1e-9);
+ assert.ok(Math.abs(eff.efficiency - 312.5) < 1e-6);
+ assert.ok(L.bandPosition(500) > L.bandPosition(5000), 'smaller fragments travel farther from the wells');
+ assert.equal(L.vitalInRange('pulse', 112), false);
+ assert.equal(L.vitalInRange('resp', 16), true);
+ assert.equal(L.intakeMl(8, 'oz', 1), 240);
+ assert.equal(L.intakeMl(4, 'oz', 0.5), 60);
+ assert.equal(L.roundUp25(340), 350);
+ assert.equal(L.roundUp25(350), 350);
+ assert.equal(L.transcribe('TACGGATTCACT'), 'AUGCCUAAGUGA');
+ assert.deepEqual(L.translate('AUGCCUAAGUGA'), ['Met', 'Pro', 'Lys', 'Stop']);
+ assert.equal(L.mutationType('TACGGATTCACT', 'TACGGGTTCACT'), 'silent');
+ assert.equal(L.mutationType('TACAAACCGATT', 'TACATACCGATT'), 'missense');
+ assert.equal(L.mutationType('TACCTTGGAACT', 'TACATTGGAACT'), 'nonsense');
+ assert.equal(L.mutationType('TACGCATGGATC', 'TACGCTGGATC'), 'frameshift-deletion');
+ assert.equal(L.mutationType('TACTTCGGCATT', 'TACTTCAGGCATT'), 'frameshift-insertion');
+ const hw = L.hardyWeinberg(0.09);
+ assert.ok(Math.abs(hw.q - 0.3) < 1e-9 && Math.abs(hw.p - 0.7) < 1e-9 && Math.abs(hw.twopq - 0.42) < 1e-9);
+ assert.ok(Math.abs(hw.p2 + hw.twopq + hw.q2 - 1) < 1e-9);
+ for (const kind of ['punnett', 'chisquare', 'gel', 'abotype', 'transformation', 'vitalsreport', 'iolab', 'codonlab', 'hwlab']) assert.ok(widgetKinds().includes(kind), kind);
+});
+
+test('the ten Health Professions courses added after Codex keep the same lesson standard', async () => {
+ await loadAllCourses({view: false});
+ const names = ['Biotechnology', 'Clinical Lab Science (Medical Lab Scientist)', 'Clinical Nursing', 'Clinical Specialty', 'Dental Science', 'Family Medicine Physician', 'Home Health Aide', 'Genetics', 'Medical Assisting', 'Nursing Assisting'];
+ for (const name of names) {
+  const lessons = courseLessons(name);
+  assert.equal(lessons.length, 10, name);
+  for (const lesson of lessons) {
+   assert.equal(lesson.rich, true, name + ' ' + lesson.title);
+   assert.equal(lesson.mcqs.length, 8, lesson.title);
+   assert.ok(lesson.sections.length >= 5, lesson.title);
+   assert.ok(lesson.frq.rubric.length >= 3 && lesson.frq.modelAnswer.length > 200, lesson.title);
+   assert.ok(lesson.sources.filter(s => /^https:\/\//.test(s.url || s[1] || '')).length >= 2, lesson.title);
+   assert.ok(lesson.sections.flatMap(s => s.blocks).filter(b => b.t === 'w').length >= 3, lesson.title);
+   assert.equal(lesson.terms.length, 3, lesson.title);
+   assert.equal(lesson.takeaways.length, 3, lesson.title);
+  }
+ }
+});

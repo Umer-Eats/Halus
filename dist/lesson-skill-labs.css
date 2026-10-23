@@ -1,0 +1,45 @@
+/* Skill laboratories: Punnett squares, chi-square, gel electrophoresis, blood typing, vitals. */
+.skill-lab .lab-prediction{display:grid;gap:8px;margin:18px 0;font-weight:600}
+.skill-lab input[type=number],.skill-lab select{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:14px var(--font-body)}
+.punnett-grid{border-collapse:separate;border-spacing:6px;margin:18px 0}.punnett-grid th{font:700 15px var(--font-body);color:var(--ink);text-transform:none;letter-spacing:0;padding:8px;text-align:center}
+.punnett-grid td{min-width:64px;padding:14px 10px;text-align:center;border-radius:10px;font:700 16px var(--font-body);animation:pq-in .35s ease-out both;animation-delay:var(--d)}
+.punnett-grid td.dom{background:var(--red-soft);color:var(--ink)}.punnett-grid td.rec{background:var(--surface-3);color:var(--ink-2)}
+@keyframes pq-in{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.punnett-ratios p{margin:6px 0}
+.chi-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.chi-table{width:100%;border-collapse:collapse;margin:16px 0;font-variant-numeric:tabular-nums}.chi-table th,.chi-table td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;text-transform:none;letter-spacing:0;font:14px var(--font-body);color:var(--ink)}
+.gel-rig{display:grid;grid-template-columns:1fr;gap:6px;margin:18px 0}.gel-pole{font:600 12px var(--font-body);color:var(--muted)}.gel-pole.pos{color:var(--red-ink)}
+.gel{position:relative;display:flex;gap:10px;height:300px;padding:10px;border-radius:12px;background:linear-gradient(#1d2a3a,#16202c)}
+.gel-lane{position:relative;flex:1;min-width:46px}.gel-lane .well{position:absolute;top:2%;left:15%;width:70%;height:10px;border:2px solid #4c6a8a;border-radius:2px}
+.gel-lane .band{position:absolute;left:15%;width:70%;height:5px;border-radius:3px;background:#ff7ab8;box-shadow:0 0 8px #ff7ab8;transition:top 2.4s cubic-bezier(.3,.6,.3,1)}.gel-lane .band.instant{transition:none}
+.gel-lane small{position:absolute;bottom:-2px;left:0;right:0;text-align:center;color:#cfd9e6;font:600 10.5px/1.2 var(--font-body)}
+.abo-wells{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+.abo-well{display:grid;justify-items:center;gap:6px;padding:14px;border-radius:14px;background:var(--surface-2)}
+.abo-well .drop{position:relative;width:86px;height:86px;border-radius:50%;background:#b3263c;box-shadow:inset 0 -6px 12px rgba(0,0,0,.25)}
+.abo-well.clump .drop{background:#f2d0d6}.abo-well.clump .drop i{position:absolute;width:16px;height:12px;border-radius:40%;background:#8f1d30}
+.abo-well.clump .drop i:nth-child(1){top:18px;left:20px}.abo-well.clump .drop i:nth-child(2){top:30px;left:48px}.abo-well.clump .drop i:nth-child(3){top:52px;left:26px}.abo-well.clump .drop i:nth-child(4){top:56px;left:54px}.abo-well.clump .drop i:nth-child(5){top:38px;left:12px}.abo-well.clump .drop i:nth-child(6){top:14px;left:50px}
+.abo-well small{font-weight:700}.abo-well em{font-size:12px;color:var(--muted)}
+.lab-steps ol{line-height:1.9;padding-left:22px;font-variant-numeric:tabular-nums}
+.vitals-grid{display:grid;gap:10px;margin:16px 0}.vital-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:0;padding:12px 14px;border:1px solid var(--line-strong);border-radius:12px}
+.vital-row legend{float:left;margin-right:auto;font-weight:500}.vital-row label{display:flex;gap:6px;align-items:center}.vital-row[data-state=good]{border-color:var(--good)}.vital-row[data-state=bad]{border-color:var(--red)}
+.vital-mark{font-size:13px;font-weight:600}
+@media(max-width:600px){.abo-wells{grid-template-columns:1fr}.gel{height:260px;gap:4px}.punnett-grid td{min-width:44px;padding:10px 4px;font-size:14px}}
+@media(prefers-reduced-motion:reduce){.punnett-grid td{animation:none}.gel-lane .band{transition:none}}
+
+/* intake and output calculator */
+.io-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:10px 0}
+.io-grid h5{margin:0 0 6px}
+.io-grid ul{margin:0;padding-left:18px;line-height:1.6}
+.io-answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0 4px;align-items:end}
+.skill-lab .io-answers .lab-prediction{margin:0}
+.skill-lab .io-answers input{max-width:none;width:100%}
+.io-work{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--surface-2,rgba(127,127,127,.08))}
+.io-work p{margin:4px 0}
+
+/* DNA to protein lab */
+.dna-strand{margin:0 0 10px}
+.dna-strand code{display:block;margin-top:4px;font:600 15px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;word-spacing:.3em;white-space:normal;word-break:normal;overflow-wrap:normal}
+.skill-lab input[type=text]{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:15px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-transform:uppercase}
+.dna-mut{margin:12px 0;padding:12px;border:1px solid var(--line-strong);border-radius:12px}
+.dna-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;margin:8px 0 12px}
+.aa{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--surface-2);font-weight:600}

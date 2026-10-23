@@ -27,9 +27,9 @@ try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
  page.on('pageerror',err=>errors.push(err.message));
  const base=`http://127.0.0.1:${server.address().port}`;
- await page.goto(base+'/qa-labs');await page.locator('.lwk-nutritionlab [data-reveal]').waitFor();
- const nutrition=page.locator('.lwk-nutritionlab');await nutrition.locator('[data-estimate]').fill('250');await nutrition.locator('[data-reveal]').click();await assert.equal(await nutrition.locator('.lw-msg').getAttribute('data-state'),'good');
- await nutrition.locator('[data-input="servings"]').fill('2');assert.equal(await nutrition.locator('.lab-answer').isHidden(),true);await nutrition.locator('[data-estimate]').fill('500');await nutrition.locator('[data-reveal]').click();assert.match(await nutrition.locator('[data-formula]').textContent(),/500 kcal/);
+ await page.goto(base+'/qa-labs');await page.locator('.lwk-nutritionlab [data-energy-check]').waitFor();
+ const nutrition=page.locator('.lwk-nutritionlab');await nutrition.locator('[data-estimate]').fill('250');await nutrition.locator('[data-energy-check]').click();await assert.equal(await nutrition.locator('.lw-msg').getAttribute('data-state'),'good');
+ await nutrition.locator('[data-input="servings"]').fill('2');assert.equal(await nutrition.locator('.lab-answer').isHidden(),true);await nutrition.locator('[data-estimate]').fill('500');await nutrition.locator('[data-energy-check]').click();assert.match(await nutrition.locator('[data-formula]').textContent(),/500 kcal/);
  await nutrition.locator('[data-lab-reset]').click();assert.equal(await nutrition.locator('[data-input="servings"]').inputValue(),'1');
  const flow=page.locator('.lwk-informaticsflow');await flow.locator('[data-fault]').selectOption('2');for(let i=0;i<3;i++)await flow.locator('[data-flow-next]').click();assert.equal(await flow.locator('[data-flow-next]').isDisabled(),true);assert.match(await flow.locator('.lab-step-summary').textContent(),/Stop and resolve/);await flow.locator('[data-lab-reset]').click();for(let i=0;i<5;i++)await flow.locator('[data-flow-next]').click();assert.match(await flow.locator('.lab-step-summary').textContent(),/acknowledged/);
  const quality=page.locator('.lwk-qualitylab');await quality.locator('[data-infer="observe"]').click();assert.equal(await quality.locator('.lw-msg').getAttribute('data-state'),'good');assert.match(await quality.locator('[data-rate-stats]').textContent(),/50%/);

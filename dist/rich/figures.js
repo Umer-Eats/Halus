@@ -944,5 +944,455 @@ export const FIGURES = {
   "source": "https://openstax.org/books/anatomy-and-physiology/pages/19-1-heart-anatomy",
   "license": "CC BY 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "biology-2e:10.5": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/418e5abd3be4fb9a0f0f1c81b82f0d51f93c81d4",
+  "width": 550,
+  "height": 385,
+  "credit": "OpenStax Biology 2e, Figure 10.5, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/10-2-the-cell-cycle",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:10.6": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/9164050222aea02b2e227df8a18237e79017ab20",
+  "width": 1792,
+  "height": 2239,
+  "credit": "OpenStax Biology 2e, Figure 10.6, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/10-2-the-cell-cycle",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:10.10": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/cfece033b72d3d13fef87efba6c8fe3527fd6155",
+  "width": 825,
+  "height": 415,
+  "credit": "OpenStax Biology 2e, Figure 10.10, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/10-2-the-cell-cycle",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:11.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/8cc4db844fe92aabfacd0bee8c6053b7e8229d92",
+  "width": 350,
+  "height": 490,
+  "credit": "OpenStax Biology 2e, Figure 11.4, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/11-1-the-process-of-meiosis",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:11.8": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/d71b9fcb5f73571d2355ee3b9d81b75d20faba7c",
+  "width": 600,
+  "height": 553,
+  "credit": "OpenStax Biology 2e, Figure 11.8, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/11-1-the-process-of-meiosis",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:13.6": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/db420d72d2ed6d9a865e270b3be39095e56147bd",
+  "width": 1500,
+  "height": 1126,
+  "credit": "OpenStax Biology 2e, Figure 13.6, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/13-2-chromosomal-basis-of-inherited-disorders",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/83af4d98c6e7004c52f95071a357b686d11dc819",
+  "width": 320,
+  "height": 477,
+  "credit": "OpenStax Biology 2e, Figure 12.4, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.5": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/8c6988fdec94ad931915871926f0417bb002aaad",
+  "width": 320,
+  "height": 397,
+  "credit": "OpenStax Biology 2e, Figure 12.5, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.16": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/0fc5d51be5b3e46106c840b69afe62a6869306af",
+  "width": 400,
+  "height": 352,
+  "credit": "OpenStax Biology 2e, Figure 12.16, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-3-laws-of-inheritance",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.17": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/11c427f45d27b3d9f7e676b9b3997e9812ef2c18",
+  "width": 550,
+  "height": 195,
+  "credit": "OpenStax Biology 2e, Figure 12.17, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-3-laws-of-inheritance",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.7": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/6e4509f7295ba8e2d5ca2d639c6f3d72125b5905",
+  "width": 300,
+  "height": 399,
+  "credit": "OpenStax Biology 2e, Figure 12.7, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.20": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/758ae8eb2ecc68a77ba786ac5fac23cfe33b3429",
+  "width": 350,
+  "height": 414,
+  "credit": "OpenStax Biology 2e, Figure 12.20, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-3-laws-of-inheritance",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.6": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/864f91b77d41d9fa7579d568c3b4f0892f09b451",
+  "width": 320,
+  "height": 281,
+  "credit": "OpenStax Biology 2e, Figure 12.6, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.12": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/3fd4f2bc594e5f7194412761a00598f469909a23",
+  "width": 400,
+  "height": 402,
+  "credit": "OpenStax Biology 2e, Figure 12.12, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:13.3": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/9d8a689ab83457c0d3bb16bfe1364a31f3ea7e99",
+  "width": 570,
+  "height": 748,
+  "credit": "OpenStax Biology 2e, Figure 13.3, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/13-1-chromosomal-theory-and-genetic-linkage",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:13.5": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/a8992f69772fdd0b93e263490c8bd249a1e7361f",
+  "width": 600,
+  "height": 163,
+  "credit": "OpenStax Biology 2e, Figure 13.5, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/13-2-chromosomal-basis-of-inherited-disorders",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:13.13": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/9df1871c83460193c50385bee9c3f16007eaf318",
+  "width": 320,
+  "height": 252,
+  "credit": "OpenStax Biology 2e, Figure 13.13, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/13-2-chromosomal-basis-of-inherited-disorders",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:13.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/d315fc103131f8d08f1cbfeec58afe47756fedd2",
+  "width": 200,
+  "height": 205,
+  "credit": "OpenStax Biology 2e, Figure 13.4, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/13-1-chromosomal-theory-and-genetic-linkage",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:14.7": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/c0c6562e5a3a2d84e6b626a8f23e2a83a8b2fbd1",
+  "width": 450,
+  "height": 155,
+  "credit": "OpenStax Biology 2e, Figure 14.7, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/14-2-dna-structure-and-sequencing",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:14.12": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/891cb2e6c3f1d6a238ad6b341415ad17e5e2cfe5",
+  "width": 275,
+  "height": 323,
+  "credit": "OpenStax Biology 2e, Figure 14.12, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/14-3-basics-of-dna-replication",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:15.11": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/824322729a85bb69e69ef65092d4b756384fccf3",
+  "width": 900,
+  "height": 675,
+  "credit": "OpenStax Biology 2e, Figure 15.11, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/15-4-rna-processing-in-eukaryotes",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:15.18": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/c4f499818ba85c5f4a2affcdae63c147cdd7f03b",
+  "width": 1200,
+  "height": 900,
+  "credit": "OpenStax Biology 2e, Figure 15.18, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/15-5-ribosomes-and-protein-synthesis",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:12.11": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/2349ec489ee52e2d13c8ac4798258719be3831c0",
+  "width": 220,
+  "height": 275,
+  "credit": "OpenStax Biology 2e, Figure 12.11, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/12-2-characteristics-and-traits",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.3": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/60abc83824951aa0362aad72380753d087235000",
+  "width": 450,
+  "height": 298,
+  "credit": "OpenStax Biology 2e, Figure 17.3, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:11.26": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/a0f463c2b72a28bb9de87185d0902a13e37c3ea1",
+  "width": 1095,
+  "height": 514,
+  "credit": "OpenStax Microbiology, Figure 11.26, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/11-6-how-asexual-prokaryotes-achieve-genetic-diversity",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:11.28": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/dcf8b212b46a6e0e255d5b68d7cda452f5572462",
+  "width": 1097,
+  "height": 764,
+  "credit": "OpenStax Microbiology, Figure 11.28, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/11-6-how-asexual-prokaryotes-achieve-genetic-diversity",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.5": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/5063cf05bb7d5435ef73bab6a3b0b65872e30e9e",
+  "width": 520,
+  "height": 496,
+  "credit": "OpenStax Biology 2e, Figure 17.5, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.7": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/5acef6c92935df62a0ff3ed56e586c0463e6c008",
+  "width": 550,
+  "height": 504,
+  "credit": "OpenStax Biology 2e, Figure 17.7, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.10": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/eedd6c0c54ac9c695d6909cf7792e6ec85c55deb",
+  "width": 250,
+  "height": 375,
+  "credit": "OpenStax Biology 2e, Figure 17.10, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:19.2": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/6b1ca5ec21f8b2963b3d393de78ee0bdc8ce3f73",
+  "width": 430,
+  "height": 553,
+  "credit": "OpenStax Biology 2e, Figure 19.2, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/19-1-population-evolution",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.9": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/17d2773d1c68bb50253bde284ba2f41b577ee9dd",
+  "width": 500,
+  "height": 375,
+  "credit": "OpenStax Biology 2e, Figure 17.9, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.8": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/457d5c29ec16d2fef15e8fab7dea83e558457998",
+  "width": 275,
+  "height": 360,
+  "credit": "OpenStax Biology 2e, Figure 17.8, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:9.2": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/4326674de465acd084d699fc9228dc1a58d64a1b",
+  "width": 1200,
+  "height": 398,
+  "credit": "OpenStax Microbiology, Figure 9.2, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/9-1-how-microbes-grow",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "anatomy-and-physiology:28.21": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/5977156db7fb8d9873006a8d227432c478590b0b",
+  "width": 420,
+  "height": 657,
+  "credit": "OpenStax Anatomy and Physiology, Figure 28.21 (Stages of Childbirth), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/28-4-maternal-changes-during-pregnancy-labor-and-birth",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:25.3": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/c3537917c7b8875bdfe1d0433ffcc52c49da1a77",
+  "width": 560,
+  "height": 205,
+  "credit": "OpenStax Anatomy and Physiology, Figure 25.3 (Female and Male Urethras), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/25-2-gross-anatomy-of-urine-transport",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:19.2": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/aff6cb4dade66dd43ffb063c5112947c735fe01d",
+  "width": 500,
+  "height": 453,
+  "credit": "OpenStax Anatomy and Physiology, Figure 19.2 (Position of the Heart in the Thorax), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/19-1-heart-anatomy",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:25.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/25f1d6b7a9fc77ce5f74cd7574878a2b92845715",
+  "width": 499,
+  "height": 306,
+  "credit": "OpenStax Anatomy and Physiology, Figure 25.4 (Bladder), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/25-2-gross-anatomy-of-urine-transport",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:25.2": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/47b3e220eb023eedb4884f03051f03536eb621cd",
+  "width": 230,
+  "height": 390,
+  "credit": "OpenStax Anatomy and Physiology, Figure 25.2 (Urine Color), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/25-1-physical-characteristics-of-urine",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:9.12": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/619024c8facab9b35a8593fb3b9ef215ccfdf7e0",
+  "width": 550,
+  "height": 651,
+  "credit": "OpenStax Anatomy and Physiology, Figure 9.12 (Movements of the Body, Part 1), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/9-5-types-of-body-movements",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:1.16": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/a47422bfbf5f1dcb46cca86199377b7e98de2e38",
+  "width": 550,
+  "height": 283,
+  "credit": "OpenStax Anatomy and Physiology, Figure 1.16 (Regions and Quadrants of the Peritoneal Cavity), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/1-6-anatomical-terminology",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "microbiology:9.11": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/edbb2287bb1dddd46323ac07e4b49580e7e07962",
+  "width": 1300,
+  "height": 668,
+  "credit": "OpenStax Microbiology, Figure 9.11, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/9-1-how-microbes-grow",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:17.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/3555fbfb5d60aac2f601b4e04e73054022bf2cb2",
+  "width": 410,
+  "height": 299,
+  "credit": "OpenStax Biology 2e, Figure 17.4, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/17-1-biotechnology",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:3.30": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/fda7338372e63c2277c31cd6a190a8d7d24b6fc5",
+  "width": 450,
+  "height": 337,
+  "credit": "OpenStax Biology 2e, Figure 3.30, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/3-4-proteins",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:20.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/dda70e66ee4059e820a45dac5de86b078ac82424",
+  "width": 1248,
+  "height": 1103,
+  "credit": "OpenStax Microbiology, Figure 20.4, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/20-1-polyclonal-and-monoclonal-antibody-production",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:20.24": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/c6a1d98b2690161d9ce091d1bdedf80149126ede",
+  "width": 1358,
+  "height": 1599,
+  "credit": "OpenStax Microbiology, Figure 20.24, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/20-4-eias-and-elisas",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:2.12": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/5d253c793bcae3cd5926986fb60bdd8dbf0db17e",
+  "width": 889,
+  "height": 757,
+  "credit": "OpenStax Microbiology, Figure 2.12, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/2-3-instruments-of-microscopy",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "anatomy-and-physiology:18.17": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/a9fa9181b953f0a6a9596420b0f714ad4a497b16",
+  "width": 420,
+  "height": 322,
+  "credit": "OpenStax Anatomy and Physiology, Figure 18.17 (ABO Blood Group), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/18-6-blood-typing",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:18.15": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/ce2a5857e2670efef399e9e2d04a4e2a0ce07ec3",
+  "width": 600,
+  "height": 548,
+  "credit": "OpenStax Anatomy and Physiology, Figure 18.15 (Erythroblastosis Fetalis), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/18-6-blood-typing",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "microbiology:2.33": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/618c08bd594aa6626811825a8fa7ea3b7c1e784a",
+  "width": 1100,
+  "height": 843,
+  "credit": "OpenStax Microbiology, Figure 2.33, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/2-4-staining-microscopic-specimens",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:2.34": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/fce1510ea2d396b9382e397319a642fef8390ba4",
+  "width": 500,
+  "height": 312,
+  "credit": "OpenStax Microbiology, Figure 2.34, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/2-4-staining-microscopic-specimens",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
  }
 };

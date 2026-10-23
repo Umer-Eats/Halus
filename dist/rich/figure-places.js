@@ -2,7 +2,7 @@
 // they illustrate. scripts/import-openstax-figures.mjs reads this file to fetch the images.
 // course → lesson number (1-based) → [section number (1-based), 'book/page', figure number, caption, alt, 'end'?]
 // A figure goes after the section's first block, or at the end of the section with 'end'.
-const AP = 'anatomy-and-physiology/', PS = 'psychology/', CP = 'college-physics/';
+const AP = 'anatomy-and-physiology/', PS = 'psychology/', CP = 'college-physics/', BIO = 'biology-2e/', MICRO = 'microbiology/';
 
 const HEMOSTASIS = [AP + '18-5-hemostasis', '18.14', 'Hemostasis has three steps: vascular spasm, a platelet plug and coagulation. Antiplatelet drugs act on the plug, anticoagulants on the clotting cascade, and thrombolytics dissolve a finished clot.', 'Three steps of hemostasis: vessel spasm, platelet plug and clot formation'];
 const ASTHMA = [AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.12', 'In asthma, the bronchiole wall becomes inflamed and thickened, mucus collects and smooth muscle tightens, narrowing the airway.', 'Normal bronchiole compared with an asthmatic bronchiole'];
@@ -217,6 +217,184 @@ export const FIGURE_PLACES = {
     ],
     11: [
       [3, AP + '19-1-heart-anatomy', '19.3', 'Hand position for chest compressions during CPR.', 'Hands placed on the lower sternum for CPR'],
+    ],
+  },
+  'Genetics': {
+    1: [
+      [2, BIO + '10-2-the-cell-cycle', '10.5', 'The cell cycle: interphase (G1, S and G2) takes most of the time, followed by the mitotic phase. DNA is copied during S phase.', 'Circular diagram of the cell cycle with G1, S, G2 and mitotic phases'],
+      [3, BIO + '10-2-the-cell-cycle', '10.6', 'The stages of mitosis and cytokinesis, from prophase to the two identical daughter cells.', 'Stages of mitosis from prophase through cytokinesis'],
+      [6, BIO + '10-2-the-cell-cycle', '10.10', 'Dividing cells in a whitefish blastula and onion root tip show each phase of mitosis under the microscope.', 'Micrographs of cells in different phases of mitosis'],
+    ],
+    2: [
+      [2, BIO + '11-1-the-process-of-meiosis', '11.4', 'Crossing over in prophase I: nonsister chromatids of homologous chromosomes exchange segments, creating new allele combinations.', 'Homologous chromosomes exchanging segments during crossing over'],
+      [3, BIO + '11-1-the-process-of-meiosis', '11.8', 'Mitosis and meiosis compared. Meiosis has two divisions and produces four genetically different haploid cells.', 'Side-by-side comparison of mitosis and meiosis'],
+      [5, BIO + '13-2-chromosomal-basis-of-inherited-disorders', '13.6', 'Nondisjunction in meiosis I or meiosis II produces gametes with an extra or missing chromosome.', 'Diagram of nondisjunction producing abnormal gametes'],
+    ],
+    3: [
+      [3, BIO + '12-2-characteristics-and-traits', '12.4', 'A monohybrid cross of pea plants: the F2 generation shows a 3:1 ratio of dominant to recessive phenotypes.', 'Punnett square of a monohybrid pea cross'],
+      [3, BIO + '12-2-characteristics-and-traits', '12.5', 'A test cross reveals whether a dominant-phenotype parent is homozygous or heterozygous.', 'Test cross outcomes for homozygous and heterozygous parents', 'end'],
+      [4, BIO + '12-3-laws-of-inheritance', '12.16', 'A dihybrid cross of two independently assorting genes gives a 9:3:3:1 phenotypic ratio in the F2.', 'Dihybrid Punnett square of pea seed color and shape'],
+      [6, BIO + '12-3-laws-of-inheritance', '12.17', 'The forked-line method multiplies probabilities gene by gene instead of drawing a large Punnett square.', 'Forked-line diagram for a trihybrid cross'],
+    ],
+    4: [
+      [1, BIO + '12-2-characteristics-and-traits', '12.7', 'Incomplete dominance: a heterozygous snapdragon has pink flowers, intermediate between red and white.', 'Pink snapdragon flower'],
+      [1, BIO + '12-3-laws-of-inheritance', '12.20', 'Epistasis in mouse coat color: one gene determines whether pigment appears at all, changing the expected ratio.', 'Cross of agouti mice showing epistatic coat colors', 'end'],
+      [3, BIO + '12-2-characteristics-and-traits', '12.6', 'A pedigree of a family carrying the recessive disorder alkaptonuria: affected children can have unaffected carrier parents.', 'Pedigree chart of an autosomal recessive disorder'],
+    ],
+    5: [
+      [2, BIO + '12-2-characteristics-and-traits', '12.12', 'A Punnett square for X-linked eye color in fruit flies: sons inherit their only X chromosome from their mother.', 'Punnett square of X-linked eye color in Drosophila'],
+      [3, BIO + '13-1-chromosomal-theory-and-genetic-linkage', '13.3', 'Linked genes travel together unless crossing over separates them, so parental types outnumber recombinants.', 'Inheritance of linked and unlinked genes'],
+      [4, BIO + '13-2-chromosomal-basis-of-inherited-disorders', '13.5', 'A human karyotype: 22 pairs of autosomes and one pair of sex chromosomes arranged by size and banding.', 'Karyotype of a human female'],
+      [5, BIO + '13-2-chromosomal-basis-of-inherited-disorders', '13.13', 'A reciprocal translocation exchanges segments between nonhomologous chromosomes.', 'Diagram of a reciprocal translocation'],
+      [6, BIO + '13-1-chromosomal-theory-and-genetic-linkage', '13.4', 'A Drosophila genetic map: gene positions in centimorgans come from recombination frequencies.', 'Genetic map of a Drosophila chromosome'],
+    ],
+    6: [
+      [1, BIO + '14-2-dna-structure-and-sequencing', '14.7', 'The DNA double helix: sugar-phosphate backbones outside and complementary base pairs (A–T, G–C) inside, with antiparallel strands.', 'DNA double helix with base pairs'],
+      [2, BIO + '14-3-basics-of-dna-replication', '14.12', 'Conservative, semiconservative and dispersive models of replication. Meselson and Stahl showed replication is semiconservative.', 'Three proposed models of DNA replication'],
+      [3, BIO + '15-4-rna-processing-in-eukaryotes', '15.11', 'Eukaryotic pre-mRNA receives a 5′ cap and poly-A tail, and introns are spliced out to form mature mRNA.', 'Processing of pre-mRNA into mature mRNA'],
+      [4, BIO + '15-5-ribosomes-and-protein-synthesis', '15.18', 'Translation: initiation at AUG, elongation as tRNAs bring amino acids, and termination at a stop codon.', 'Steps of protein synthesis on a ribosome'],
+    ],
+    7: [
+      [3, BIO + '12-2-characteristics-and-traits', '12.11', 'Fruit flies with different eye colors—easily scored phenotypes that make Drosophila a classic model organism.', 'Six fruit flies with different eye colors'],
+      [4, BIO + '17-1-biotechnology', '17.3', 'The basic steps of DNA extraction: lyse cells, remove proteins and debris, and precipitate DNA with alcohol.', 'Steps of DNA extraction in test tubes'],
+    ],
+    8: [
+      [1, MICRO + '11-6-how-asexual-prokaryotes-achieve-genetic-diversity', '11.26', 'Three routes of horizontal gene transfer in bacteria: transformation, transduction and conjugation.', 'Diagrams of transformation, transduction and conjugation'],
+      [3, MICRO + '11-6-how-asexual-prokaryotes-achieve-genetic-diversity', '11.28', 'Conjugation: a donor cell’s pilus contacts a recipient, and a copy of the plasmid passes between the cells.', 'Steps of bacterial conjugation through a pilus'],
+      [5, BIO + '17-1-biotechnology', '17.5', 'PCR repeats denaturation, annealing and extension to double a DNA region each cycle.', 'Cycles of the polymerase chain reaction'],
+      [5, BIO + '17-1-biotechnology', '17.7', 'Molecular cloning inserts a gene into a plasmid vector and uses antibiotic selection to find transformed cells.', 'Steps of cloning a gene into a plasmid', 'end'],
+    ],
+    9: [
+      [5, BIO + '17-1-biotechnology', '17.10', 'Corn ears show kernels of different colors that can be counted to test genetic ratios with chi-square.', 'Ears of corn with kernels of different colors'],
+    ],
+    10: [
+      [1, BIO + '19-1-population-evolution', '19.2', 'The Hardy-Weinberg principle predicts genotype frequencies (p², 2pq, q²) from allele frequencies.', 'Hardy-Weinberg diagram of allele and genotype frequencies'],
+      [3, BIO + '17-1-biotechnology', '17.9', 'Gene therapy can use a modified virus to deliver a working gene into a patient’s cells.', 'Gene therapy using a viral vector'],
+      [4, BIO + '17-1-biotechnology', '17.8', 'Dolly the sheep was cloned by nuclear transfer from an adult cell into an egg whose nucleus had been removed.', 'Steps used to clone Dolly the sheep'],
+    ],
+  },
+  'Dental Science': {
+    2: [
+      [1, AP + '7-2-the-skull', '7.5', 'Lateral view of the skull showing the maxilla, mandible, zygomatic bone and temporal bone.', 'Lateral view of the human skull'],
+      [1, AP + '7-2-the-skull', '7.15', 'The isolated mandible: body, ramus, angle, coronoid process, condyle and the mental and mandibular foramina.', 'The mandible and its landmarks', 'end'],
+      [2, AP + '11-3-axial-muscles-of-the-head-neck-and-back', '11.10', 'Muscles that move the lower jaw, including the masseter, temporalis and pterygoid muscles.', 'Muscles of mastication'],
+      [3, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.7', 'The mouth: lips, palate, uvula, tongue and other landmarks of the oral cavity.', 'Landmarks of the oral cavity'],
+      [4, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.9', 'The parotid, submandibular and sublingual salivary glands and their ducts.', 'Major salivary glands'],
+    ],
+    3: [
+      [1, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.11', 'Structure of a tooth: enamel, dentin, pulp, cementum, periodontal ligament and alveolar bone.', 'Cross section of a tooth'],
+      [2, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.10', 'The permanent and primary (deciduous) teeth with typical eruption ages.', 'Permanent and deciduous dentitions with eruption ages'],
+    ],
+    5: [
+      [4, MICRO + '9-1-how-microbes-grow', '9.2', 'Bacteria multiply by binary fission, which is why instrument processing must remove and kill microorganisms before reuse.', 'Bacterial cell dividing by binary fission', 'end'],
+    ],
+  },
+  'Clinical Nursing': {
+    6: [
+      [2, AP + '28-4-maternal-changes-during-pregnancy-labor-and-birth', '28.21', 'The stages of childbirth: dilation, expulsion of the baby and delivery of the placenta.', 'Stages of labor and birth'],
+    ],
+    8: [
+      [1, AP + '19-1-heart-anatomy', '19.15', 'The coronary arteries supply the heart muscle; blockage causes angina or myocardial infarction.', 'Coronary circulation of the heart'],
+      [3, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.2', 'The major respiratory structures from the nasal cavity to the alveoli.', 'Major organs of the respiratory system'],
+    ],
+    9: [
+      [4, AP + '25-2-gross-anatomy-of-urine-transport', '25.3', 'The female urethra is much shorter than the male urethra, which affects catheter insertion depth and UTI risk.', 'Female and male urethras'],
+    ],
+    10: [
+      [1, AP + '9-4-synovial-joints', '9.11', 'Osteoarthritis wears away joint cartilage, causing pain and stiffness.', 'Osteoarthritis of a joint'],
+    ],
+  },
+  'Home Health Aide': {
+    4: [
+      [3, AP + '19-1-heart-anatomy', '19.2', 'The heart sits in the chest with its apex pointing down and to the left—where the apical pulse is heard.', 'Position of the heart in the thorax'],
+      [4, AP + '20-2-blood-flow-blood-pressure-and-resistance', '20.11', 'Common pulse sites, including the radial, carotid, brachial and pedal pulses.', 'Pulse sites on the body'],
+    ],
+    6: [
+      [1, AP + '25-2-gross-anatomy-of-urine-transport', '25.4', 'The bladder stores urine until it is emptied through the urethra.', 'Anatomy of the urinary bladder'],
+      [3, AP + '25-1-physical-characteristics-of-urine', '25.2', 'Urine color ranges from pale yellow to dark amber; dark urine can signal dehydration.', 'Range of urine colors'],
+    ],
+    7: [
+      [3, AP + '9-4-synovial-joints', '9.11', 'Osteoarthritis wears away joint cartilage, causing pain and stiffness.', 'Osteoarthritis of a joint'],
+      [6, AP + '9-5-types-of-body-movements', '9.12', 'Body movements such as flexion, extension, abduction and adduction used in range-of-motion exercises.', 'Body movements at joints'],
+    ],
+    8: [
+      [2, AP + '14-1-sensory-perception', '14.15', 'Structures of the eye affected by cataracts, glaucoma and macular degeneration.', 'Structure of the eye'],
+      [5, AP + '23-3-the-mouth-pharynx-and-esophagus', '23.7', 'The mouth and gums are checked for sores and irritation during denture care.', 'Landmarks of the oral cavity'],
+    ],
+  },
+  'Medical Assisting': {
+    7: [
+      [2, AP + '1-6-anatomical-terminology', '1.13', 'Directional terms applied to the human body.', 'Directional terms on the human body'],
+      [2, AP + '1-6-anatomical-terminology', '1.14', 'The sagittal, frontal and transverse planes of the body.', 'Planes of the body', 'end'],
+      [2, AP + '1-6-anatomical-terminology', '1.16', 'The four abdominal quadrants and nine regions.', 'Abdominal quadrants and regions', 'end'],
+    ],
+    8: [
+      [2, AP + '20-2-blood-flow-blood-pressure-and-resistance', '20.12', 'Measuring blood pressure with a cuff and stethoscope: the first sound is systolic and the last is diastolic.', 'Blood pressure measurement with a sphygmomanometer'],
+    ],
+    9: [
+      [4, AP + '25-1-physical-characteristics-of-urine', '25.2', 'Urine color is part of the physical examination in a urinalysis.', 'Range of urine colors'],
+    ],
+    10: [
+      [3, AP + '14-1-sensory-perception', '14.15', 'Structure of the eye. Visual acuity depends on the cornea, lens and the central retina (macula).', 'Structure of the eye'],
+    ],
+  },
+  'Nursing Assisting': {
+    5: [
+      [1, ...SKIN.slice(0, 2), 'The skin has three layers: epidermis, dermis and subcutaneous tissue (hypodermis). Pressure over bony areas cuts off blood flow to these layers.', SKIN[3]],
+      [3, AP + '9-5-types-of-body-movements', '9.12', 'Flexion, extension, abduction, adduction and other movements used in range-of-motion exercises.', 'Body movements at joints'],
+    ],
+    6: [
+      [2, AP + '20-2-blood-flow-blood-pressure-and-resistance', '20.11', 'Common pulse sites, including the radial artery on the thumb side of the wrist.', 'Pulse sites on the body'],
+      [4, AP + '20-2-blood-flow-blood-pressure-and-resistance', '20.12', 'Blood pressure measurement: the first sound is systolic and the last sound is diastolic.', 'Blood pressure measurement with a sphygmomanometer'],
+    ],
+    7: [
+      [1, AP + '25-2-gross-anatomy-of-urine-transport', '25.4', 'The urinary bladder stores urine until it is emptied.', 'Anatomy of the urinary bladder', 'end'],
+    ],
+  },
+  'Biotechnology': {
+    4: [
+      [6, MICRO + '9-1-how-microbes-grow', '9.11', 'Serial dilution: each transfer dilutes the sample by a set factor so colonies can be counted.', 'Diagram of serial dilution'],
+    ],
+    5: [
+      [1, BIO + '14-2-dna-structure-and-sequencing', '14.7', 'The DNA double helix with complementary base pairs.', 'DNA double helix with base pairs'],
+    ],
+    6: [
+      [1, BIO + '17-1-biotechnology', '17.4', 'An agarose gel under UV light: DNA fragments separate by size, with smaller fragments traveling farther.', 'DNA bands on an agarose gel'],
+    ],
+    7: [
+      [1, BIO + '17-1-biotechnology', '17.7', 'Cloning a gene into a plasmid vector and selecting transformed cells with an antibiotic.', 'Steps of cloning a gene into a plasmid'],
+    ],
+    8: [
+      [2, BIO + '17-1-biotechnology', '17.5', 'Each PCR cycle has denaturation, annealing and extension steps.', 'Cycles of the polymerase chain reaction'],
+    ],
+    9: [
+      [1, BIO + '3-4-proteins', '3.30', 'The four levels of protein structure: primary, secondary, tertiary and quaternary.', 'Four levels of protein structure'],
+    ],
+    10: [
+      [2, MICRO + '20-1-polyclonal-and-monoclonal-antibody-production', '20.4', 'Monoclonal antibodies are made by fusing antibody-producing cells with myeloma cells to form hybridomas.', 'Production of monoclonal antibodies'],
+      [3, MICRO + '20-4-eias-and-elisas', '20.24', 'A sandwich ELISA: a capture antibody, the antigen and an enzyme-linked detection antibody produce a color change.', 'Diagram of a sandwich ELISA'],
+    ],
+  },
+  'Clinical Lab Science (Medical Lab Scientist)': {
+    3: [
+      [3, MICRO + '2-3-instruments-of-microscopy', '2.12', 'Parts of a brightfield compound microscope.', 'Labeled compound light microscope'],
+    ],
+    4: [
+      [1, AP + '18-1-an-overview-of-blood', '18.2', 'Centrifuged blood separates into plasma, the buffy coat and red blood cells (the hematocrit).', 'Composition of centrifuged blood'],
+    ],
+    5: [
+      [1, ...HEMOSTASIS],
+    ],
+    6: [
+      [3, AP + '18-6-blood-typing', '18.17', 'ABO blood groups: the antigens on red cells and the antibodies in plasma for types A, B, AB and O.', 'ABO blood group antigens and antibodies'],
+      [5, AP + '18-6-blood-typing', '18.15', 'Hemolytic disease of the newborn (erythroblastosis fetalis) from Rh incompatibility.', 'Rh incompatibility between mother and fetus'],
+    ],
+    7: [
+      [2, AP + '25-1-physical-characteristics-of-urine', '25.2', 'Urine color in the physical examination of urine.', 'Range of urine colors'],
+    ],
+    9: [
+      [2, MICRO + '2-4-staining-microscopic-specimens', '2.33', 'The Gram stain steps: crystal violet, iodine, decolorizer and safranin.', 'Table of Gram stain steps'],
+      [2, MICRO + '2-4-staining-microscopic-specimens', '2.34', 'Gram-positive cocci stain purple and gram-negative rods stain pink.', 'Purple cocci and pink rods after a Gram stain', 'end'],
     ],
   },
 };

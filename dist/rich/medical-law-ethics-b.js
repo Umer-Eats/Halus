@@ -1,7 +1,7 @@
 // Medical Law & Ethics lessons 5–7: the health care environment.
 const RULES=['HOSA Medical Law & Ethics 2026–27 guidelines','https://hosa.org/wp-content/uploads/2026/08/MLE-26-27.pdf'];
 const PRIV=['HHS: summary of the HIPAA Privacy Rule','https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html'];
-const ACCESS=['HHS: individuals’ right to access their health information','https://www.hhs.gov/hipaa/for-professionals/privacy/guidance/access/index.html'];
+const ACCESS=['HHS: individuals’ right to access their health information','https://www.hhs.gov/hipaa/for-individuals/right-to-access/index.html'];
 const BREACH=['HHS: HIPAA Breach Notification Rule','https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html'];
 const AMA_TERM=['AMA Code of Medical Ethics: terminating a patient-physician relationship','https://code-medical-ethics.ama-assn.org/ethics-opinions/terminating-patient-physician-relationship'];
 const AMA_REL=['AMA Code of Medical Ethics: patient-physician relationships','https://code-medical-ethics.ama-assn.org/chapters/patient-relationships'];
