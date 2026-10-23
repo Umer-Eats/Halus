@@ -141,3 +141,22 @@ test('the ten Health Professions courses added after Codex keep the same lesson 
   }
  }
 });
+
+test('the next ten Health Professions courses keep the same lesson standard', async () => {
+ await loadAllCourses({view: false});
+ const names = ['Occupational Therapy', 'Patient Care Technician', 'Personal Care', 'Pharmacy Science', 'Phlebotomy', 'Physical Therapy', 'Physician Assistant - Medical Case Challenge', 'Respiratory Therapy', 'Sports Medicine', 'Surgical Technologist'];
+ for (const name of names) {
+  const lessons = courseLessons(name);
+  assert.equal(lessons.length, 10, name);
+  for (const lesson of lessons) {
+   assert.equal(lesson.rich, true, name + ' ' + lesson.title);
+   assert.equal(lesson.mcqs.length, 8, lesson.title);
+   assert.ok(lesson.sections.length >= 5, lesson.title);
+   assert.ok(lesson.frq.rubric.length >= 3 && lesson.frq.modelAnswer.length > 200, lesson.title);
+   assert.ok(lesson.sources.filter(s => /^https:\/\//.test(s.url || s[1] || '')).length >= 2, lesson.title);
+   assert.ok(lesson.sections.flatMap(s => s.blocks).filter(b => b.t === 'w').length >= 3, lesson.title);
+   assert.equal(lesson.terms.length, 3, lesson.title);
+   assert.equal(lesson.takeaways.length, 3, lesson.title);
+  }
+ }
+});

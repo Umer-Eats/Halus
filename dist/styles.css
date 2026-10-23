@@ -13,7 +13,6 @@
 :root {
   --font-display: Manrope, 'Segoe UI', sans-serif;
   --font-body: Manrope, 'Segoe UI', sans-serif;
-  --font-editorial: Georgia, 'Times New Roman', serif;
   --font-accent: 'Valus Rounded', Manrope, sans-serif;
   --font-mono: Consolas, 'SFMono-Regular', ui-monospace, monospace;
   --font-button: var(--font-body);

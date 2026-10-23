@@ -98,7 +98,3 @@ body:has(.home-editorial) .foot-brand p,body:has(.home-editorial) .foot-col a,bo
 .home-editorial>.cellular-atlas{padding-bottom:40px}
 @media(max-width:760px){.home-editorial .specimen-stage{min-height:min(70vh,520px)}}
 @media(max-width:480px){.home-editorial .specimen-stage{min-height:400px}}
-
-/* Editorial headlines use a gentler reading face; branded words retain Audiowide. */
-.home-editorial :is(.organism-intro h1,.belief-strip>p,.atlas-intro h2,.study-story h2,.event-orbit h2,.chapter-statement,.chapter-story h2,.open-invitation h2){font-family:var(--font-editorial);letter-spacing:-.045em}
-.home-editorial :is(.organism-intro h1,.belief-strip>p,.atlas-intro h2,.study-story h2,.event-orbit h2,.chapter-statement,.chapter-story h2,.open-invitation h2) span{font-family:var(--font-accent);letter-spacing:-.045em}

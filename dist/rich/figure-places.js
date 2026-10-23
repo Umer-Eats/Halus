@@ -397,6 +397,106 @@ export const FIGURE_PLACES = {
       [2, MICRO + '2-4-staining-microscopic-specimens', '2.34', 'Gram-positive cocci stain purple and gram-negative rods stain pink.', 'Purple cocci and pink rods after a Gram stain', 'end'],
     ],
   },
+  'Patient Care Technician': {
+    9: [
+      [1, AP + '20-5-circulatory-pathways', '20.38', 'Veins of the upper limb, including the cephalic, basilic and median cubital veins used for venipuncture.', 'Diagram of the veins of the arm'],
+    ],
+    10: [
+      [2, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.22', 'Standard placement of ECG leads on the chest and limbs.', 'Chest and limb electrode positions for an ECG'],
+      [5, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.25', 'Common ECG abnormalities compared with a normal tracing.', 'Normal and abnormal ECG tracings'],
+    ],
+  },
+  'Personal Care': {
+    4: [
+      [7, AP + '5-1-layers-of-the-skin', '5.2', 'The layers of the skin: epidermis, dermis and the fatty hypodermis that cushions bony areas.', 'Cross-section of skin layers'],
+    ],
+    9: [
+      [1, AP + '19-1-heart-anatomy', '19.4', 'The heart pumps blood through the lungs and the body, creating the pressure measured as blood pressure.', 'Pulmonary and systemic circulation'],
+    ],
+  },
+  'Pharmacy Science': {
+    8: [
+      [2, AP + '19-1-heart-anatomy', '19.16', 'Atherosclerosis narrows coronary arteries; statins, antiplatelets and nitrates target this process.', 'Narrowed coronary artery with plaque'],
+      [4, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.12', 'Normal airway tissue compared with the inflamed, narrowed airway of asthma.', 'Normal and asthmatic bronchiole'],
+    ],
+    9: [
+      [1, AP + '23-6-accessory-organs-in-digestion-the-liver-pancreas-and-gallbladder', '23.26', 'The pancreas has exocrine cells that make enzymes and islet cells that make insulin and glucagon.', 'Exocrine and endocrine pancreas'],
+    ],
+  },
+  'Phlebotomy': {
+    3: [
+      [2, AP + '18-1-an-overview-of-blood', '18.2', 'Centrifuged blood separates into plasma, the buffy coat and red blood cells.', 'Composition of centrifuged blood'],
+      [3, AP + '18-4-leukocytes-and-platelets', '18.13', 'The five types of leukocytes and their typical percentages.', 'Neutrophils, eosinophils, basophils, lymphocytes and monocytes'],
+      [4, ...HEMOSTASIS],
+      [5, AP + '20-5-circulatory-pathways', '20.38', 'Veins of the upper limb: the cephalic, basilic and median cubital veins in the antecubital area.', 'Diagram of the veins of the arm'],
+    ],
+  },
+  'Physical Therapy': {
+    5: [
+      [2, AP + '9-4-synovial-joints', '9.11', 'Osteoarthritis: loss of articular cartilage and bone changes in a joint.', 'Healthy joint compared with an osteoarthritic joint'],
+    ],
+    6: [
+      [1, AP + '9-5-types-of-body-movements', '9.12', 'Body movements, part 1: flexion, extension, abduction, adduction and circumduction.', 'Illustrated body movements'],
+      [1, AP + '9-5-types-of-body-movements', '9.13', 'Body movements, part 2: rotation, supination, pronation, dorsiflexion, plantar flexion, inversion and eversion.', 'More illustrated body movements', 'end'],
+    ],
+    7: [
+      [1, AP + '5-1-layers-of-the-skin', '5.2', 'Skin layers: pressure over bone starves the dermis and hypodermis of blood.', 'Cross-section of skin layers'],
+    ],
+  },
+  'Physician Assistant - Medical Case Challenge': {
+    5: [
+      [2, AP + '19-1-heart-anatomy', '19.16', 'Atherosclerotic plaque narrows a coronary artery and can rupture, causing acute coronary syndrome.', 'Narrowed coronary artery with plaque'],
+      [3, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.25', 'Common ECG abnormalities, including atrial fibrillation, compared with a normal tracing.', 'Normal and abnormal ECG tracings'],
+    ],
+    7: [
+      [1, AP + '23-6-accessory-organs-in-digestion-the-liver-pancreas-and-gallbladder', '23.24', 'The liver, gallbladder and pancreas and their ducts.', 'Accessory digestive organs'],
+    ],
+    8: [
+      [3, AP + '25-3-gross-anatomy-of-the-kidney', '25.10', 'Blood flow through the nephron, from the glomerulus in Bowman’s capsule through the tubules.', 'Nephron and its blood supply'],
+    ],
+  },
+  'Respiratory Therapy': {
+    3: [
+      [1, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.2', 'Major respiratory structures from the nasal cavity to the alveoli.', 'Major structures of the respiratory system'],
+      [2, AP + '22-3-the-process-of-breathing', '22.17', 'Inspiration and expiration: the diaphragm and intercostals change chest volume and pressure.', 'Chest changes during inspiration and expiration'],
+      [3, AP + '22-3-the-process-of-breathing', '22.18', 'Respiratory volumes and capacities on a spirogram.', 'Graph of lung volumes and capacities'],
+      [4, AP + '22-5-transport-of-gases', '22.27', 'Oxygen–hemoglobin dissociation curves in the fetus and adult.', 'S-shaped oxygen–hemoglobin dissociation curves'],
+      [5, AP + '22-3-the-process-of-breathing', '22.20', 'Respiratory centers in the brainstem control the rhythm of breathing.', 'Brainstem respiratory centers'],
+    ],
+    5: [
+      [4, AP + '22-3-the-process-of-breathing', '22.19', 'Pulmonary function testing with a spirometer.', 'Patient performing spirometry'],
+    ],
+    6: [
+      [1, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.12', 'Normal airway tissue compared with the inflamed, narrowed airway of asthma.', 'Normal and asthmatic bronchiole'],
+    ],
+  },
+  'Sports Medicine': {
+    2: [
+      [1, AP + '8-4-bones-of-the-lower-limb', '8.19', 'Bones of the foot: tarsals, metatarsals and phalanges.', 'Bones of the foot'],
+      [2, AP + '11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs', '11.32', 'Muscles of the lower leg, including the gastrocnemius, soleus, tibialis anterior and fibularis muscles.', 'Muscles of the lower leg'],
+      [3, AP + '8-4-bones-of-the-lower-limb', '8.16', 'The femur and patella.', 'Femur and patella'],
+      [3, AP + '11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs', '11.31', 'Thigh muscles that move the femur, tibia and fibula: quadriceps, hamstrings, sartorius and gracilis.', 'Thigh muscles', 'end'],
+    ],
+    3: [
+      [1, AP + '11-5-muscles-of-the-pectoral-girdle-and-upper-limbs', '11.23', 'Muscles that move the humerus, including the deltoid, rotator cuff, latissimus dorsi and teres major.', 'Shoulder muscles'],
+      [2, AP + '8-2-bones-of-the-upper-limb', '8.6', 'The ulna and radius of the forearm.', 'Ulna and radius'],
+      [3, AP + '8-2-bones-of-the-upper-limb', '8.7', 'Bones of the wrist and hand: carpals, metacarpals and phalanges.', 'Bones of the wrist and hand'],
+    ],
+    4: [
+      [1, AP + '9-5-types-of-body-movements', '9.12', 'Body movements: flexion, extension, abduction, adduction and circumduction.', 'Illustrated body movements'],
+      [1, AP + '9-5-types-of-body-movements', '9.13', 'Body movements: rotation, supination, pronation, dorsiflexion, plantar flexion, inversion and eversion.', 'More illustrated body movements', 'end'],
+    ],
+  },
+  'Surgical Technologist': {
+    9: [
+      [1, AP + '11-4-axial-muscles-of-the-abdominal-wall-and-thorax', '11.16', 'Muscles of the abdominal wall: rectus abdominis, external and internal obliques and transversus abdominis.', 'Abdominal wall muscles'],
+      [2, AP + '23-6-accessory-organs-in-digestion-the-liver-pancreas-and-gallbladder', '23.24', 'The liver, gallbladder, pancreas and bile ducts.', 'Accessory digestive organs'],
+      [4, AP + '25-3-gross-anatomy-of-the-kidney', '25.10', 'Blood flow in the nephron, beginning at the glomerulus inside Bowman’s capsule.', 'Nephron and its blood supply'],
+    ],
+    10: [
+      [1, AP + '19-1-heart-anatomy', '19.15', 'Coronary circulation: the arteries bypassed in coronary artery bypass grafting.', 'Coronary arteries and veins'],
+    ],
+  },
 };
 
 /** Key used in figures.js for a book page and figure number. */

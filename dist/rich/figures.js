@@ -1394,5 +1394,149 @@ export const FIGURES = {
   "source": "https://openstax.org/books/microbiology/pages/2-4-staining-microscopic-specimens",
   "license": "CC BY-NC-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "anatomy-and-physiology:20.38": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/89c2f3510e7594b881d0e12ada82fe1351bacad3",
+  "width": 385,
+  "height": 436,
+  "credit": "OpenStax Anatomy and Physiology, Figure 20.38 (Veins of the Upper Limb), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/20-5-circulatory-pathways",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:19.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/38bde48e307e339036f8a4b50a1874aa6bdcb0d8",
+  "width": 520,
+  "height": 574,
+  "credit": "OpenStax Anatomy and Physiology, Figure 19.4 (Dual System of the Human Blood Circulation), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/19-1-heart-anatomy",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:23.26": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/65de80fe9396d266a09772aa978551d22566f5d8",
+  "width": 350,
+  "height": 454,
+  "credit": "OpenStax Anatomy and Physiology, Figure 23.26 (Exocrine and Endocrine Pancreas), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/23-6-accessory-organs-in-digestion-the-liver-pancreas-and-gallbladder",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:18.13": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/2762b31a3fa0757d35c704edb326cb123fddc7d5",
+  "width": 380,
+  "height": 89,
+  "credit": "OpenStax Anatomy and Physiology, Figure 18.13 (Leukocytes), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/18-4-leukocytes-and-platelets",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:9.13": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/8782cf72dca7895dd21c9c591f4411c0aa148ec5",
+  "width": 520,
+  "height": 561,
+  "credit": "OpenStax Anatomy and Physiology, Figure 9.13 (Movements of the Body, Part 2), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/9-5-types-of-body-movements",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:22.27": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/4327801a93c73cbacc598163ab87b242545c64da",
+  "width": 430,
+  "height": 327,
+  "credit": "OpenStax Anatomy and Physiology, Figure 22.27 (Oxygen-Hemoglobin Dissociation Curves in Fetus and Adult), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/22-5-transport-of-gases",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:22.20": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/09661eecd0d3de0b9ace2adb333009eb500288e6",
+  "width": 465,
+  "height": 599,
+  "credit": "OpenStax Anatomy and Physiology, Figure 22.20 (Respiratory Centers of the Brain), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/22-3-the-process-of-breathing",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:22.19": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/15b2230c1a9392143da7cafdb04d9617a0fb6fb3",
+  "width": 499,
+  "height": 367,
+  "credit": "OpenStax Anatomy and Physiology, Figure 22.19 (Pulmonary Function Testing), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/22-3-the-process-of-breathing",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:8.19": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/f18d5fb174826160f664e435a126c47e94f2c576",
+  "width": 600,
+  "height": 440,
+  "credit": "OpenStax Anatomy and Physiology, Figure 8.19 (Bones of the Foot), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/8-4-bones-of-the-lower-limb",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:11.32": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/adeb0a7389faaf57fe6dd39c017a6d25a03e6816",
+  "width": 530,
+  "height": 315,
+  "credit": "OpenStax Anatomy and Physiology, Figure 11.32 (Muscles of the Lower Leg), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:8.16": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/6e59c1693b3349bffa2c27ac7a2e29f889a08edc",
+  "width": 380,
+  "height": 594,
+  "credit": "OpenStax Anatomy and Physiology, Figure 8.16 (Femur and Patella), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/8-4-bones-of-the-lower-limb",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:11.31": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/f93340072bc0a256b93903fcd82275dba8c70774",
+  "width": 520,
+  "height": 724,
+  "credit": "OpenStax Anatomy and Physiology, Figure 11.31 (Thigh Muscles That Move the Femur, Tibia, and Fibula), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:11.23": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/e5ba9b5bb7343a347f55336ebd7a61f3b35b0cdc",
+  "width": 520,
+  "height": 553,
+  "credit": "OpenStax Anatomy and Physiology, Figure 11.23 (Muscles That Move the Humerus), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:8.6": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/b9c3c45f968f9af4e3706ef9ac442d49ea0e4871",
+  "width": 350,
+  "height": 473,
+  "credit": "OpenStax Anatomy and Physiology, Figure 8.6 (Ulna and Radius), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/8-2-bones-of-the-upper-limb",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:8.7": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/541c7cf2586e9daaea40767bbc68011fdb8573b1",
+  "width": 480,
+  "height": 386,
+  "credit": "OpenStax Anatomy and Physiology, Figure 8.7 (Bones of the Wrist and Hand), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/8-2-bones-of-the-upper-limb",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:11.16": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/33fa36d780f23fa5ad21b00e8a38f3ef6ecb5428",
+  "width": 520,
+  "height": 671,
+  "credit": "OpenStax Anatomy and Physiology, Figure 11.16 (Muscles of the Abdomen), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/11-4-axial-muscles-of-the-abdominal-wall-and-thorax",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
  }
 };

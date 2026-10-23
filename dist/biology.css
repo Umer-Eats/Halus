@@ -4,7 +4,6 @@
 :root{--bg:#fcfaf8;--bg-deep:#f1e9e7;--ink:#30191e;--ink-2:#59464b;--muted:#78646a;--red:#c51e3e;--red-hover:#a61330;--red-ink:#ad1835;--red-soft:#f9e9eb;--line:#612a3515;--line-strong:#612a352d;--radius:24px}
 :root[data-theme='dark']{--bg:#140d10;--bg-deep:#0b0709;--surface:#21161a;--surface-2:#291b20;--surface-3:#35252b;--ink:#fcf3f3;--ink-2:#d9c6cd;--muted:#b49aa5;--red:#ef4b68;--red-hover:#ff607b;--red-ink:#ff8ba2;--red-soft:#ef4b6818;--line:#f4b8c514;--line-strong:#f4b8c530}
 body{font-family:var(--font-body);background:var(--bg);line-height:1.6}
-.page-hero h1,.catalog .page-heading h1{font-family:var(--font-editorial);letter-spacing:-.035em}
 .landing{--wrap:min(1280px,calc(100% - 96px))}
 .micro,.eyebrow{font-size:11px;letter-spacing:.08em;font-weight:600}
 .button{font-size:13px;letter-spacing:0;text-transform:none;min-height:48px;box-shadow:none;font-weight:600}
