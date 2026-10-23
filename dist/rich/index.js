@@ -5,4 +5,9 @@ export const RICH_COURSES = {
   'Behavioral Health': () => import('./behavioral-health.js'),
   'Biomedical Equipment Technician': () => import('./biomedical-equipment-technician.js'),
   'Dental Terminology': () => import('./dental-terminology.js'),
+  'Medical Terminology': () => import('./medical-terminology.js'),
+  'Human Growth & Development': () => import('./human-growth-development.js'),
+  'Health Informatics': () => import('./health-informatics.js'),
+  'Nutrition': () => import('./nutrition.js'),
+  'Healthcare Administration': () => import('./healthcare-administration.js'),
 };

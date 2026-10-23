@@ -7,6 +7,7 @@
 // A block is a paragraph string, or {t:'list'|'table'|'callout'|'check'|'example'|'fig'|'w', …}.
 // Correct options are written first and moved to a stable, prompt-dependent position here.
 import { placeFigures } from './figure-places.js';
+import { addSubjectVisuals } from './subject-visuals.js';
 
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const hash = s => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -49,6 +50,7 @@ function lesson(courseName, l) {
 export function course(name, { intro, units }) {
   const built = { rich: true, intro, units: units.map(u => ({ title: u.title, summary: u.summary, lessons: u.lessons.map(l => lesson(name, l)) })) };
   placeFigures(name, built.units.flatMap(u => u.lessons));
+  addSubjectVisuals(name, built.units.flatMap(u => u.lessons));
   return built;
 }
 

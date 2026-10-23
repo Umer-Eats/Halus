@@ -11,7 +11,7 @@ Valus is an independent project and is not affiliated with or endorsed by HOSA. 
 - Password-gated school enrollment, with separate student and instructor passwords.
 - All 64 regular secondary event cards directly in My event, with search, category and format filters.
 - One selected event per student; students and instructors can change or clear it. Selection feeds the teacher roster, event assignments, and the signed-in global event directory.
-- Event pages replace the dashboard sidebar with a right-side toolkit. Rules, Lessons and event-specific tools are Coming soon; each event links to its reviewed official guideline.
+- Event pages replace the dashboard sidebar with a right-side toolkit. Rules pages include local official guideline PDFs; Lessons opens event-specific units, activities, and checkpoints.
 - Three shared orientation lessons, a practice check, account-specific notes, and a preparation checklist.
 - Assignments for an entire chapter or a particular event, plus student responses.
 - Chapter posts, instructor roster management, and progress analytics.
@@ -19,6 +19,14 @@ Valus is an independent project and is not affiliated with or endorsed by HOSA. 
 - Light/dark appearance, reduced-motion support, a live bloodstream hero, and a cellular atlas.
 
 The rankings pages display students and selected events to signed-in members. There are nine displayed tiers, but no live ranked assessments, ranking points, or competitive scores. Event tools are Coming soon. Existing orientation progress is preserved. Assignment types are labels; selecting “Quiz” or “Skill checklist” does not generate a separate assessment engine. See HOSA_EVENT_RESEARCH.md for the source and tool mapping for every event.
+
+## Rich lesson courses
+
+The rich curriculum includes Pharmacology, Pathophysiology, Behavioral Health, Biomedical Equipment Technician, Dental Terminology, Nutrition, Medical Terminology, Health Informatics, Healthcare Administration, and Human Growth & Development. The five newest courses each contain ten lessons with eight multiple-choice questions and a rubric-based written response per lesson. Their topic coverage follows the linked 2026–27 HOSA test plans; the lessons supplement the official references listed in those guidelines.
+
+Lessons are authored in `dist/rich/` and loaded through `dist/rich/index.js`. Shared diagrams, animations, sorting, matching, and sequencing live in `dist/lesson-widgets.js`; subject models live in `dist/lesson-labs.js`. Supplemental textbook figures retain their attribution in the lesson viewer. Activities support touch/click and keyboard input as well as dragging, and animations respect reduced-motion preferences. Checkpoints retain the existing optional practice and instructor-assignment behavior. Written responses use the server-side Valus AI grader.
+
+Run `npm test` for curriculum, grading, and API checks. `scripts/check-rich-ui.mjs` runs an isolated browser check with a synthetic local account; set `PLAYWRIGHT_ENTRY` to the installed Playwright module before running it. It checks all fifty new lesson pages on a mobile viewport and exercises the shared interactive models without using production accounts or AI requests.
 
 ## Run locally
 

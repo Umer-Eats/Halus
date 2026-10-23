@@ -204,11 +204,18 @@ const flip = {
 /* ---------- step through a process ---------- */
 const stepper = {
   label: 'Step through it',
-  render: w => `<div class="lw-stepper ${w.diagram ? 'with-figure' : ''}">${w.diagram ? `<div class="lw-figure">${DIAGRAMS[w.diagram] || ''}</div>` : ''}<div class="lw-step"><div class="lw-dots">${w.steps.map((_, i) => `<button type="button" data-go="${i}" aria-label="Step ${i + 1}">${i + 1}</button>`).join('')}</div><div class="lw-step-text" aria-live="polite"></div><div class="lw-actions"><button type="button" class="text-button" data-prev>← Back</button><button type="button" class="button" data-next>Next →</button></div></div></div>`,
+  render: w => `<div class="lw-stepper ${w.diagram ? 'with-figure' : ''}">${w.diagram ? `<div class="lw-figure">${DIAGRAMS[w.diagram] || ''}</div>` : ''}<div class="lw-step"><div class="lw-dots">${w.steps.map((_, i) => `<button type="button" data-go="${i}" aria-label="Step ${i + 1}">${i + 1}</button>`).join('')}</div><div class="lw-step-text" aria-live="polite"></div><div class="lw-actions"><button type="button" class="button secondary" data-play aria-pressed="false">Play sequence</button><button type="button" class="text-button" data-prev>← Back</button><button type="button" class="button" data-next>Next →</button></div></div></div>`,
   mount(node, w) {
-    let at = 0;
+    let at=0,playing=false,timer=null;
+    const play=node.querySelector('[data-play]');
+    const reduced=()=>typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pause=()=>{playing=false;clearTimeout(timer);play.textContent='Play sequence';play.setAttribute('aria-pressed','false');};
+    const tick=()=>{if(!playing||!node.isConnected||reduced()){pause();return;}if(at===w.steps.length-1){pause();return;}at++;draw();timer=setTimeout(tick,2600);};
+    if(reduced()){play.disabled=true;play.textContent='Use Next to step through';}
+
     const draw = () => {
       const [title, text, partsLit] = w.steps[at];
+      if(!reduced())node.querySelector('.lw-step-text').animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:240,easing:'ease-out'});
       node.querySelector('.lw-step-text').innerHTML = `<span class="eyebrow">Step ${at + 1} of ${w.steps.length}</span><h5>${e(title)}</h5><p>${inline(text)}</p>`;
       node.querySelectorAll('[data-go]').forEach(b => b.classList.toggle('on', Number(b.dataset.go) === at));
       const lit = new Set(partsLit || []);
@@ -217,6 +224,8 @@ const stepper = {
       node.querySelector('[data-next]').textContent = at === w.steps.length - 1 ? 'Start over' : 'Next →';
     };
     node.addEventListener('click', ev => {
+      if(ev.target.closest('[data-play]')){if(playing){pause();return;}if(reduced())return;playing=true;play.textContent='Pause sequence';play.setAttribute('aria-pressed','true');if(at===w.steps.length-1)at=0;draw();timer=setTimeout(tick,2600);return;}
+      pause();
       if (ev.target.closest('[data-next]')) at = at === w.steps.length - 1 ? 0 : at + 1;
       else if (ev.target.closest('[data-prev]')) at = Math.max(0, at - 1);
       else if (ev.target.closest('[data-go]')) at = Number(ev.target.closest('[data-go]').dataset.go);
@@ -293,6 +302,7 @@ export function mountWidgets(root) {
     const w = CONFIG.get(node.dataset.wid);
     if (!w || node.dataset.ready) return;
     node.dataset.ready = '1';
+    CONFIG.delete(node.dataset.wid); // Event listeners now own the config; release the global reference.
     try { W[w.kind].mount(node, w); } catch (error) { console.error('Lesson activity failed', w.kind, error); node.insertAdjacentHTML('beforeend', '<p class="subtle">This activity could not start. Reload the page to try again.</p>'); }
   });
 }

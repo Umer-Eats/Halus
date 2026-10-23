@@ -15,7 +15,7 @@ import { FIGURE_PLACES } from '../dist/rich/figure-places.js';
 import { widgetKinds } from '../dist/lesson-widgets.js';
 import { DIAGRAMS } from '../dist/lesson-diagrams.js';
 
-await loadAllCourses({ view: false });
+await loadAllCourses({ view: true });
 import { coursePage } from '../dist/course-workspace.js';
 
 const communities = loadCommunities([{ id: 'ppchs', name: 'Pines', studentPassword: { env: 'S' }, instructorPassword: { env: 'T' } }]);
@@ -77,7 +77,7 @@ test('the in-lesson checkpoint records student accuracy and grades teacher previ
   assert.equal(preview.status, 200);
   assert.equal(preview.data.recorded, false);
   assert.equal(preview.data.accuracy, 100);
-  const free = await call('POST', url, { as: 'ana', body: { answers: answers(second, 1), response } });
+  const free = await call('POST', url, { as: 'ana', body: { answers: answers(second, second.mcqs.length / 2), response } });
   assert.deepEqual([free.data.recorded, free.data.accuracy, free.data.assignmentId], [true, 75, null]);
   assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.accuracy[second.id], { latest: 75, attempts: 1 });
   assert.equal((await call('POST', '/courses/lessons/nope/checkpoint', { as: 'ana', body: { answers: [0, 0], response } })).status, 404);
@@ -104,10 +104,10 @@ test('teachers assign a lesson checkpoint and every attempt records accuracy', a
   assert.equal((await call('PUT', `/assignments/${a.id}/submission`, { as: 'ana', body: { body: 'text only' } })).status, 400);
   assert.equal((await call('POST', `/assignments/${a.id}/checkpoint`, { as: 'ana', body: { answers: [0], response } })).status, 400);
 
-  // One of two MCQs right (50%) and FRQ 50% gives 50% accuracy; a wrong MCQ no longer blocks submitting.
-  const one = await call('POST', `/assignments/${a.id}/checkpoint`, { as: 'ana', body: { answers: answers(first, 1), response } });
+  // Half the MCQs right (50%) and FRQ 50% gives 50% accuracy; a wrong MCQ does not block submitting.
+  const one = await call('POST', `/assignments/${a.id}/checkpoint`, { as: 'ana', body: { answers: answers(first, first.mcqs.length / 2), response } });
   assert.equal(one.status, 200);
-  assert.deepEqual([one.data.mcqCorrect, one.data.mcqTotal, one.data.frqScore, one.data.accuracy], [1, 2, 50, 50]);
+  assert.deepEqual([one.data.mcqCorrect, one.data.mcqTotal, one.data.frqScore, one.data.accuracy], [first.mcqs.length / 2, first.mcqs.length, 50, 50]);
 
   // Grader outage still records MCQ accuracy.
   grader = async () => { throw new AppError(503, 'Valus AI could not grade this response right now.'); };
@@ -119,7 +119,7 @@ test('teachers assign a lesson checkpoint and every attempt records accuracy', a
 
   const subs = (await call('GET', `/assignments/${a.id}/submissions`, { as: 'teach' })).data.submissions;
   assert.equal(subs.length, 1);
-  assert.deepEqual(subs[0].checkpoint, { accuracy: 100, mcqCorrect: 2, mcqTotal: 2, frqScore: null, attempts: 2 });
+  assert.deepEqual(subs[0].checkpoint, { accuracy: 100, mcqCorrect: first.mcqs.length, mcqTotal: first.mcqs.length, frqScore: null, attempts: 2 });
   assert.equal((await call('GET', '/assignments', { as: 'ana' })).data.assignments.find((x) => x.id === a.id).submitted, true);
   assert.deepEqual((await call('GET', '/courses/progress', { as: 'ana' })).data.accuracy[first.id], { latest: 100, attempts: 2 });
   const ana = (await call('GET', '/students', { as: 'teach' })).data.students.find((s) => s.uid === 'ana');

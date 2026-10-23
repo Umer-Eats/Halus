@@ -1,3 +1,4 @@
+import {SUBJECT_DIAGRAMS} from './subject-diagrams.js';
 // Original schematic diagrams for the interactive models. Elements with data-part are the
 // selectable parts; lessons list each part's name and explanation. Diagrams are teaching
 // schematics, not to scale.
@@ -7,6 +8,7 @@ const arrow = (d, cls = 'arr') => `<path class="${cls}" d="${d}" marker-end="url
 const defs = '<defs><marker id="lw-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arr-head"/></marker></defs>';
 
 export const DIAGRAMS = {
+  ...SUBJECT_DIAGRAMS,
   neuron: svg('0 0 520 220', 'Neuron', `
     <g data-part="dendrite"><path class="branch" d="M72 98L32 58M52 78L18 84M72 122L30 162M50 142L16 136M92 82L84 34M86 56L58 28M94 140L90 192M90 170L64 196"/></g>
     <circle data-part="soma" class="p1" cx="100" cy="110" r="32"/>
