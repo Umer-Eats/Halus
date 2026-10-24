@@ -298,7 +298,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Career research, verified interviews, and a presentation.",
@@ -476,7 +475,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "tests",
-      "video",
       "speech"
     ],
     "summary": "Knowledge test · speech or presentation.",
@@ -634,7 +632,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -650,7 +647,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -666,7 +662,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -696,7 +691,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -712,7 +706,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "tests",
-      "video",
       "speech"
     ],
     "summary": "Knowledge test, printed portfolio, and a personal health presentation.",
@@ -729,7 +722,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Application documents and a live interview; IDEA eligibility applies.",
@@ -746,7 +738,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Application documents and a live employment interview.",
@@ -774,7 +765,6 @@ export const EVENT_DETAILS = {
     "tools": [
       "rules",
       "lessons",
-      "video",
       "speech"
     ],
     "summary": "A prepared speech on the annual HOSA theme.",
@@ -790,7 +780,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "A persuasive research paper and live speech.",
@@ -806,7 +795,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "A prepared speech with an eligibility form upload.",
@@ -823,7 +811,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "tests",
-      "video",
       "speech"
     ],
     "summary": "Knowledge test · speech or presentation.",
@@ -839,7 +826,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -855,7 +841,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "tests",
-      "video",
       "speech"
     ],
     "summary": "Knowledge test · speech or presentation.",
@@ -887,7 +872,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -903,7 +887,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -932,7 +915,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -942,14 +924,12 @@ export const EVENT_DETAILS = {
   "Parliamentary Procedure": {
     "types": [
       "Testing",
-      "Skills",
       "Speech & presentation"
     ],
     "tools": [
       "rules",
       "lessons",
       "tests",
-      "video",
       "mock",
       "speech"
     ],
@@ -967,7 +947,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
@@ -983,7 +962,6 @@ export const EVENT_DETAILS = {
       "rules",
       "lessons",
       "upload",
-      "video",
       "speech"
     ],
     "summary": "Speech or presentation · digital submission.",
