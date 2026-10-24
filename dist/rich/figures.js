@@ -1601,5 +1601,23 @@ export const FIGURES = {
   "source": "https://openstax.org/books/microbiology/pages/16-3-modes-of-disease-transmission",
   "license": "CC BY-NC-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "anatomy-and-physiology:8.15": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/68be4683554df7c8be92cbebe1381bad70a10da1",
+  "width": 480,
+  "height": 224,
+  "credit": "OpenStax Anatomy and Physiology, Figure 8.15 (Male and Female Pelvis), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/8-3-the-pelvic-girdle-and-pelvis",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "anatomy-and-physiology:7.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/2b992922f28d116ef649105fc6d93b2880df5084",
+  "width": 480,
+  "height": 406,
+  "credit": "OpenStax Anatomy and Physiology, Figure 7.4 (Anterior View of Skull), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/7-2-the-skull",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
  }
 };

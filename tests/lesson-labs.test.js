@@ -161,6 +161,26 @@ test('the third ten courses (Health Professions, Emergency Preparedness and Lead
  }
 });
 
+test('the Teamwork and Leadership courses keep the same lesson standard', async () => {
+ await loadAllCourses({view: false});
+ const names = ['Biomedical Debate', 'Community Awareness', 'Creative Problem Solving', 'Forensic Science', 'Health Career Display', 'Health Education', 'HOSA Bowl', 'Medical Innovation', 'Parliamentary Procedure', 'Public Service Announcement', 'Research Poster', 'Health Career Photography', 'Healthy Living', 'Interviewing Skills', 'Job Seeking Skills', 'Organizational Leadership', 'Prepared Speaking', 'Researched Persuasive Writing & Speaking', 'Speaking Skills'];
+ for (const name of names) {
+  const lessons = courseLessons(name);
+  assert.equal(lessons.length, 10, name);
+  for (const lesson of lessons) {
+   assert.equal(lesson.rich, true, name + ' ' + lesson.title);
+   assert.equal(lesson.mcqs.length, 8, lesson.title);
+   assert.ok(lesson.sections.length >= 5 && lesson.sections.length <= 7, lesson.title);
+   assert.ok(lesson.frq.rubric.length >= 3 && lesson.frq.modelAnswer.length > 200, lesson.title);
+   assert.ok(lesson.sources.filter(s => /^https:\/\//.test(s.url || s[1] || '')).length >= 2, lesson.title);
+   assert.match(lesson.sources[0].url || lesson.sources[0][1] || '', /^https:\/\/hosa\.org\/wp-content\/uploads\//, lesson.title);
+   assert.ok(lesson.sections.flatMap(s => s.blocks).filter(b => b.t === 'w').length >= 3, lesson.title);
+   assert.equal(lesson.terms.length, 3, lesson.title);
+   assert.equal(lesson.takeaways.length, 3, lesson.title);
+  }
+ }
+});
+
 test('the next ten Health Professions courses keep the same lesson standard', async () => {
  await loadAllCourses({view: false});
  const names = ['Occupational Therapy', 'Patient Care Technician', 'Personal Care', 'Pharmacy Science', 'Phlebotomy', 'Physical Therapy', 'Physician Assistant - Medical Case Challenge', 'Respiratory Therapy', 'Sports Medicine', 'Surgical Technologist'];

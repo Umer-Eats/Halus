@@ -574,6 +574,31 @@ export const FIGURE_PLACES = {
       [1, AP + '6-5-fractures-bone-repair', '6.20', 'Bones can break in different ways. In an open fracture, the broken bone comes through the skin.', 'Drawings of different kinds of broken bones'],
     ],
   },
+  'Forensic Science': {
+    6: [
+      [2, AP + '8-3-the-pelvic-girdle-and-pelvis', '8.15', 'The pelvis is the most reliable bone for estimating sex. A female pelvis is usually wider, with a broader subpubic angle and a rounder pelvic inlet.', 'Male and female pelvis compared from the front'],
+      [6, AP + '7-2-the-skull', '7.4', 'Front view of the skull. Forensic odontologists compare teeth and jaws, and anthropologists read features of the skull, to help identify remains.', 'Anterior view of the human skull with bones labeled'],
+    ],
+    9: [
+      [1, BIO + '14-2-dna-structure-and-sequencing', '14.7', 'DNA is a double helix with a sugar-phosphate backbone outside and paired bases inside: A pairs with T, and G pairs with C. Forensic DNA profiles compare short repeated stretches of this code.', 'DNA double helix with base pairs'],
+    ],
+  },
+  'HOSA Bowl': {
+    4: [
+      [1, AP + '1-6-anatomical-terminology', '1.13', 'Directional terms describe where structures are in relation to each other, using the body in anatomical position.', 'Human figure with directional terms such as superior, inferior, medial and lateral'],
+      [4, AP + '19-1-heart-anatomy', '19.9', 'Inside the heart: blood moves from the atria to the ventricles through valves, and the left ventricle pumps blood into the aorta.', 'Internal structures of the heart with chambers and valves labeled'],
+    ],
+  },
+  'Healthy Living': {
+    8: [
+      [2, AP + '19-1-heart-anatomy', '19.16', 'Atherosclerosis narrows coronary arteries with plaque, reducing blood flow to the heart muscle. Not smoking, an active life and a heart-healthy diet lower this risk.', 'Coronary artery narrowed by atherosclerotic plaque'],
+    ],
+  },
+  'Public Service Announcement': {
+    2: [
+      [1, AP + '13-2-the-central-nervous-system', '13.7', 'The lobes of the cerebral cortex handle different jobs, such as planning, movement, sensation, hearing, memory and vision.', 'Lobes of the cerebral cortex: frontal, parietal, temporal and occipital'],
+    ],
+  },
 };
 
 /** Key used in figures.js for a book page and figure number. */
