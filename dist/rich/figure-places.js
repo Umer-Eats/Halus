@@ -497,6 +497,83 @@ export const FIGURE_PLACES = {
       [1, AP + '19-1-heart-anatomy', '19.15', 'Coronary circulation: the arteries bypassed in coronary artery bypass grafting.', 'Coronary arteries and veins'],
     ],
   },
+  'Veterinary Science': {
+    3: [
+      [1, BIO + '34-1-digestive-systems', '34.8', 'Ruminants such as goats and cattle have a four-chambered stomach—rumen, reticulum, omasum and abomasum—where microbes break down plant fiber before true digestion.', 'Digestive system of a goat showing the four stomach chambers'],
+      [1, BIO + '34-1-digestive-systems', '34.7', 'Birds have a crop that stores food and a muscular gizzard that grinds it, since they have no teeth.', 'Avian digestive system with crop, proventriculus and gizzard', 'end'],
+    ],
+    5: [
+      [4, MICRO + '16-3-modes-of-disease-transmission', '16.13', 'Arthropod vectors such as ticks, fleas and mosquitoes carry pathogens between animals and people, which is why parasite control protects both pets and families.', 'Table of common arthropod vectors and the pathogens they carry'],
+    ],
+  },
+  'CERT Skills': {
+    4: [
+      [1, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.4', 'The upper airway. In an unresponsive person, the tongue can fall back and block it, which is why CERT opens the airway with a jaw thrust.', 'Upper airway showing the nasal cavity, pharynx and larynx'],
+    ],
+    5: [
+      [1, ...HEMOSTASIS.slice(0, 2), 'The body’s own bleeding control—vessel spasm, a platelet plug and a clot—cannot keep up with severe bleeding, so rescuers apply direct pressure or a tourniquet.', HEMOSTASIS[3], 'end'],
+    ],
+    8: [
+      [1, ...SKIN.slice(0, 2), 'Burn depth depends on how many skin layers are damaged: superficial burns stay in the epidermis, while deeper burns reach the dermis and hypodermis.', SKIN[3]],
+      [3, AP + '6-5-fractures-bone-repair', '6.20', 'Types of fractures. In the field, treat any painful, swollen or deformed injury as a fracture and splint it in the position found.', 'Illustrations of closed, open, transverse, oblique, spiral, comminuted, impacted and greenstick fractures'],
+    ],
+  },
+  'CPR/First Aid': {
+    3: [
+      [1, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.26', 'An automated external defibrillator analyzes the heart rhythm and delivers a shock only when it detects a shockable rhythm such as ventricular fibrillation.', 'Automated external defibrillator with pads'],
+    ],
+    5: [
+      [1, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.4', 'The upper airway. A piece of food lodged in the larynx or trachea can block airflow completely, causing severe choking.', 'Upper airway showing the nasal cavity, pharynx and larynx'],
+    ],
+    6: [
+      [1, ...HEMOSTASIS.slice(0, 2), 'The body slows bleeding with vessel spasm, a platelet plug and a clot. Severe bleeding overwhelms these steps, so firm direct pressure and tourniquets are needed.', HEMOSTASIS[3], 'end'],
+    ],
+    7: [
+      [1, AP + '6-5-fractures-bone-repair', '6.20', 'Types of fractures. An open fracture breaks through the skin; all suspected fractures are splinted in the position found.', 'Illustrations of closed, open, transverse, oblique, spiral, comminuted, impacted and greenstick fractures'],
+    ],
+    8: [
+      [1, ...SKIN.slice(0, 2), 'Burn depth depends on the skin layers involved: superficial burns affect the epidermis, partial-thickness burns reach the dermis and full-thickness burns destroy all layers.', SKIN[3], 'end'],
+    ],
+    10: [
+      [2, ...GLUCOSE.slice(0, 2), 'Insulin lowers blood glucose and glucagon raises it. Too much insulin or too little food can cause low blood sugar, which is treated with fast-acting sugar if the person can swallow.', GLUCOSE[3]],
+    ],
+  },
+  'Emergency Medical Technician': {
+    4: [
+      [1, AP + '22-1-organs-and-structures-of-the-respiratory-system', '22.2', 'The major respiratory structures. Airway adjuncts, suction and ventilation keep the path from the mouth and nose to the alveoli open.', 'Major respiratory structures from the nasal cavity to the lungs'],
+    ],
+    5: [
+      [1, AP + '19-1-heart-anatomy', '19.15', 'The coronary arteries supply the heart muscle. A blocked coronary artery causes acute myocardial infarction.', 'Coronary arteries and veins on the surface of the heart'],
+      [3, AP + '19-2-cardiac-muscle-and-electrical-activity', '19.18', 'The heart’s conduction system. When its electrical activity becomes chaotic, as in ventricular fibrillation, an AED shock can reset the rhythm.', 'Conduction system of the heart from the SA node to the Purkinje fibers', 'end'],
+    ],
+    6: [
+      [1, ...HEMOSTASIS.slice(0, 2), 'Hemostasis—vessel spasm, a platelet plug and coagulation—controls minor bleeding. Major bleeding needs direct pressure, a pressure dressing or a tourniquet.', HEMOSTASIS[3], 'end'],
+      [5, ...SKIN.slice(0, 2), 'Skin layers determine burn depth: superficial (epidermis), partial-thickness (into the dermis) and full-thickness (through all layers).', SKIN[3]],
+    ],
+    7: [
+      [1, AP + '6-5-fractures-bone-repair', '6.20', 'Types of fractures, including open, comminuted and greenstick. A Colles’ fracture is a break of the distal radius.', 'Illustrations of closed, open, transverse, oblique, spiral, comminuted, impacted and greenstick fractures'],
+    ],
+    8: [
+      [1, ...ASTHMA.slice(0, 2), 'In asthma, inflamed bronchioles narrow, causing wheezing and prolonged exhalation; bronchodilator inhalers relax the smooth muscle.', ASTHMA[3]],
+      [2, ...GLUCOSE.slice(0, 2), 'Insulin and glucagon regulate blood glucose. Hypoglycemia develops quickly and is treated with oral glucose if the patient can swallow.', GLUCOSE[3], 'end'],
+    ],
+  },
+  'Epidemiology': {
+    1: [
+      [3, MICRO + '16-2-tracking-infectious-diseases', '16.5', 'John Snow’s 1854 map of cholera deaths clustered around the Broad Street pump—an early example of descriptive epidemiology by place.', 'Photo of John Snow and his map of cholera deaths in London'],
+    ],
+    5: [
+      [3, MICRO + '16-2-tracking-infectious-diseases', '16.6', 'Epidemic curves: a point-source outbreak rises and falls sharply, while a propagated outbreak shows successive peaks as the disease spreads from person to person.', 'Graphs of disease incidence for point-source and propagated outbreaks'],
+    ],
+    6: [
+      [1, MICRO + '16-3-modes-of-disease-transmission', '16.10', 'Fomites—objects such as doorknobs, towels and needles—can carry pathogens from one person to another by indirect contact.', 'Photos of a hand on a doorknob, a towel on a hook and a syringe'],
+    ],
+  },
+  'Life Support Skills': {
+    7: [
+      [1, AP + '6-5-fractures-bone-repair', '6.20', 'Bones can break in different ways. In an open fracture, the broken bone comes through the skin.', 'Drawings of different kinds of broken bones'],
+    ],
+  },
 };
 
 /** Key used in figures.js for a book page and figure number. */

@@ -1538,5 +1538,68 @@ export const FIGURES = {
   "source": "https://openstax.org/books/anatomy-and-physiology/pages/11-4-axial-muscles-of-the-abdominal-wall-and-thorax",
   "license": "CC BY 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "biology-2e:34.8": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/879aab75f67cd9611ce39e3f860c67c9b9c27695",
+  "width": 520,
+  "height": 362,
+  "credit": "OpenStax Biology 2e, Figure 34.8, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/34-1-digestive-systems",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "biology-2e:34.7": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/bc0d0f8e6d974040bc64fb8a3c297bc507a0364d",
+  "width": 280,
+  "height": 467,
+  "credit": "OpenStax Biology 2e, Figure 34.7, OpenStax / Rice University",
+  "source": "https://openstax.org/books/biology-2e/pages/34-1-digestive-systems",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:16.13": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/4b804cc111de176756b245d4ee903ae49b434d3c",
+  "width": 1300,
+  "height": 1600,
+  "credit": "OpenStax Microbiology, Figure 16.13, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/16-3-modes-of-disease-transmission",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "anatomy-and-physiology:22.4": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/dbbae187749a6cc16b96e3221925513794698cf8",
+  "width": 450,
+  "height": 311,
+  "credit": "OpenStax Anatomy and Physiology, Figure 22.4 (Upper Airway), OpenStax / Rice University",
+  "source": "https://openstax.org/books/anatomy-and-physiology/pages/22-1-organs-and-structures-of-the-respiratory-system",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+ },
+ "microbiology:16.5": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/3139f41d90206003805de887d6e07e66c0bbc55c",
+  "width": 1100,
+  "height": 663,
+  "credit": "OpenStax Microbiology, Figure 16.5, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/16-2-tracking-infectious-diseases",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:16.6": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/7f533f34af6c04c4d16a5f3ff48e2e7f83229b15",
+  "width": 1304,
+  "height": 628,
+  "credit": "OpenStax Microbiology, Figure 16.6, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/16-2-tracking-infectious-diseases",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+ },
+ "microbiology:16.10": {
+  "url": "https://openstax.org/apps/archive/20260604.144757/resources/d93e008b75c49532ccf7c56b30ffaca748ce6122",
+  "width": 1100,
+  "height": 237,
+  "credit": "OpenStax Microbiology, Figure 16.10, OpenStax / Rice University",
+  "source": "https://openstax.org/books/microbiology/pages/16-3-modes-of-disease-transmission",
+  "license": "CC BY-NC-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
  }
 };

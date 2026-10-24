@@ -5,7 +5,7 @@ export const TOOL_LABELS = {
   "lessons": "Lessons",
   "tests": "Practice Tests",
   "upload": "Online Upload Grader",
-  "video": "Video Grader",
+  "video": "Skills Video Grader",
   "mock": "Online Mock Procedure",
   "speech": "Speech Grader"
 };

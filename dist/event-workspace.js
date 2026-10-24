@@ -16,7 +16,7 @@ export function catalogCards(options={}) {
     return `<article class="event-card focus-card ${selected?'is-selected':''}">
       ${options.canSelect?`<label class="event-pick" title="${selected?'Clear selected event':'Make this my event'}"><input type="checkbox" data-event-pick="${escape(e.name)}" aria-label="${selected?'Clear':'Select'} ${escape(e.name)} as my event" ${selected?'checked':''} ${options.saving?'disabled':''}><span class="sr-only">My event</span></label>`:''}
       <span class="micro">${escape(e.category)}</span>
-      <a class="event-card-link" href="${eventHref(e.name)}"><h3>${escape(e.name)}</h3><p>${escape(detail.summary)}</p><span class="event-card-open">Explore event <span aria-hidden="true">↗</span></span></a>
+      <a class="event-card-link" href="${eventHref(e.name)}"><h3>${escape(e.name)}</h3><p>${escape(detail.summary)}</p><span class="event-card-open">Explore event</span></a>
       <div class="event-type-tags">${detail.types.map(t=>`<span>${escape(t)}</span>`).join('')}${selected?'<span class="selected-label">My event</span>':''}</div>
       ${e.special?'<small class="subtle">IDEA eligibility applies</small>':''}
     </article>`;
@@ -42,10 +42,10 @@ export function eventWorkspace({event,detail,tool,valid,lessonId}, {brand,theme,
     <header class="event-focus-header">${brand}<h1 class="event-focus-title">${escape(event.name)}</h1><div class="event-focus-actions"><a class="text-button" href="${teacher?'#/students':'#/my-event'}">← ${teacher?'Back to students':'All my events'}</a>${theme}</div></header>
     <div class="event-focus-layout">
       <main id="main" class="event-focus-main" tabindex="-1">
-        ${valid&&tool==='rules'?rulesPage(event.name):valid&&tool==='lessons'?coursePage(event.name,lessonId,courseProgress,teacher):`<section class="event-coming-soon" aria-labelledby="tool-title"><span class="eyebrow">YOUR EVENT TOOLKIT</span><h2 id="tool-title">${escape(label)}</h2><div class="coming-soon-mark" aria-hidden="true">↗</div><h3>${valid?'Coming soon.':'Choose an available tool.'}</h3><p>${valid?'A little room for what comes next. This section is being prepared.':'Use the event navigation to continue.'}</p></section>`}
+        ${valid&&tool==='rules'?rulesPage(event.name):valid&&tool==='lessons'?coursePage(event.name,lessonId,courseProgress,teacher):`<section class="event-coming-soon" aria-labelledby="tool-title"><span class="eyebrow">YOUR EVENT TOOLKIT</span><h2 id="tool-title">${escape(label)}</h2><h3>${valid?'Coming soon.':'Choose an available tool.'}</h3><p>${valid?'A little room for what comes next. This section is being prepared.':'Use the event navigation to continue.'}</p></section>`}
         <p class="event-source">Tool selection is based on the <a href="${escape(detail.source)}" target="_blank" rel="noreferrer">official HOSA guidelines ↗</a>. State requirements may vary. ${escape(detail.note||'')}</p>
       </main>
-      <aside class="event-tools"><span class="eyebrow">EVENT SPACE</span><nav aria-label="Event tools">${detail.tools.map((key,i)=>`<a href="${eventHref(event.name,key)}" ${key===tool?'aria-current="page"':''}><span class="tool-number">${String(i+1).padStart(2,'0')}</span><span>${TOOL_LABELS[key]}</span><span aria-hidden="true">↗</span></a>`).join('')}</nav><p>One focus.<br><span>Every possibility.</span></p></aside>
+      <aside class="event-tools"><span class="eyebrow">EVENT SPACE</span><nav aria-label="Event tools">${detail.tools.map((key,i)=>`<a href="${eventHref(event.name,key)}" ${key===tool?'aria-current="page"':''}><span class="tool-number">${String(i+1).padStart(2,'0')}</span><span>${TOOL_LABELS[key]}</span></a>`).join('')}</nav><p>One focus.<br><span>Every possibility.</span></p></aside>
     </div>
   </div>`;
 }

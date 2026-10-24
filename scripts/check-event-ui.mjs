@@ -78,9 +78,9 @@ try{
  await page.getByRole('heading',{name:'Students & events'}).waitFor();
  assert.match(await page.locator('.rank-directory').innerText(),/Healthy Living/);
  await page.evaluate(()=>{window.becomeTeacher();location.hash='/students';});
- await page.getByRole('link',{name:'Healthy Living ↗'}).waitFor();
+ await page.getByRole('link',{name:'Healthy Living'}).waitFor();
  await page.setViewportSize({width:1440,height:1000});
- await page.getByRole('link',{name:'Healthy Living ↗'}).click();
+ await page.getByRole('link',{name:'Healthy Living'}).click();
  await page.locator('.event-tools').waitFor();
  assert.ok((await page.locator('.event-focus-title').innerText()).trim());
  assert.equal(await page.getByRole('link',{name:/Online Upload Grader/}).count(),0);
