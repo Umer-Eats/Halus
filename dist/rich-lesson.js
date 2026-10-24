@@ -2,10 +2,11 @@
 // inside the section they teach, plus quick checks and worked examples.
 import {renderWidget, mountWidgets, e, inline} from './lesson-widgets.js';
 import {FIGURES} from './rich/figures.js';
+import {conceptMap} from './visual-studio.js';
 
 const CALLOUT = {exam: 'On the test', safety: 'Safety first', clinical: 'In practice', remember: 'Remember', mistake: 'Common mistake', history: 'History'};
 
-function block(b) {
+function block(b, section) {
   if (typeof b === 'string') return `<p>${inline(b)}</p>`;
   switch (b.t) {
     case 'list': { const tag = b.ordered ? 'ol' : 'ul'; return `${b.title ? `<p class="lesson-list-title">${inline(b.title)}</p>` : ''}<${tag} class="lesson-list">${b.items.map(i => `<li>${inline(i)}</li>`).join('')}</${tag}>`; }
@@ -14,7 +15,7 @@ function block(b) {
     case 'check': return `<form class="quick-check" data-quick="${b.answer}"><span class="eyebrow">Quick check</span><p class="qc-q">${inline(b.q)}</p>${b.options.map((o, i) => `<label class="mcq-option"><input type="radio" name="qc" value="${i}"><span>${inline(o)}</span></label>`).join('')}<div class="qc-foot"><button type="submit" class="button secondary">Check</button><p class="qc-why" aria-live="polite" data-why="${e(b.why)}"></p></div></form>`;
     case 'example': return `<section class="worked" data-worked><span class="eyebrow">Worked example</span><h4>${inline(b.title || 'Try it')}</h4><p>${inline(b.prompt)}</p><ol class="worked-steps">${b.steps.map(s => `<li hidden>${inline(s)}</li>`).join('')}</ol>${b.answer ? `<p class="worked-answer" hidden><strong>Answer:</strong> ${inline(b.answer)}</p>` : ''}<button type="button" class="button secondary" data-next-step>Show the first step</button></section>`;
     case 'fig': { const f = FIGURES[b.file]; if (!f) return ''; return `<figure class="lesson-media lesson-fig"><button type="button" class="fig-zoom" data-zoom aria-label="Enlarge figure: ${e(b.alt)}"><img src="${e(f.url)}" alt="${e(b.alt)}" loading="lazy" referrerpolicy="no-referrer"${f.width ? ` style="aspect-ratio:${f.width}/${f.height}"` : ''}></button><figcaption>${inline(b.caption)}<span class="credit">Image: ${e(f.credit)} · <a href="${e(f.source)}" target="_blank" rel="noreferrer">Source ↗</a> · <a href="${e(f.licenseUrl || f.source)}" target="_blank" rel="noreferrer">${e(f.license)}</a></span></figcaption></figure>`; }
-    case 'w': return renderWidget(b);
+    case 'w': return renderWidget({...b, studyNotes: section ? {title:section.title, paragraphs:section.blocks.filter(x=>typeof x==='string').slice(0,3)} : null});
     default: return '';
   }
 }
@@ -24,7 +25,8 @@ export function richLessonBody(lesson) {
   const toc = lesson.sections.map((s, i) => `<li><button type="button" class="text-button" data-jump="${i}">${e(s.title)}</button></li>`).join('');
   return `${lesson.hook ? `<section class="lesson-hook"><span class="eyebrow">Start here</span><p>${inline(lesson.hook)}</p></section>` : ''}
   <div class="lesson-intro-grid"><section class="course-card objectives"><h3>What you’ll be able to do</h3><ul>${lesson.objectives.map(o => `<li>${inline(o)}</li>`).join('')}</ul></section><nav class="course-card lesson-toc" aria-label="In this lesson"><h3>In this lesson</h3><ol>${toc}<li><button type="button" class="text-button" data-jump="checkpoint">Lesson checkpoint</button></li></ol></nav></div>
-  <div class="lesson-prose rich">${lesson.sections.map((s, i) => `<section class="lesson-section" data-section="${i}"><h3><span class="section-num">${String(i + 1).padStart(2, '0')}</span>${e(s.title)}</h3>${s.blocks.map(block).join('')}</section>`).join('')}</div>
+  ${renderWidget(conceptMap(lesson))}
+  <div class="lesson-prose rich">${lesson.sections.map((s, i) => `<section class="lesson-section" data-section="${i}"><h3><span class="section-num">${String(i + 1).padStart(2, '0')}</span>${e(s.title)}</h3>${s.blocks.map(b=>block(b,s)).join('')}</section>`).join('')}</div>
   ${lesson.takeaways.length ? `<section class="course-card takeaways"><span class="eyebrow">Key takeaways</span><ul>${lesson.takeaways.map(t => `<li>${inline(t)}</li>`).join('')}</ul></section>` : ''}
   ${lesson.terms.length ? `<section class="course-card terms"><span class="eyebrow">Key terms</span><dl>${lesson.terms.map(([t, d]) => `<div><dt>${inline(t)}</dt><dd>${inline(d)}</dd></div>`).join('')}</dl></section>` : ''}`;
 }

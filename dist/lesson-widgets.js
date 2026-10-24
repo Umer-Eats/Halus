@@ -5,6 +5,7 @@ import {SIMS} from './lesson-sims.js';
 import {SUBJECT_LABS} from './lesson-labs.js';
 import {SCIENCE_LABS} from './lesson-science-labs.js';
 import {SKILL_LABS} from './lesson-skill-labs.js';
+import {CONCEPT_MAP, mountVisualStudio} from './visual-studio.js';
 import {dragify, snapshot, glide, under} from './lesson-drag.js';
 
 export const e = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -20,7 +21,7 @@ const label = {
     const parts = new Map(w.parts.map(([id, name, detail]) => [id, {name, detail}]));
     const detail = node.querySelector('.lw-detail');
     let quiz = null, advancing = false, quizTimer;
-    const light = id => { node.querySelectorAll('[data-part]').forEach(p => p.classList.toggle('hl', p.dataset.part === id)); node.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('on', b.dataset.pick === id)); };
+    const light = id => { node.querySelectorAll('[data-part]').forEach(p => p.classList.toggle('hl', p.dataset.part === id)); node.querySelectorAll('[data-pick]').forEach(b => { b.classList.toggle('on', b.dataset.pick === id); b.setAttribute('aria-pressed',String(b.dataset.pick === id)); }); };
     const show = id => { const p = parts.get(id); if (!p) return; light(id); detail.innerHTML = `<h5>${e(p.name)}</h5><p>${inline(p.detail)}</p>`; };
     const ask = () => {
       if (!quiz.order.length) { detail.innerHTML = `<h5>Quiz complete</h5><p>You found ${quiz.score} of ${parts.size} on the first try.</p><button type="button" class="button secondary" data-restart>Try again</button>`; light(null); return; }
@@ -37,7 +38,7 @@ const label = {
     node.addEventListener('click', ev => {
       const mode = ev.target.closest('[data-mode]');
       if (mode) { clearTimeout(quizTimer); advancing=false;
-        node.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b === mode));
+        node.querySelectorAll('[data-mode]').forEach(b => { b.classList.toggle('on', b === mode); b.setAttribute('aria-pressed',String(b===mode)); });
         node.querySelector('.lw-parts').hidden = mode.dataset.mode === 'quiz';
         quiz = mode.dataset.mode === 'quiz' ? {order: shuffle([...parts.keys()]), score: 0} : null;
         light(null);
@@ -48,7 +49,8 @@ const label = {
       const pick = ev.target.closest('[data-pick]') || ev.target.closest('[data-part]');
       if (pick) choose(pick.dataset.pick || pick.dataset.part);
     });
-    node.querySelectorAll('svg [data-part]').forEach(p => { p.setAttribute('tabindex', '0'); p.setAttribute('role', 'button'); p.setAttribute('aria-label', parts.get(p.dataset.part)?.name || p.dataset.part); p.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); choose(p.dataset.part); } }); });
+    node.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode==='explore')));
+    node.querySelectorAll('svg [data-part]').forEach(p => { p.setAttribute('tabindex', '0'); p.setAttribute('role', 'button'); p.setAttribute('aria-label', parts.get(p.dataset.part)?.name || p.dataset.part); p.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); p.dispatchEvent(new MouseEvent('click',{bubbles:true})); } }); });
   },
 };
 
@@ -286,7 +288,7 @@ const wordbuild = {
   },
 };
 
-const W = {label, sort, match, order, flip, stepper, case: scenario, wordbuild, ...SIMS, ...SUBJECT_LABS, ...SCIENCE_LABS, ...SKILL_LABS};
+const W = {label, sort, match, order, flip, stepper, case: scenario, wordbuild, conceptmap: CONCEPT_MAP, ...SIMS, ...SUBJECT_LABS, ...SCIENCE_LABS, ...SKILL_LABS};
 
 let seq = 0;
 const CONFIG = new Map();
@@ -305,7 +307,7 @@ export function mountWidgets(root) {
     if (!w || node.dataset.ready) return;
     node.dataset.ready = '1';
     CONFIG.delete(node.dataset.wid); // Event listeners now own the config; release the global reference.
-    try { W[w.kind].mount(node, w); } catch (error) { console.error('Lesson activity failed', w.kind, error); node.insertAdjacentHTML('beforeend', '<p class="subtle">This activity could not start. Reload the page to try again.</p>'); }
+    try { W[w.kind].mount(node, w); mountVisualStudio(node, w); } catch (error) { console.error('Lesson activity failed', w.kind, error); node.insertAdjacentHTML('beforeend', '<p class="subtle">This activity could not start. Reload the page to try again.</p>'); }
   });
 }
 export const widgetKinds = () => Object.keys(W);
